@@ -84,6 +84,7 @@ const SpaceScreen = () => {
         console.log(`getMac =>${MyMac}`)
     }
     const setConfig = async () => {
+        //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
         let superObj = {
             "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
             "ServiceID": {
