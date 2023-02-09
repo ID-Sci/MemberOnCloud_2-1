@@ -1,0 +1,23 @@
+[
+    {"endpoint": {
+        "WebService": "",
+        "ServiceID": {
+            "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
+            "ETransaction": "{167f0c96-86fd-488f-94d1-cc3169d60b1a}",
+            "DeliveryRequest": "{a054c25a-b1bc-4359-927f-c6b4c817995e}",
+            "DeliveryService": "{2ebf806a-0903-4cc6-afe3-8fa22d29c46c}",
+            "CheckPrice": "{8298a46f-1c97-4ffd-9780-efb749ee8b9b}",
+            "QueueBuster": "{60b9aae0-7b15-4110-9514-ed687d4439c5}",
+            "DeliveryMonitor": "{9c88e551-cb87-4281-be45-6e10a6a79b85}",
+            "VanSales": "{4c6be9a1-8692-436e-89d0-291aa876b559}",
+            "WebBasket": "{d4b587e8-2a95-4c23-adc9-10cd0c72fbb3}",
+            "MemberDeveloper": "{44fa3ed0-dc72-4b27-9c60-cf2a8532a019}",
+            "WebBasketUsers": "{c2131f0b-f20b-4e1f-9403-2b1dc2787839}",
+            "MemberUsers": "{622AA43A-7822-48FD-AC49-BDB400FFC3FA}",
+            "QrPayment": "{5fdd2cd8-7a6f-4d7d-abec-263db6b0e78b}"
+        },
+        "Mac": "",
+        "Username": "",
+        "Password": ""}
+    }
+]
