@@ -87,7 +87,7 @@ const SpaceScreen = () => {
     const setConfig = async () => {
         //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
         let superObj = {
-            "WebService": "http://deverp.businessplus.co.th:8907/Member/BplusErpDvSvrIIS.dll",
+            "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
             "ServiceID": {
                 "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
                 "ETransaction": "{167f0c96-86fd-488f-94d1-cc3169d60b1a}",
