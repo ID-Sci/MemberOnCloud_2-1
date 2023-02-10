@@ -25,81 +25,62 @@ import CurrencyInput from 'react-native-currency-input';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default FlatListNewproduct = ({ route }) => {
+export default FlatListProductScreen = ({ route }) => {
     const navigation = useNavigation();
     return (route &&
         (
-            <View
+            <ScrollView
+                style={{
+                    width: deviceWidth,
+                    height: deviceHeight * 0.9
+                }}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
             >
                 <View style={{
                     alignItems: 'center',
+                    padding: deviceWidth * 0.05,
                     justifyContent: 'space-between',
                     flexDirection: 'row',
-                    paddingLeft: deviceWidth * 0.05,
-                    paddingRight: deviceWidth * 0.05,
-                    paddingBottom: deviceWidth * 0.05
+                    flexWrap: 'wrap',
                 }}>
-                    <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
-                        สินค้าใหม่
-                    </Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('Newproduct', { name:'สินค้าใหม่',route: route })}
-                    >
-                        <Text style={{
-                            fontSize: FontSize.medium,
-                        }}
-                        >
-                            ดูเพิ่มเติม {`>>`}
-                        </Text>
-                    </TouchableOpacity>
-
-                </View>
-                <ScrollView
-                    paddingBottom={deviceWidth * 0.05}
-                    horizontal={true}
-                    contentContainerStyle={{ paddingHorizontal: 20 }}
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
-                >
                     {route.map((item, index) => {
                         return (index < 10 &&
                             <>
-                                <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
+                                <View style={{ padding: deviceWidth * 0.01, }}>
                                     <TouchableOpacity style={{
                                         backgroundColor: '#fff', alignItems: 'center',
                                         justifyContent: 'center',
-                                        height: deviceWidth * 0.5,
-                                        width: deviceWidth * 0.5,
+                                        width: deviceWidth * 0.42,
                                         borderRadius: deviceWidth * 0.05,
                                     }}
                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
-
-                                        {item.IMAGE64 == "" ? <Image
+                                        <View
                                             style={{
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                height: deviceWidth * 0.2,
-                                                width: deviceWidth * 0.2,
-                                            }}
-                                            source={require('../img/newproduct.png')}
-                                        /> : <Image
-                                            style={{
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                height: deviceWidth * 0.2,
-                                                width: deviceWidth * 0.2,
-                                            }}
-                                            source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
-                                        />}
+                                                height: deviceHeight * 0.2
+                                            }}>
+                                            {item.IMAGE64 == "" ? <Image
+                                                style={{
+                                                    shadowColor: '#000',
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.8,
+                                                    shadowRadius: 2,
+                                                    height: deviceWidth * 0.2,
+                                                    width: deviceWidth * 0.3,
+                                                }}
+                                                source={require('../img/newproduct.png')}
+                                            /> : <Image
+                                                style={{
+                                                    shadowColor: '#000',
+                                                    shadowOffset: { width: 0, height: 2 },
+                                                    shadowOpacity: 0.8,
+                                                    shadowRadius: 2,
+                                                    height: deviceHeight * 0.2,
+                                                    width: deviceWidth * 0.3,
+                                                }}
+                                                source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
+                                            />}
+                                        </View>
                                         <View
                                             style={{
 
@@ -144,7 +125,13 @@ export default FlatListNewproduct = ({ route }) => {
                                                     {item.UTQ_NAME}
                                                 </Text>
                                             </View>
+
+
+
                                         </View>
+
+
+
 
 
                                     </TouchableOpacity>
@@ -153,8 +140,9 @@ export default FlatListNewproduct = ({ route }) => {
                         )
                     })}
 
-                </ScrollView>
-            </View>)
+
+                </View>
+            </ScrollView>)
     )
 }
 

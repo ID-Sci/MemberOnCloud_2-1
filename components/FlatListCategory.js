@@ -34,7 +34,7 @@ export default FlatListCategory = ({ route }) => {
             horizontal={true}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false} >
-            {route.map((item) => {
+            {route.map((item,index) => {
                 return (
                     <>
                         <View style={{ paddingRight: deviceWidth * 0.015, paddingLeft: deviceWidth * 0.015 }}>

@@ -26,7 +26,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 export default FlatListPromotion = ({ route }) => {
-
+    const navigation = useNavigation();
     return (route &&
         (
             <View
@@ -48,7 +48,7 @@ export default FlatListPromotion = ({ route }) => {
                         กิจกรรม/ประชาสัมพันธ์
                     </Text>
                     <TouchableOpacity
-                        onPress={() => console.log(route[0])}
+                        onPress={() => navigation.navigate('ShowTemppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: route })}
                     >
                         <Text style={{
                             fontSize: FontSize.medium,
@@ -66,8 +66,8 @@ export default FlatListPromotion = ({ route }) => {
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
-                    {route.map((item) => {
-                        return (
+                    {route.map((item, index) => {
+                        return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
                                     <TouchableOpacity style={{
@@ -76,7 +76,7 @@ export default FlatListPromotion = ({ route }) => {
                                         borderRadius: deviceWidth * 0.05,
                                         width: deviceWidth * 0.8,
                                     }}
-                                        onPress={() => console.log(item.SHWC_GOODS)}>
+                                        onPress={() => navigation.navigate('Temppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: item })}>
 
                                         <Image
                                             style={{

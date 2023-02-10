@@ -1,6 +1,6 @@
 // const backgroundColor = "#03A9F4";
 
-const backgroundColor = "#E6EBFF";
+const backgroundColor = "#F1F1F1";
 const backgroundColorSecondary = "#FCFCFC";
 const backgroundLoginColor = "#03A9F4";
 const backgroundLoginColorSecondary = "#FCFCFC";
@@ -13,7 +13,7 @@ export default {
   lightPrimiryColor: "#80d6ff",
   darkPrimiryColor: "#0077c2",
   fontColor: "#474040",
-  buttonTextColor:'#ffffff',
+  buttonTextColor: '#ffffff',
   fontColor2: "#FCFCFC",
   fontColorSecondary: "#B5B7C0",
   borderColor: "#B5B7C0",
@@ -28,8 +28,8 @@ export default {
   buttonColorSecondary: "#448AFF",
   loadingColor: "#f50052",
   // backgroundColor: "#F1F1F1",
-  headerColor: "#E86C2C",
+  headerColor: "#4a934a",
   headerColor2: "#E8995E",
   alert: "rgba(255,0,0,0.8)",
-   menuButton : "rgba(2, 136, 209, 0.7)"
+  menuButton: "#5cb85c"
 };

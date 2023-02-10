@@ -26,7 +26,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 export default FlatListPromotion = ({ route }) => {
-
+    const navigation = useNavigation();
     return (route &&
         (
             <View
@@ -47,17 +47,18 @@ export default FlatListPromotion = ({ route }) => {
                         }}>
                         โปรโมชั่นแนะนำ
                     </Text>
+
                     <TouchableOpacity
-                     onPress={() => console.log(route[0])}
+                        onPress={() => navigation.navigate('ShowTemppage', { name:'โปรโมชั่นแนะนำ', route: route })}
                     >
-                    <Text style={{
-                        fontSize: FontSize.medium,
-                    }}
-                    >
-                        ดูเพิ่มเติม {`>>`}
-                    </Text>
+                        <Text style={{
+                            fontSize: FontSize.medium,
+                        }}
+                        >
+                            ดูเพิ่มเติม {`>>`}
+                        </Text>
                     </TouchableOpacity>
-                 
+
                 </View>
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
@@ -66,8 +67,8 @@ export default FlatListPromotion = ({ route }) => {
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
-                    {route.map((item) => {
-                        return (
+                    {route.map((item, index) => {
+                        return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
                                     <TouchableOpacity style={{
@@ -77,7 +78,7 @@ export default FlatListPromotion = ({ route }) => {
                                         width: deviceWidth * 0.8,
                                         borderRadius: deviceWidth * 0.05,
                                     }}
-                                        onPress={() => console.log(item.SHWPH_TTL_ECPTN)}>
+                                    onPress={() => navigation.navigate('Temppage', { name: 'โปรโมชั่นแนะนำ', route: item })}>
                                         <Image
                                             style={{
                                                 shadowColor: '#000',

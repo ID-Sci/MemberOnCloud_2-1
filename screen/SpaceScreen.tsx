@@ -137,7 +137,7 @@ const SpaceScreen = () => {
             .then((json) => {
                 console.log(json.ReasonString)
                 if (json && json.ResponseCode == '200') {
-                } 
+                }
             }
             )
             .catch((error) => {
@@ -474,7 +474,7 @@ const SpaceScreen = () => {
                 flex: 1,
                 flexDirection: 'column',
             }} >
-               
+
                 <ScrollView>
                     <KeyboardAvoidingView keyboardVerticalOffset={1} behavior={'position'}>
                         <Image
@@ -502,13 +502,6 @@ const SpaceScreen = () => {
                     position: 'absolute',
                 }}>
                 <ActivityIndicator
-                    style={{
-                        borderRadius: 15,
-                        backgroundColor: null,
-                        width: 100,
-                        height: 100,
-                        alignSelf: 'center',
-                    }}
                     animating={true}
                     size="large"
                     color={Colors.lightPrimiryColor}

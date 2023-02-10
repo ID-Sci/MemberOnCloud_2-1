@@ -37,7 +37,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 let images: Array<[]> = []
 
-const HomeScreen = () => {
+const HomeScreen = ({ route }: any) => {
     const [GOODS_CODE, setGOODS_CODE] = useState('');
     const navigation = useNavigation();
     const categoryList = useAppSelector(categorySelector)
@@ -50,34 +50,34 @@ const HomeScreen = () => {
     useEffect(() => {
 
     }, [])
-    useEffect(() => {
+    // useEffect(() => {
 
-        console.log('index >> ', navigation.getState().index)
+    //     console.log('index >> ', navigation.getState().routes[navigation.getState().index].name)
 
-        const backAction = () => {
-            if (navigation.getState().index == 0) {
-                Alert.alert(`แจ้งเตือน`, `คุณต้องการออกจากโปรแกรมหรือไม่`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() },
-                    {
-                        text: `ยกเลิก`,
-                        onPress: () => null,
-                        style: "cancel"
-                    }
-                ]);
-                return true;
-            };
-        }
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
+    //     const backAction = () => {
+    //         if (navigation.getState().index == 0 && navigation.getState().routes[navigation.getState().index].name =='Home') {
+    //             Alert.alert(`แจ้งเตือน`, `คุณต้องการออกจากโปรแกรมหรือไม่`, [
+    //                 { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() },
+    //                 {
+    //                     text: `ยกเลิก`,
+    //                     onPress: () => null,
+    //                     style: "cancel"
+    //                 }
+    //             ]);
+    //             return true;
+    //         };
+    //     }
+    //     const backHandler = BackHandler.addEventListener(
+    //         "hardwareBackPress",
+    //         backAction
+    //     );
 
-        return () => backHandler.remove();
-    }, []);
+    //     return () => backHandler.remove();
+    // }, []);
 
     return (
         <View>
-            <View style={{ width: deviceWidth, height: deviceHeight-deviceWidth*0.1 }}>
+            <View style={{ width: deviceWidth, height: deviceHeight - deviceWidth * 0.1 }}>
                 <ScrollView style={{ height: deviceHeight }}>
                     <View >
                         <FlatSlider route={bannerList.bannerPage} />

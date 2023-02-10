@@ -33,6 +33,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screen/HomeScreen'
 import SpaceScreen from './screen/SpaceScreen'
+import ProductScreen from './screen/ProductScreen'
+import ProductOrderScreen from './screen/ProductOrderScreen'
+import LoginScreen from './screen/LoginScreen'
+import ShowTemppageScreen from './screen/ShowTemppageScreen'
+import TemppageScreen from './screen/TemppageScreen'
+
+
 import { store } from './src/store/store';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -43,7 +50,7 @@ const Navigator = () => {
   const MainNavigator = () => {
     return (
       <MainStack.Navigator initialRouteName={'Space'}>
-         <MainStack.Screen
+        <MainStack.Screen
           options={{ headerShown: false }}
           name="Space"
           component={SpaceScreen}
@@ -53,8 +60,32 @@ const Navigator = () => {
           name="bstab"
           component={Maintabs}
         />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Newproduct"
+          component={ProductScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="ProductOrder"
+          component={ProductOrderScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Login"
+          component={LoginScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="ShowTemppage"
+          component={ShowTemppageScreen}
+        />
+          <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Temppage"
+          component={TemppageScreen}
+        />
 
-       
       </MainStack.Navigator>
     )
   }
@@ -73,7 +104,7 @@ const App = (): JSX.Element => {
 
   return (
     <Provider store={store}>
-       <StatusBar hidden={true} />
+      <StatusBar hidden={true} />
       <Navigator />
     </Provider>
 
@@ -136,7 +167,7 @@ const Maintabs = () => (
   >
     <BottomTabs.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
     <BottomTabs.Screen options={{ headerShown: false }} name="basket" component={SpaceScreen} />
-    <BottomTabs.Screen options={{ headerShown: false }} name="Profile" component={HomeScreen} />
+    <BottomTabs.Screen options={{ headerShown: false }} name="Profile" component={LoginScreen} />
   </BottomTabs.Navigator>
 );
 
