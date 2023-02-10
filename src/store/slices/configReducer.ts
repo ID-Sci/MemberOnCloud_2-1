@@ -3,24 +3,29 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 type authState = {
-   ConfigList: Object,
-   LoginList: Object
+   UserList: Object,
+   LoginList: Object,
+   MB_LOGIN_GUID:String
 }
 
 const initialState: authState = {
-   ConfigList: {},
-   LoginList: {}
+   UserList: {},
+   LoginList: {},
+   MB_LOGIN_GUID:''
 }
 
 export const configReducer = createSlice({
    name: "Config",
    initialState,
    reducers: {
-      updateConfigList: (state: authState, action: PayloadAction<any>) => {
-         state.ConfigList = action.payload;
+      updateMB_LOGIN_GUID: (state: authState, action: PayloadAction<any>) => {
+         state.MB_LOGIN_GUID = action.payload;
       },
-      clearConfigList: (state: authState) => {
-         state.ConfigList = {};
+      updateUserList: (state: authState, action: PayloadAction<any>) => {
+         state.UserList = action.payload;
+      },
+      clearUserList: (state: authState) => {
+         state.UserList = {};
       },
       updateLoginList: (state: authState, action: PayloadAction<any>) => {
          state.LoginList = action.payload;
@@ -37,6 +42,6 @@ export const configReducer = createSlice({
  
  
 
-export const { updateConfigList, clearConfigList ,updateLoginList, clearLoginList} = configReducer.actions;
+export const { updateUserList, clearUserList ,updateLoginList, clearLoginList,updateMB_LOGIN_GUID} = configReducer.actions;
 export const config = (store: RootState) => store.configReducer;
 export default configReducer.reducer;

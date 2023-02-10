@@ -36,8 +36,13 @@ import SpaceScreen from './screen/SpaceScreen'
 import ProductScreen from './screen/ProductScreen'
 import ProductOrderScreen from './screen/ProductOrderScreen'
 import LoginScreen from './screen/LoginScreen'
+import RegisterScreen from './screen/RegisterScreen'
+import HistoryScreen from './screen/HistoryScreen'
+
 import ShowTemppageScreen from './screen/ShowTemppageScreen'
 import TemppageScreen from './screen/TemppageScreen'
+import MyCardScreen from './screen/MyCardScreen'
+import ProfileScreen from './screen/ProfileScreen'
 
 
 import { store } from './src/store/store';
@@ -71,19 +76,35 @@ const Navigator = () => {
           component={ProductOrderScreen}
         />
         <MainStack.Screen
-          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          options={{ headerShown: false, }}
           name="Login"
           component={LoginScreen}
         />
         <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Register"
+          component={RegisterScreen}
+        />
+             <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="History"
+          component={HistoryScreen}
+        />
+
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="ShowTemppage"
           component={ShowTemppageScreen}
         />
-          <MainStack.Screen
+        <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="Temppage"
           component={TemppageScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="MyCard"
+          component={MyCardScreen}
         />
 
       </MainStack.Navigator>
@@ -116,9 +137,9 @@ const Maintabs = () => (
 
   <BottomTabs.Navigator
 
-    screenOptions={({ route }) => ({
+    screenOptions={({ route }:any) => ({
       tabBarShowLabel: false,
-      tabBarIcon: ({ focused }) => {
+      tabBarIcon: ({ focused }:any) => {
         if (route.name === 'Home') {
           return (
             <Image
@@ -167,7 +188,7 @@ const Maintabs = () => (
   >
     <BottomTabs.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
     <BottomTabs.Screen options={{ headerShown: false }} name="basket" component={SpaceScreen} />
-    <BottomTabs.Screen options={{ headerShown: false }} name="Profile" component={LoginScreen} />
+    <BottomTabs.Screen options={{ headerShown: false }} name="Profile" component={ProfileScreen} />
   </BottomTabs.Navigator>
 );
 

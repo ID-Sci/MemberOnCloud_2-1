@@ -22,7 +22,7 @@ import Colors from '../src/styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-import FlatListPromotion from '../components/FlatListPromotion';
+
 import { BorderlessButton } from 'react-native-gesture-handler';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;

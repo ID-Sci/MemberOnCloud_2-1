@@ -28,12 +28,13 @@ import Colors from '../src/styles/colors';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import FlatSlider from '../components/FlatListSlider';
 import RNRestart from 'react-native-restart';
-import { config, updateConfigList, clearConfigList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { config, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
 import { projSelector, updateProjList, clearProjList } from '../src/store/slices/projReducer';
 import { promotionSelector, updatePromotionList, clearPromotionList, updatePromotionPage, clearPromotionPage } from '../src/store/slices/promotionReducer';
 import { categorySelector, updateCategoryList, clearCategoryList, updateCategoryPage, clearCategoryPage } from '../src/store/slices/categoryReducer';
 import { bannerSelector, updateBannerList, clearBannerList, updateBannerPage, clearBannerPage } from '../src/store/slices/bannerReducer';
 import { activitySelector, updateActivityList, clearActivityList, updateActivityPage, clearActivityPage } from '../src/store/slices/activityReducer';
+import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, clearMycardPage } from '../src/store/slices/mycardReducer';
 import { newproductSlice, updateNewproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../src/store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../src/store/store';
 // import { Language, changeLanguage } from '../src/translations/I18n';
@@ -86,7 +87,7 @@ const SpaceScreen = () => {
     const setConfig = async () => {
         //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
         let superObj = {
-            "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
+            "WebService": "http://deverp.businessplus.co.th:8907/Member/BplusErpDvSvrIIS.dll",
             "ServiceID": {
                 "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
                 "ETransaction": "{167f0c96-86fd-488f-94d1-cc3169d60b1a}",
@@ -104,7 +105,7 @@ const SpaceScreen = () => {
             },
             "Mac": MyMac,
             "Username": "BUSINESS",
-            "Password": "SYSTEM65",
+            "Password": "SYSTEM64",
             "Phone": "0828845662"
         }
         //   JSON.stringify(superObj)
@@ -218,6 +219,7 @@ const SpaceScreen = () => {
                 if (json && json.ResponseCode == '200') {
                     let responseData = JSON.parse(json.ResponseData)
                     console.log(responseData)
+                    // await dispatch(clearUserList())
                     await dispatch(updateLoginList(responseData))
                     await getProJ(responseData)
                 } else {
@@ -338,6 +340,9 @@ const SpaceScreen = () => {
                     let Activity = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('ACTIVITY') })[0]
                     console.log(`\nActivity [${Activity ? true : false}]\n +> `)
                     Activity && await fetchLayoutData('Activity', LoginList, Activity)
+                    let Mycard = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('MYCARD') })[0]
+                    console.log(`\nMycard [${Mycard ? true : false}]\n +> `)
+                    Mycard && await fetchLayoutData('Mycard', LoginList, Mycard)
 
                 } else {
                     CState = false
@@ -399,6 +404,10 @@ const SpaceScreen = () => {
                     if (LayoutKey == 'Activity') {
                         await dispatch(updateActivityList(responseData.SHOWLAYOUT))
                         await dispatch(updateActivityPage(responseData.SHOWPAGE))
+                    }
+                    if (LayoutKey == 'Mycard') {
+                        await dispatch(updateMycardList(responseData.SHOWLAYOUT))
+                        await dispatch(updateMycardPage(responseData.SHOWPAGE))
                     }
                     if (LayoutKey == 'Newproduct') {
                         await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
