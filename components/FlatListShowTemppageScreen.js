@@ -32,7 +32,7 @@ export default FlatListShowTemppageScreen = ({ route }) => {
             <ScrollView
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight * 0.9
+                    height: deviceHeight  
                 }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}

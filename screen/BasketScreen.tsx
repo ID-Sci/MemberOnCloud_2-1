@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 
 import {
@@ -19,27 +17,26 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../src/styles/colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../src/styles/FontSizeHelper';
-import CurrencyInput from 'react-native-currency-input';
-import FlatListShowTemppageScreen from '../components/FlatListShowTemppageScreen';
-import { BorderlessButton } from 'react-native-gesture-handler';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import UnFlatListBasket from '../components/UnFlatListBasket';
+import FlatListBasket from '../components/FlatListBasket';
+import { useAppSelector } from '../src/store/store';
+import { basketSelector } from '../src/store/slices/basketReducer';
+import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const ShowTemppageScreen = ({ route }: any) => {
+const BasketScreen = ({ route }: any) => {
     const navigation = useNavigation();
-   
-    return (route.params.route &&
+    const basketProduct = useAppSelector(basketSelector)
+    const ConfigList = useAppSelector(config)
+    return (basketProduct &&
         (
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight,
-                    
-                    backgroundColor: Colors.backgroundLoginColorSecondary,
-                    
+                    height: deviceHeight
                 }}
             >
 
@@ -51,6 +48,7 @@ const ShowTemppageScreen = ({ route }: any) => {
                         flexDirection: 'row',
                         width: deviceWidth,
                         padding: deviceHeight * 0.02,
+                        backgroundColor: Colors.backgroundLoginColorSecondary,
                         borderBottomWidth: 1,
                         borderColor: Colors.borderColor
                     }}>
@@ -60,7 +58,7 @@ const ShowTemppageScreen = ({ route }: any) => {
                             color: Colors.menuButton,
                             fontWeight: 'bold',
                         }}>
-                        {route.params.name}
+                        ตะกร้าของฉัน
                     </Text>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
@@ -73,9 +71,12 @@ const ShowTemppageScreen = ({ route }: any) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <FlatListShowTemppageScreen route={route.params.route} />
+                {ConfigList.MB_LOGIN_GUID?
+                <FlatListBasket items={basketProduct.basketProduct} itemsERP={basketProduct.basketProductERP} prepareDocument={basketProduct.prepareDocument} />:
+                <UnFlatListBasket route={{}} />}
+              
             </View>)
     )
 }
 
-export default ShowTemppageScreen 
+export default BasketScreen 

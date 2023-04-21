@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Feather from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
- 
+
 import { FontSize } from '../src/styles/FontSizeHelper';
 import { config, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
@@ -60,13 +60,31 @@ const HistoryScreen = () => {
 
 
 
-            })
+            }) .catch( async (error) => {
+                let datetime = new Date()
+                var day: any = datetime.getDate()
+                day = day > 9 ? day : '0' + day
+                var month: any = datetime.getMonth() + 1
+                month = month > 9 ? month : '0' + month
+
+                var year = datetime.getFullYear()
+                let fullODate = year - 100 + '' + month + '01'
+                var year = datetime.getFullYear()
+                let fullDate = year + '' + month + '' + day
+                console.log()
+                console.log('>')
+                console.log(fullODate)
+                console.log(fullDate)
+                console.log()
+                await fetchUserData(fullODate, fullDate)
+                console.log('ERROR ' + error);
+            });
 
     }
     const fetchUserData = async (ODate: any, ToDate: any) => {
         console.log('FETCH /LookupErp');
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
 
         await fetch(configToken.WebService + '/Member', {
@@ -229,25 +247,25 @@ const HistoryScreen = () => {
                             /
                         </Text>
                         <TouchableOpacity
-                         onPress={() => setHistoryTab(false)}>
-                        <Text
-                           
-                            style={{
-                                color: HistoryTab == true ? 'black' : '#0288D1',
-                                paddingRight: 20,
-                                fontSize: FontSize.medium,
-                            }}>
-                            ประวัติการแลกแต้ม
-                        </Text>
+                            onPress={() => setHistoryTab(false)}>
+                            <Text
+
+                                style={{
+                                    color: HistoryTab == true ? 'black' : '#0288D1',
+                                    paddingRight: 20,
+                                    fontSize: FontSize.medium,
+                                }}>
+                                ประวัติการแลกแต้ม
+                            </Text>
                         </TouchableOpacity>
-                        
+
                     </View>
                     {
                         HistoryTab ? <ScrollView>
                             {PurchaseLoading ? <ActivityIndicator
-                                
+
                                 animating={PurchaseLoading}
-                                marginTop={deviceHeight * 0.25}
+                                style={{ marginTop: deviceHeight * 0.25 }}
                                 size="large"
                                 color="#0288D1"
                             /> : Purchase.length > 0 ?
@@ -267,12 +285,12 @@ const HistoryScreen = () => {
                                             }}>
                                                 เลขอ้างอิง # {items.MBP_REF}
                                             </Text>
-                                            <View marginTop={10}>
+                                            <View style={{ marginTop: deviceHeight * 0.25 }}>
                                                 <View
                                                     style={{
                                                         flexDirection: 'row',
                                                     }} >
-                                                    <View width={(deviceWidth * 0.6) - 20}>
+                                                    <View style={{ width: (deviceWidth * 0.6) - 20 }}>
                                                         <Text style={{
                                                             color: 'black',
                                                             fontSize: FontSize.medium,
@@ -281,8 +299,9 @@ const HistoryScreen = () => {
                                                         </Text>
                                                     </View>
                                                     <View
-                                                        width={(deviceWidth * 0.4) - 20}
+
                                                         style={{
+                                                            width: (deviceWidth * 0.4) - 20,
                                                             flexDirection: 'row',
                                                             justifyContent: 'space-between'
                                                         }}>
@@ -305,7 +324,7 @@ const HistoryScreen = () => {
                                                     style={{
                                                         flexDirection: 'row',
                                                     }} >
-                                                    <View width={(deviceWidth * 0.6) - 20}>
+                                                    <View style={{ width: (deviceWidth * 0.6) - 20 }}>
                                                         <Text style={{
                                                             color: 'black',
                                                             fontSize: FontSize.medium,
@@ -314,8 +333,9 @@ const HistoryScreen = () => {
                                                         </Text>
                                                     </View>
                                                     <View
-                                                        width={(deviceWidth * 0.4) - 20}
+                                                       
                                                         style={{
+                                                            width: (deviceWidth * 0.4) - 20,
                                                             flexDirection: 'row',
                                                             justifyContent: 'space-between'
                                                         }}>
@@ -341,23 +361,19 @@ const HistoryScreen = () => {
                                         padding: 10,
                                         borderBottomColor: '#000000',
                                         borderBottomWidth: 0.2,
-                                        marginBottom: 1
+                                        marginBottom: 1,
+                                        width: deviceWidth,
+                                        alignItems: 'center',
                                     }}
                                 >
-                                    <View
-                                        marginBottom={10}
-                                        width={deviceWidth - 20}
-                                        style={{
-                                            alignSelf: 'center',
-                                        }}
-                                    >
-                                        <Text style={{
-                                            color: 'black',
-                                            fontSize: FontSize.medium,
-                                        }}>
-                                            ไม่พบข้อมูล
-                                        </Text>
-                                    </View>
+
+                                    <Text style={{
+                                        color: 'black',
+                                        fontSize: FontSize.medium,
+                                    }}>
+                                        ไม่พบข้อมูล
+                                    </Text>
+
                                 </View>
                             }
 
@@ -366,7 +382,7 @@ const HistoryScreen = () => {
                             {RedeemLoading ? <ActivityIndicator
 
                                 animating={RedeemLoading}
-                                marginTop={deviceHeight * 0.25}
+                                style={{ marginTop: deviceHeight * 0.25 }}
                                 size="large"
                                 color="#0288D1"
                             /> :
@@ -386,12 +402,12 @@ const HistoryScreen = () => {
                                                 }}>
                                                     เลขอ้างอิง # {items.MBP_REF}
                                                 </Text>
-                                                <View marginTop={10}>
+                                                <View style={{ marginTop: deviceHeight * 0.25 }}>
                                                     <View
                                                         style={{
                                                             flexDirection: 'row',
                                                         }} >
-                                                        <View width={(deviceWidth * 0.4) - 20}>
+                                                        <View style={{ width: (deviceWidth * 0.4) - 20 }}>
                                                             <Text style={{
                                                                 color: 'black',
                                                                 fontSize: FontSize.medium,
@@ -400,8 +416,9 @@ const HistoryScreen = () => {
                                                             </Text>
                                                         </View>
                                                         <View
-                                                            width={(deviceWidth * 0.6) - 20}
+                                                           
                                                             style={{
+                                                                width: (deviceWidth * 0.6) - 20 ,
                                                                 flexDirection: 'row',
                                                                 justifyContent: 'space-between'
                                                             }}>
@@ -422,7 +439,7 @@ const HistoryScreen = () => {
                                                         style={{
                                                             flexDirection: 'row',
                                                         }} >
-                                                        <View width={(deviceWidth * 0.4) - 20}>
+                                                        <View style={{ width: (deviceWidth * 0.4) - 20 }}>
                                                             <Text style={{
                                                                 color: 'black',
                                                                 fontSize: FontSize.medium,
@@ -431,8 +448,9 @@ const HistoryScreen = () => {
                                                             </Text>
                                                         </View>
                                                         <View
-                                                            width={(deviceWidth * 0.6) - 20}
+
                                                             style={{
+                                                                width: (deviceWidth * 0.6) - 20,
                                                                 flexDirection: 'row',
                                                                 justifyContent: 'space-between'
                                                             }}>
@@ -457,25 +475,19 @@ const HistoryScreen = () => {
                                             padding: 10,
                                             borderBottomColor: '#000000',
                                             borderBottomWidth: 0.2,
-                                            marginBottom: 1
+                                            marginBottom: 1,
+                                            width: deviceWidth,
+                                            alignItems: 'center',
                                         }}
                                     >
-                                        <View
-                                            marginBottom={10}
-                                            width={deviceWidth - 20}
-                                            style={{
-                                                width: deviceWidth - 20,
-                                                marginBottom: 10,
-                                                alignSelf: 'center',
-                                            }}
-                                        >
-                                            <Text style={{
-                                                color: 'black',
-                                                fontSize: FontSize.medium,
-                                            }}>
-                                                ไม่พบข้อมูล
-                                            </Text>
-                                        </View>
+
+                                        <Text style={{
+                                            color: 'black',
+                                            fontSize: FontSize.medium,
+                                        }}>
+                                            ไม่พบข้อมูล
+                                        </Text>
+
                                     </View>
                             }
                         </ScrollView>

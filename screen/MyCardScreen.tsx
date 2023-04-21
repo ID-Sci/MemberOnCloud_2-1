@@ -16,6 +16,8 @@ import {
     Alert,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../src/styles/colors';
@@ -37,13 +39,15 @@ const MyCardScreen = () => {
     const ConfigList = useAppSelector(config)
     const navigation = useNavigation()
     const [order, setOrder] = useState(1)
+    const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     let MycardList = useAppSelector(mycardSelector)
     console.log(ConfigList.UserList)
     const getlogoutMbUsers = async () => {
         console.log(`logoutMbUsers`)
+        setLoading(true)
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
         await fetch(configToken.WebService + '/MbUsers', {
             method: 'POST',
@@ -61,24 +65,55 @@ const MyCardScreen = () => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                     dispatch(updateMB_LOGIN_GUID(''))
-                   
-                    Alert.alert(`สำเร็จ`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    dispatch(updateMB_LOGIN_GUID(''))
+                    const NewKey = { ...configToken, logined: 'false' }
+                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                    setLoading(false)
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
                 Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
     return (
 
         <View style={{ alignItems: 'flex-end', backgroundColor: '#fff', }}>
+              {loading &&
+                    <Modal
+                        transparent={true}
+                        animationType={'none'}
+                        visible={loading}
+                        onRequestClose={() => { }}>
+                        <View
+                            style={{
+                                flex: 1,
+                                alignItems: 'center',
+                                justifyContent: 'space-around',
+                                flexDirection: 'column',
+                            }}>
+                            <View
+                                style={{
+                                    backgroundColor: '#fff',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-around',
+                                    height: 100,
+                                    width: 100,
+                                    borderRadius: deviceWidth * 0.05
+                                }}>
+                                <ActivityIndicator
+                                    animating={loading}
+                                    size="large"
+                                    color={Colors.lightPrimiryColor} />
+                            </View>
+                        </View>
+                    </Modal>
+                }
             <View style={{
                 alignSelf: 'center',
                 justifyContent: 'center',
@@ -89,54 +124,82 @@ const MyCardScreen = () => {
             }}
             >
                 <View>
-                    <Image
-                        style={{
-                            height: deviceHeight * 0.3,
-                            width: undefined,
-                            alignSelf: 'stretch',
-                        }}
-                        resizeMode="stretch"
-                        source={{ uri: `data:image/png;base64,${MycardList.mycardPage[0].IMAGE64}` }}></Image>
-                    <View
-                        style={{
-                            flexDirection: 'column',
-                            position: 'absolute',
-                            top: 0,
-                            left: 30,
-                            right: 0,
-                            bottom: 20,
-                            justifyContent: 'flex-end',
-                            alignItems: 'flex-start',
-                        }}>
-                        <Text
+                    <View>
+                        <Image
                             style={{
-                                shadowColor: 'black',
-                                fontWeight: 'bold',
-                                shadowOpacity: 0.8,
-                                shadowRadius: 3,
-                                elevation: 5,
-                                fontSize: FontSize.medium,
-                                textShadowOffset: { width: 3, height: 3 },
-                                textShadowRadius: 1,
-                                color: 'white',
-                            }}>
-                            {ConfigList.UserList.MB_CODE}
-                        </Text>
-                        <Text
+                                height: deviceHeight * 0.3,
+                                width: undefined,
+                                alignSelf: 'stretch',
+                            }}
+                            resizeMode="stretch"
+                            source={{ uri: `data:image/png;base64,${MycardList.mycardPage[0].IMAGE64}` }}></Image>
+                        <View
                             style={{
-                                shadowColor: 'black',
-                                shadowOpacity: 0.8,
-                                shadowRadius: 3,
-                                elevation: 5,
-                                fontSize: FontSize.medium,
-                                textShadowOffset: { width: 3, height: 3 },
-                                textShadowRadius: 1,
-                                color: 'white',
+                                flexDirection: 'column',
+                                position: 'absolute',
+                                top: 0,
+                                left: 30,
+                                right: 0,
+                                bottom: 20,
+                                justifyContent: 'flex-end',
+                                alignItems: 'flex-start',
                             }}>
-                            {`${ConfigList.UserList.MB_NAME} ${ConfigList.UserList.MB_SURNME}`}
-                        </Text>
+                            <Text
+                                style={{
+                                    shadowColor: 'black',
+                                    fontWeight: 'bold',
+                                    shadowOpacity: 0.8,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                    fontSize: FontSize.medium,
+                                    textShadowOffset: { width: 3, height: 3 },
+                                    textShadowRadius: 1,
+                                    color: 'white',
+                                }}>
+                                {ConfigList.UserList.MB_CODE}
+                            </Text>
+                            <Text
+                                style={{
+                                    shadowColor: 'black',
+                                    shadowOpacity: 0.8,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                    fontSize: FontSize.medium,
+                                    textShadowOffset: { width: 3, height: 3 },
+                                    textShadowRadius: 1,
+                                    color: 'white',
+                                }}>
+                                {`${ConfigList.UserList.MB_NAME} ${ConfigList.UserList.MB_SURNME}`}
+                            </Text>
+                        </View>
+
+                    </View>
+                    <View style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Updateuser', { name: 'แก้ไขข้อมูลส่วนตัว' })}
+                            style={{
+
+                                padding: deviceWidth * 0.025,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Text
+                            style={{
+                                fontWeight:'bold',
+                                color:Colors.darkPrimiryColor
+                            }}>
+                                - แก้ไข -
+                            </Text>
+                        </TouchableOpacity>
+
                     </View>
                 </View>
+
+
 
             </View>
             <ScrollView
@@ -153,7 +216,6 @@ const MyCardScreen = () => {
                     <View
                         style={{
                             flexDirection: 'row',
-                            marginTop: 20,
                             justifyContent: 'space-between',
                         }}>
                         <Text style={{ fontSize: FontSize.medium }}>
@@ -248,10 +310,6 @@ const MyCardScreen = () => {
                     </View>
 
                 </View>
-
-
-
-
 
             </ScrollView>
         </View >

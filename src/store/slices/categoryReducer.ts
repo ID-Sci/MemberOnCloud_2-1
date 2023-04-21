@@ -5,11 +5,13 @@ import { RootState } from '../store';
 type authState = {
    categoryList: Object,
    categoryPage: Array<{ id: number, data: string }>
+   categoryContent:Array<[]>
 }
 
 const initialState: authState = {
    categoryList: {},
-   categoryPage:[]
+   categoryPage:[],
+   categoryContent: []
 }
 
 export const categorySlice = createSlice({
@@ -28,9 +30,15 @@ export const categorySlice = createSlice({
       clearCategoryPage: (state: authState) => {
          state.categoryPage = [];
       },
+      updateCategoryContent: (state: authState, action: PayloadAction<any>) => {
+         state.categoryContent = action.payload;
+      },
+      clearCategoryContent: (state: authState) => {
+         state.categoryContent = [];
+      },
    },
 })
 
-export const { updateCategoryList, clearCategoryList,updateCategoryPage,clearCategoryPage } = categorySlice.actions;
+export const { updateCategoryList, clearCategoryList,updateCategoryPage,clearCategoryPage,updateCategoryContent,clearCategoryContent } = categorySlice.actions;
 export const categorySelector = (store: RootState) => store.categoryReducer;
 export default categorySlice.reducer;

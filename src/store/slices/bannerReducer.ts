@@ -23,7 +23,13 @@ export const bannerSlice = createSlice({
          state.bannerList = {};
       },
       updateBannerPage: (state: authState, action: PayloadAction<any>) => {
-         state.bannerPage = action.payload;
+         const newBanner =
+         action.payload &&
+         action.payload.map((object:any) => {
+           object['image'] = `data:image/png;base64,${object.IMAGE64}`
+           return object
+         })
+         state.bannerPage = newBanner;
       },
       clearBannerPage: (state: authState) => {
          state.bannerPage = [];

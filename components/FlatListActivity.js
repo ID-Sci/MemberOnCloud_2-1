@@ -36,8 +36,7 @@ export default FlatListPromotion = ({ route }) => {
                     justifyContent: 'space-between',
                     flexDirection: 'row',
                     paddingLeft: deviceWidth * 0.05,
-                    paddingRight: deviceWidth * 0.05,
-                    paddingBottom: deviceWidth * 0.05
+                    paddingRight: deviceWidth * 0.05, 
                 }}>
                     <Text
                         style={{

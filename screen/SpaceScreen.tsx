@@ -28,20 +28,22 @@ import Colors from '../src/styles/colors';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import FlatSlider from '../components/FlatListSlider';
 import RNRestart from 'react-native-restart';
-import { config, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
 import { projSelector, updateProjList, clearProjList } from '../src/store/slices/projReducer';
 import { promotionSelector, updatePromotionList, clearPromotionList, updatePromotionPage, clearPromotionPage } from '../src/store/slices/promotionReducer';
+import { updateNotificationList, clearNotificationList, updateNotificationPage, clearNotificationPage } from '../src/store/slices/notificationReducer';
 import { categorySelector, updateCategoryList, clearCategoryList, updateCategoryPage, clearCategoryPage } from '../src/store/slices/categoryReducer';
 import { bannerSelector, updateBannerList, clearBannerList, updateBannerPage, clearBannerPage } from '../src/store/slices/bannerReducer';
 import { activitySelector, updateActivityList, clearActivityList, updateActivityPage, clearActivityPage } from '../src/store/slices/activityReducer';
 import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, clearMycardPage } from '../src/store/slices/mycardReducer';
-import { newproductSlice, updateNewproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../src/store/slices/newproductReducer';
+import { newproductSlice, updateNewproductList, updateAllproductList, clearAllproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../src/store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../src/store/store';
 // import { Language, changeLanguage } from '../src/translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 const MyConfig = '/config.json';
 let MyMac = ''
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let CState = true
 const SpaceScreen = () => {
     const dispatch = useAppDispatch();
@@ -49,8 +51,7 @@ const SpaceScreen = () => {
     const projList = useAppSelector(projSelector)
     let images: Array<[]> = [];
     const navigation = useNavigation();
-    console.log(`ConfigList >> ${JSON.stringify(ConfigList)}`)
-    console.log(`projList >> ${JSON.stringify(projList)}`)
+
     useEffect(() => {
         if (CState)
             loadFuntion()
@@ -64,6 +65,7 @@ const SpaceScreen = () => {
         if (CState) await UnRegister()
         if (CState) await Register()
         if (CState) await fetchGuidLog()
+        if (CState) await setnotiItem()
         if (CState)
             await navigation.dispatch(
                 navigation.replace('bstab')
@@ -86,8 +88,12 @@ const SpaceScreen = () => {
     }
     const setConfig = async () => {
         //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+
         let superObj = {
             "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
+            "OTPService": "http://203.150.55.21:8891/BplusNotiService/BplusNotiIIS.dll",
             "ServiceID": {
                 "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
                 "ETransaction": "{167f0c96-86fd-488f-94d1-cc3169d60b1a}",
@@ -101,26 +107,29 @@ const SpaceScreen = () => {
                 "MemberDeveloper": "{44fa3ed0-dc72-4b27-9c60-cf2a8532a019}",
                 "WebBasketUsers": "{c2131f0b-f20b-4e1f-9403-2b1dc2787839}",
                 "MemberUsers": "{622AA43A-7822-48FD-AC49-BDB400FFC3FA}",
-                "QrPayment": "{5fdd2cd8-7a6f-4d7d-abec-263db6b0e78b}"
+                "QrPayment": "{5fdd2cd8-7a6f-4d7d-abec-263db6b0e78b}",
+                "NTFU_SVID": "{9c6dd907-45ba-43ec-872b-69b928e64be2}"
             },
+            "BPLUS_APPID": "cdaa9350-cb32-416e-a85b-6ecedd81ebdf",
             "Mac": MyMac,
             "Username": "BUSINESS",
             "Password": "SYSTEM64",
-            "Phone": "0828845662"
+            "Phone": "0828845662",
+            "MB_PW": "",
+            "logined": "false",
+            "upDateKey": "1"
+        } 
+        if (  configToken == null || configToken.upDateKey != superObj.upDateKey) {
+            console.log(`new Obj >>`)
+            await Keychain.setGenericPassword("config", JSON.stringify(superObj))
         }
-        //   JSON.stringify(superObj)
-
-        await Keychain.setGenericPassword("config", JSON.stringify(superObj))
-
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
-
-        console.log(`setConfig load .. ${configToken.WebService}`)
     }
+
+
     const UnRegister = async () => {
         console.log(`UnRegister`)
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
         await fetch(configToken.WebService + '/DevUsers', {
             method: 'POST',
@@ -147,11 +156,12 @@ const SpaceScreen = () => {
                 Alert.alert(`แจ้งเตือน`, `${error}`, [
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
             });
-    };
+    }
+
     const Register = async () => {
         console.log(`Register`)
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
         await fetch(configToken.WebService + '/DevUsers', {
             method: 'POST',
@@ -188,14 +198,12 @@ const SpaceScreen = () => {
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
 
             });
-
-
     };
 
     const fetchGuidLog = async () => {
         console.log(`Login`)
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
         await fetch(configToken.WebService + '/DevUsers', {
             method: 'POST',
@@ -219,9 +227,12 @@ const SpaceScreen = () => {
                 if (json && json.ResponseCode == '200') {
                     let responseData = JSON.parse(json.ResponseData)
                     console.log(responseData)
-                    // await dispatch(clearUserList())
                     await dispatch(updateLoginList(responseData))
                     await getProJ(responseData)
+                    console.log(`configToken.logined >> [${configToken.logined}]`)
+                    if (configToken.logined == 'true') {
+                        await getLoginMbUsers(responseData)
+                    }
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -240,15 +251,83 @@ const SpaceScreen = () => {
                 CState = false
                 Alert.alert(`แจ้งเตือน`, `${error}`, [
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
-            });
+            })
+    }
 
-    };
+    const getLoginMbUsers = async (LoginList: Object) => {
+        console.log(`LoginByMobile`)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/MbUsers', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'LoginByMobile',
+                'BPAPUS-PARAM': '{"MB_CNTRY_CODE": "66", "MB_REG_MOBILE": "' +
+                    configToken.Phone +
+                    '","MB_PW": "' +
+                    configToken.MB_PW +
+                    '"}',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    await getMemberInfo(LoginList, responseData.MB_LOGIN_GUID)
+                } else {
+                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(`แจ้งเตือน`, `${error}`, [
+                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+    }
+
+    const getMemberInfo = async (LoginList: Object, MB_LOGIN_GUID: any) => {
+        console.log(`getProJ [Ec000400]`)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/Member', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'ShowMemberInfo',
+                'BPAPUS-PARAM':
+                    '{ "MB_LOGIN_GUID": "' + MB_LOGIN_GUID + '"}',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
+                    await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
+                    const NewKey = { ...configToken, Phone: configToken.Phone, MB_PW: configToken.MB_PW, logined: 'true' }
+                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                } else {
+                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(`แจ้งเตือน`, `${error}`, [
+                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+    }
+
     const getProJ = async (LoginList: Object) => {
         console.log(`getProJ [Ec000400]`)
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
-
-        console.log(LoginList.BPAPUS_GUID)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -270,33 +349,30 @@ const SpaceScreen = () => {
 
                     if (responseData.Ec000400.length > 0) {
                         console.log(responseData.Ec000400[0])
-
                         await dispatch(updateProjList(responseData.Ec000400[0]))
                         await FetchDataProject(LoginList, responseData.Ec000400[0])
                     } else {
                         CState = false
                         Alert.alert(`แจ้งเตือน`, `ไม่พบโครงการ`, [
                             { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
-
                     }
                 } else {
                     CState = false
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
                 }
-
-
             })
             .catch((error) => {
                 CState = false
                 Alert.alert(`แจ้งเตือน`, `${error}`, [
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
                 console.log('ERROR ' + error);
-            });
-    };
+            })
+    }
+
     const FetchDataProject = async (LoginList: object, ProjList: object) => {
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`FetchDataProject`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
@@ -326,6 +402,10 @@ const SpaceScreen = () => {
                     console.log(`\nBanner [${Banner ? true : false}]\n +> `)
                     Banner && await fetchLayoutData('Banner', LoginList, Banner)
 
+                    let Notication = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NOTI') })[0]
+                    console.log(`\nNotication [${Notication ? true : false}]\n +> `)
+                    Notication && await fetchLayoutData('Notication', LoginList, Notication)
+
                     let Category = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('CATEGORY') })[0]
                     console.log(`\nCategory [${Category ? true : false}]\n +>`)
                     Category && await fetchLayoutData('Category', LoginList, Category)
@@ -337,9 +417,11 @@ const SpaceScreen = () => {
                     let Newproduct = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NEWPRODUCT') })[0]
                     console.log(`\nPromotion [${Newproduct ? true : false}]\n +> `)
                     Newproduct && await fetchLayoutData('Newproduct', LoginList, Newproduct)
+               
                     let Activity = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('ACTIVITY') })[0]
                     console.log(`\nActivity [${Activity ? true : false}]\n +> `)
                     Activity && await fetchLayoutData('Activity', LoginList, Activity)
+               
                     let Mycard = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('MYCARD') })[0]
                     console.log(`\nMycard [${Mycard ? true : false}]\n +> `)
                     Mycard && await fetchLayoutData('Mycard', LoginList, Mycard)
@@ -359,9 +441,10 @@ const SpaceScreen = () => {
 
             })
     }
+
     const fetchLayoutData = async (LayoutKey: String, LoginList: object, LayoutList: object) => {
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`fetchLayoutData ${LayoutKey}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
@@ -384,17 +467,27 @@ const SpaceScreen = () => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     if (LayoutKey == 'Banner') {
-                        await responseData.SHOWPAGE.map((Banneritem: any) => {
+                        await responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return a.SHWLD_SEQ - b.SHWLD_SEQ;
+                        }).map((Banneritem: any) => {
                             let objImage: any = {
                                 image: `data:image/png;base64,${Banneritem.IMAGE64}`
                             }
                             images.push(objImage)
                         })
                         await dispatch(updateBannerList(responseData.SHOWLAYOUT))
-                        await dispatch(updateBannerPage(images))
+                        await dispatch(updateBannerPage(responseData.SHOWPAGE))
+                    }
+                    if (LayoutKey == 'Notication') {
+                        await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
+                        await dispatch(updateNotificationPage(responseData.SHOWPAGE))
                     }
                     if (LayoutKey == 'Category') {
                         await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
+                        let tempdata = await getProducrALLCategory(responseData.SHOWPAGE, LoginList)
+                        await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
+                            return a.GOODS_CODE - b.GOODS_CODE;
+                        })))
                         await dispatch(updateCategoryPage(responseData.SHOWPAGE))
                     }
                     if (LayoutKey == 'Promotion') {
@@ -415,14 +508,12 @@ const SpaceScreen = () => {
                         await fetchPageData('Newproduct', LoginList, responseData.SHOWPAGE[0])
                     }
 
-
                     //    console.log(responseData)
                 } else {
                     CState = false
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
                 }
-
             })
             .catch((error) => {
                 console.error('GetLayout >> ' + error);
@@ -431,10 +522,11 @@ const SpaceScreen = () => {
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
 
             })
-    };
+    }
+
     const fetchPageData = async (PageKey: String, LoginList: object, PageList: object) => {
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = JSON.parse(checkLoginToken.password)
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`fetchPageData ${PageList}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
@@ -458,6 +550,8 @@ const SpaceScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     if (PageKey == 'Newproduct') {
                         await dispatch(updateNewproductContent(responseData.SHOWCONTENT))
+                    } else if (PageKey == 'Category') {
+                        return responseData.SHOWCONTENT[0]
                     }
                     //console.log(responseData)
                 } else {
@@ -474,7 +568,75 @@ const SpaceScreen = () => {
                     { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
 
             })
-    };
+    }
+
+
+    const getProducrALLCategory = async (categoryList: any, LoginList: object,) => {
+
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        let tempProductList: any = []
+        for (var r in categoryList) {
+            console.log(`[${r + 1}] ${categoryList[r].SHWPH_GUID}`)
+            await fetch(configToken.WebService + '/ECommerce', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                    'BPAPUS-FUNCTION': 'GetPage',
+                    'BPAPUS-PARAM':
+                        '{"SHWP_GUID": "' +
+                        categoryList[r].SHWPH_GUID +
+                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                    'BPAPUS-FILTER': '',
+                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-OFFSET': '0',
+                    'BPAPUS-FETCH': '0',
+                }),
+            })
+                .then((response) => response.json())
+                .then(async (json) => {
+                    if (json.ResponseCode == 200) {
+                        let responseData = JSON.parse(json.ResponseData);
+                        if (responseData.SHOWCONTENT) {
+                            await responseData.SHOWCONTENT.map((tempItem: any) => {
+                                tempProductList.push(tempItem)
+                            })
+                        }
+                    } else {
+                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                    }
+                    console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
+
+                })
+                .catch((error) => {
+                    Alert.alert(`แจ้งเตือน`, `${error}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    console.log('ERROR ' + error);
+                })
+            console.log()
+
+        }
+
+        console.log(`end getProducrALLCategory`)
+        return tempProductList
+    }
+
+    const setnotiItem = async () => {
+        try {
+            const value = await AsyncStorage.getItem('noti')
+           
+            if (value !== null) {
+
+                // value previously stored
+            } else {
+                await AsyncStorage.setItem('noti', '0')
+            }
+        } catch (e) {
+            await AsyncStorage.setItem('noti', '0')
+        }
+    }
 
     return (
         <>

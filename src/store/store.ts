@@ -11,6 +11,8 @@ import bannerReducer from './slices/bannerReducer'
 import newproductReducer from './slices/newproductReducer'
 import activityReducer from './slices/activityReducer'
 import mycardReducer from './slices/mycardReducer'
+import notificationReducer from './slices/notificationReducer'
+import basketReducer from './slices/basketReducer'
 
 const reducer = {
    authReducer,
@@ -18,11 +20,13 @@ const reducer = {
    emptyTankReducer,
    projReducer,
    promotionReducer,
+   notificationReducer,
    categoryReducer,
    bannerReducer,
    newproductReducer,
    activityReducer,
-   mycardReducer
+   mycardReducer,
+   basketReducer
 }
 
 export const store = configureStore({ reducer });

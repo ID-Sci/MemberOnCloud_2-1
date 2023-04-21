@@ -33,10 +33,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from './screen/HomeScreen'
 import SpaceScreen from './screen/SpaceScreen'
+import BasketScreen from './screen/BasketScreen'
 import ProductScreen from './screen/ProductScreen'
+import ProductCategoryScreen from './screen/ProductCategoryScreen'
+import ProductSearchScreen from './screen/ProductSearchScreen'
+
 import ProductOrderScreen from './screen/ProductOrderScreen'
 import LoginScreen from './screen/LoginScreen'
 import RegisterScreen from './screen/RegisterScreen'
+import UpdateScreen from './screen/UpdateScreen'
+import FoegetScreen from './screen/FoegetScreen'
+
+import Scanbarcode from './screen/Scanbarcode'
 import HistoryScreen from './screen/HistoryScreen'
 
 import ShowTemppageScreen from './screen/ShowTemppageScreen'
@@ -72,6 +80,17 @@ const Navigator = () => {
         />
         <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="ProductCategory"
+          component={ProductCategoryScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="ProductSearch"
+          component={ProductSearchScreen}
+        />
+
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="ProductOrder"
           component={ProductOrderScreen}
         />
@@ -85,7 +104,24 @@ const Navigator = () => {
           name="Register"
           component={RegisterScreen}
         />
-             <MainStack.Screen
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Updateuser"
+          component={UpdateScreen}
+        />
+
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Foeget"
+          component={FoegetScreen}
+        />
+
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="Scanner"
+          component={Scanbarcode}
+        />
+        <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="History"
           component={HistoryScreen}
@@ -137,9 +173,9 @@ const Maintabs = () => (
 
   <BottomTabs.Navigator
 
-    screenOptions={({ route }:any) => ({
+    screenOptions={({ route }: any) => ({
       tabBarShowLabel: false,
-      tabBarIcon: ({ focused }:any) => {
+      tabBarIcon: ({ focused }: any) => {
         if (route.name === 'Home') {
           return (
             <Image
@@ -187,7 +223,7 @@ const Maintabs = () => (
     })}
   >
     <BottomTabs.Screen options={{ headerShown: false }} name="Home" component={HomeScreen} />
-    <BottomTabs.Screen options={{ headerShown: false }} name="basket" component={SpaceScreen} />
+    <BottomTabs.Screen options={{ headerShown: false }} name="basket" component={BasketScreen} />
     <BottomTabs.Screen options={{ headerShown: false }} name="Profile" component={ProfileScreen} />
   </BottomTabs.Navigator>
 );

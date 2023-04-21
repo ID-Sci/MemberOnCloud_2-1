@@ -25,7 +25,7 @@ import { FontSize } from '../src/styles/FontSizeHelper';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default FlatListCategory = ({ route }) => {
+export default FlatListCategory = ({ route, onPressCategory }) => {
 
     return (route &&
         (<ScrollView
@@ -34,7 +34,7 @@ export default FlatListCategory = ({ route }) => {
             horizontal={true}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false} >
-            {route.map((item,index) => {
+            {route.map((item, index) => {
                 return (
                     <>
                         <View style={{ paddingRight: deviceWidth * 0.015, paddingLeft: deviceWidth * 0.015 }}>
@@ -42,7 +42,7 @@ export default FlatListCategory = ({ route }) => {
                                 backgroundColor: '#fff', alignSelf: 'center', padding: deviceWidth * 0.03,
                                 justifyContent: 'center', borderRadius: deviceWidth * 0.1, flexDirection: 'row', backgroundColor: Colors.borderColor
                             }}
-                                onPress={() => console.log(item.SHWPH_TTL_ECPTN)}>
+                                onPress={() => onPressCategory(item)}>
                                 <Image
                                     style={{
                                         height: deviceWidth * 0.1,
@@ -59,7 +59,28 @@ export default FlatListCategory = ({ route }) => {
                     </>
                 )
             })}
+            <View style={{ paddingRight: deviceWidth * 0.015, paddingLeft: deviceWidth * 0.015 }}>
+                <TouchableOpacity style={{
+                    backgroundColor: '#fff', alignSelf: 'center', padding: deviceWidth * 0.03,
+                    justifyContent: 'center', borderRadius: deviceWidth * 0.1, flexDirection: 'row', backgroundColor: Colors.borderColor
+                }}
+                    onPress={() => onPressCategory('ALL')}>
+                    <View style={{
+                        height: deviceWidth * 0.1,
+                        width: deviceWidth * 0.1,
+                        alignSelf: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        <Text style={{
+                            textAlign:'center',
+                            fontWeight:'bold'
+                        }}>
+                            ALL
+                        </Text>
+                    </View>
 
+                </TouchableOpacity>
+            </View>
         </ScrollView>)
     )
 }

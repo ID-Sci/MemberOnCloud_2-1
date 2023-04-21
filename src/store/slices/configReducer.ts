@@ -4,20 +4,34 @@ import { RootState } from '../store';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 type authState = {
    UserList: Object,
-   LoginList: Object,
-   MB_LOGIN_GUID:String
+   LoginList: LoginListType,
+   MB_LOGIN_GUID: String,
+   AR_CODE: String
+}
+
+type LoginListType = {
+   user: string
+}
+
+const testObject = {
+   user: ""
 }
 
 const initialState: authState = {
    UserList: {},
-   LoginList: {},
-   MB_LOGIN_GUID:''
+   LoginList: testObject,
+   MB_LOGIN_GUID: '',
+   AR_CODE: ''
 }
+
 
 export const configReducer = createSlice({
    name: "Config",
    initialState,
    reducers: {
+      updateARcode: (state: authState, action: PayloadAction<any>) => {
+         state.AR_CODE = action.payload;
+      },
       updateMB_LOGIN_GUID: (state: authState, action: PayloadAction<any>) => {
          state.MB_LOGIN_GUID = action.payload;
       },
@@ -37,11 +51,11 @@ export const configReducer = createSlice({
 })
 
 
- 
 
- 
- 
 
-export const { updateUserList, clearUserList ,updateLoginList, clearLoginList,updateMB_LOGIN_GUID} = configReducer.actions;
+
+
+
+export const { updateUserList, clearUserList, updateLoginList, clearLoginList, updateMB_LOGIN_GUID, updateARcode } = configReducer.actions;
 export const config = (store: RootState) => store.configReducer;
 export default configReducer.reducer;

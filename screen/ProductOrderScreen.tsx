@@ -22,16 +22,37 @@ import Colors from '../src/styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-
+import { updateBasket,basketSelector } from '../src/store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
+import { useAppDispatch, useAppSelector } from '../src/store/store'
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 const ProductOrderScreen = ({ route }: any) => {
-    const navigation = useNavigation()
-    const [order, setOrder] = useState(1)
     const item = route.params.route
-    console.log(item.SHWC_GUID)
+    const navigation = useNavigation()
+    const dispatch = useAppDispatch();
+    const [order, setOrder] = useState(item.QTY? item.QTY : 1)
+    const basketProduct = useAppSelector(basketSelector)
+
+    const addBasket = async (order: any) => {
+        let dateTime = new Date()
+        let addBasket = [] 
+        let newItem = {
+            ...item,
+            QTY: order,
+            KEY: item.KEY? item.KEY : dateTime.getTime()
+        }
+
+        let itemEdit = item.KEY?
+            basketProduct.basketProduct.filter((filteritem: any) => { return filteritem.KEY != item.KEY })
+            : basketProduct.basketProduct
+
+        addBasket = [...itemEdit,newItem]
+        await dispatch(updateBasket(addBasket))
+        navigation.goBack()
+    }
+
     return (route.params.route &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -248,7 +269,7 @@ const ProductOrderScreen = ({ route }: any) => {
                     }}>
 
                         <TouchableOpacity
-                            onPress={() => navigation.goBack()}
+                            onPress={() => addBasket(order)}
                             style={{
 
                                 padding: deviceWidth * 0.025,

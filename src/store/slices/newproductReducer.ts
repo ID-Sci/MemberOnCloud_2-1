@@ -6,12 +6,14 @@ type authState = {
    newproductList: Object
    newproductPage:Array<[]>
    newproductContent:Array<[]>
+   allproductList:Array<[]>
 }
 
 const initialState: authState = {
    newproductList: {},
    newproductPage:[],
-   newproductContent:[]
+   newproductContent:[],
+   allproductList:[]
 }
 
 export const newproductSlice = createSlice({
@@ -23,6 +25,12 @@ export const newproductSlice = createSlice({
       },
       clearnewproductList: (state: authState) => {
          state.newproductList = {};
+      },
+      updateAllproductList: (state: authState, action: PayloadAction<any>) => {
+         state.allproductList =action.payload;
+      },
+      clearAllproductList: (state: authState) => {
+         state.allproductList =[];
       },
       updateNewproductPage: (state: authState, action: PayloadAction<any>) => {
          state.newproductPage = action.payload;
@@ -39,6 +47,6 @@ export const newproductSlice = createSlice({
    },
 })
 
-export const { updateNewproductList, clearnewproductList,updateNewproductPage,clearNewproductPage,updateNewproductContent,clearNewproductContent } = newproductSlice.actions;
+export const { updateNewproductList,clearnewproductList,updateAllproductList, clearAllproductList,updateNewproductPage,clearNewproductPage,updateNewproductContent,clearNewproductContent } = newproductSlice.actions;
 export const newproductSelector = (store: RootState) => store.newproductReducer;
 export default newproductSlice.reducer;

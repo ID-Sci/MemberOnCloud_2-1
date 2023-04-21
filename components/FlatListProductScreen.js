@@ -32,14 +32,14 @@ export default FlatListProductScreen = ({ route }) => {
             <ScrollView
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight * 0.9
                 }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
                 <View style={{
                     alignItems: 'center',
-                    padding: deviceWidth * 0.05,
+                    paddingLeft: deviceWidth * 0.05,
+                    paddingRight: deviceWidth * 0.05,
                     justifyContent: 'space-between',
                     flexDirection: 'row',
                     flexWrap: 'wrap',

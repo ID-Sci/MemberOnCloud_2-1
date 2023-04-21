@@ -40,7 +40,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 const defaultCountDown = 60;
 
-const RegisterScreen = ({ route }: any) => {
+const UpdateScreen = ({ route }: any) => {
     const dispatch = useAppDispatch();
     const [countdown, setCountdown] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -98,20 +98,24 @@ const RegisterScreen = ({ route }: any) => {
 
     }
 
+    useEffect(() => {
+        setPhoneNum(ConfigList.UserList.MB_REG_MOBILE)
+        ConfigList.UserList.MB_I_CARD && set_I_CARD(ConfigList.UserList.MB_I_CARD)
+    }, [])
     const [newData, setNewData] = useState({
-        MB_INTL: 'นาย',
-        MB_NAME: '',
-        MB_SURNME: '',
-        MB_SEX: '',
-        MB_BIRTH: new Date(),
-        MB_ADDR_1: '',
-        MB_ADDR_2: '',
-        MB_ADDR_3: '',
-        MB_POST: '',
-        MB_I_CARD: '',
-        MB_EMAIL: '',
-        MB_CNTRY_CODE: '66',
-        MB_REG_MOBILE: '',
+        MB_INTL: ConfigList.UserList.MB_INTL,
+        MB_NAME: ConfigList.UserList.MB_NAME,
+        MB_SURNME: ConfigList.UserList.MB_SURNME,
+        MB_SEX: ConfigList.UserList.MB_SEX,
+        MB_BIRTH: new Date(ConfigList.UserList.MB_BIRTH.substr(0, 4) + '-' + ConfigList.UserList.MB_BIRTH.substr(4, 2) + '-' + ConfigList.UserList.MB_BIRTH.substr(6, 2)),
+        MB_ADDR_1: ConfigList.UserList.MB_ADDR_1,
+        MB_ADDR_2: ConfigList.UserList.MB_ADDR_2,
+        MB_ADDR_3: ConfigList.UserList.MB_ADDR_3,
+        MB_POST: ConfigList.UserList.MB_POST,
+        MB_I_CARD: ConfigList.UserList.MB_I_CARD,
+        MB_EMAIL: ConfigList.UserList.MB_EMAIL,
+        MB_CNTRY_CODE: ConfigList.UserList.MB_CNTRY_CODE,
+        MB_REG_MOBILE: ConfigList.UserList.MB_REG_MOBILE,
         MB_PW: '',
         MB_CPW: ''
     });
@@ -202,7 +206,7 @@ const RegisterScreen = ({ route }: any) => {
             .then((json) => {
                 if (json[0].NTFU_GUID) {
                     console.log(`otp Request Success => { ${otpPassword} }`);
-                    Alert.alert('', `ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ\nเบอร์มือถือ (+66) ${Phone}`, [{ text: 'ตกลง', onPress: () => setLoading(false) }]);
+                    Alert.alert('', `ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ\nเบอร์มือถือ (+66) ${Phone}`, [{ text: 'ตกลง', onPress: () =>   setLoading(false)}]);
                 }
             })
             .catch((error) => {
@@ -219,78 +223,7 @@ const RegisterScreen = ({ route }: any) => {
     };
 
 
-    const getNewMemberMbUsers = async () => {
 
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let sex = 'M'
-        let birthDate = ''
-        let nowDate = new Date();
-        if (newData.MB_BIRTH)
-            nowDate = new Date(newData.MB_BIRTH)
-        var day: any = nowDate.getDate()
-        day = day > 9 ? day : '0' + day
-        var month: any = nowDate.getMonth() + 1
-        month = month > 9 ? month : '0' + month
-        var year = nowDate.getFullYear()
-        birthDate = year + '' + month + '' + day
-
-        newData.MB_INTL == 'นาย' || newData.MB_INTL == 'คุณ' || newData.MB_INTL == 'ด.ช.' || newData.MB_INTL == 'MR.' ? sex = 'M' : sex = 'F'
-
-        await fetch(configToken.WebService + '/MbUsers', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'NewMember',
-                'BPAPUS-PARAM':
-                    '{"MB_INTL":  "' +
-                    newData.MB_INTL +
-                    '","MB_NAME":"' +
-                    newData.MB_NAME +
-                    '","MB_SURNME":"' +
-                    newData.MB_SURNME +
-                    '","MB_SEX": "' +
-                    sex +
-                    '","MB_BIRTH": "' +
-                    birthDate +
-                    '","MB_ADDR_1": "' +
-                    newData.MB_ADDR_1 +
-                    '","MB_ADDR_2": "' +
-                    newData.MB_ADDR_2 +
-                    '","MB_ADDR_3": "' +
-                    newData.MB_ADDR_3 +
-                    '","MB_POST": "' +
-                    newData.MB_POST +
-                    '","MB_I_CARD": "' +
-                    newData.MB_I_CARD +
-                    '","MB_EMAIL": "' +
-                    newData.MB_EMAIL +
-                    '","MB_CNTRY_CODE":"' +
-                    newData.MB_CNTRY_CODE +
-                    '","MB_REG_MOBILE":"' +
-                    newData.MB_REG_MOBILE +
-                    '","MB_PW": "' +
-                    newData.MB_PW + '"}',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json)
-                if (json.ResponseCode == 200) {
-                    LoginByMobile()
-                } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
-                }
-            })
-            .catch((error) => {
-
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
-                console.log('ERROR ' + error);
-            });
-    };
     const LoginByMobile = async () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -315,6 +248,7 @@ const RegisterScreen = ({ route }: any) => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
+                    await UpdateMember(responseData.MB_LOGIN_GUID)
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
@@ -351,11 +285,10 @@ const RegisterScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    await updateMB_LOGIN_GUID(MB_LOGIN_GUID)
+                    await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                     navigation.goBack()
-                    setLoading(false)
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => setLoading(false) }])
@@ -366,19 +299,22 @@ const RegisterScreen = ({ route }: any) => {
                     { text: `ยืนยัน`, onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
+            setLoading(false)
     }
     const UpdateMember = async (NEW_GUID: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         let sex = 'M'
         let birthDate = ''
-        if (newData.MB_BIRTH == '') {
-            let nowDate = new Date();
-            birthDate = `${nowDate.getFullYear()}${nowDate.getMonth().toString().length > 1 ? nowDate.getMonth() : '0' + nowDate.getMonth()}${nowDate.getDate().toString().length > 1 ? nowDate.getDate() : '0' + nowDate.getDate()}`
-        } else {
-            let nowDate = newData.MB_BIRTH.split('-')
-            birthDate = nowDate[2] + nowDate[1] + nowDate[0];
-        }
+        let nowDate = new Date();
+        if (newData.MB_BIRTH)
+            nowDate = new Date(newData.MB_BIRTH)
+        var day: any = nowDate.getDate()
+        day = day > 9 ? day : '0' + day
+        var month: any = nowDate.getMonth() + 1
+        month = month > 9 ? month : '0' + month
+        var year = nowDate.getFullYear()
+        birthDate = year + '' + month + '' + day
         newData.MB_INTL == 'นาย' || newData.MB_INTL == 'คุณ' || newData.MB_INTL == 'ด.ช.' || newData.MB_INTL == 'MR.' ? sex = 'M' : sex = 'F'
 
         await fetch(configToken.WebService + '/MbUsers', {
@@ -460,10 +396,11 @@ const RegisterScreen = ({ route }: any) => {
 
         if (tempcode.length == 4) {
             if (tempcode == OTPpassword) {
+                setLoading(true)
                 setCountdown(0)
                 setPinCode('')
                 setRegis(false)
-                getNewMemberMbUsers()
+                LoginByMobile()
             }
             else {
                 Alert.alert(`แจ้งเตือน`, `รหัสไม่ถูกต้อง`, [
@@ -1198,4 +1135,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default RegisterScreen
+export default UpdateScreen
