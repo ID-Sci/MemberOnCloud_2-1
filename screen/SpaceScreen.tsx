@@ -67,9 +67,10 @@ const SpaceScreen = () => {
         if (CState) await fetchGuidLog()
         if (CState) await setnotiItem()
         if (CState)
-            await navigation.dispatch(
-                navigation.replace('bstab')
-            )
+        navigation.navigate('bstab')
+            //  navigation.dispatch(
+            //     navigation.replace('bstab')
+            // )
 
     }
 
