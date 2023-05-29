@@ -48,7 +48,7 @@ export default FlatListNewproduct = ({ route }) => {
                         สินค้าใหม่
                     </Text>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('Newproduct', { name:'สินค้าใหม่',route: route })}
+                        onPress={() => navigation.navigate('Newproduct', { name: 'สินค้าใหม่', route: route })}
                     >
                         <Text style={{
                             fontSize: FontSize.medium,
@@ -62,6 +62,7 @@ export default FlatListNewproduct = ({ route }) => {
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
+                    height={deviceHeight * 0.4}
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -73,8 +74,17 @@ export default FlatListNewproduct = ({ route }) => {
                                     <TouchableOpacity style={{
                                         backgroundColor: '#fff', alignItems: 'center',
                                         justifyContent: 'center',
-                                        height: deviceWidth * 0.5,
+                                        height: deviceWidth * 0.6,
                                         width: deviceWidth * 0.5,
+                                        shadowColor: "#000",
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 2,
+                                        },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 3.84,
+
+                                        elevation: 5,
                                         borderRadius: deviceWidth * 0.05,
                                     }}
                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
@@ -85,8 +95,9 @@ export default FlatListNewproduct = ({ route }) => {
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.8,
                                                 shadowRadius: 2,
-                                                height: deviceWidth * 0.2,
-                                                width: deviceWidth * 0.2,
+                                                height: deviceWidth * 0.35,
+                                                width: deviceWidth * 0.35,
+                                                resizeMode: 'contain',
                                             }}
                                             source={require('../img/newproduct.png')}
                                         /> : <Image
@@ -95,8 +106,10 @@ export default FlatListNewproduct = ({ route }) => {
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.8,
                                                 shadowRadius: 2,
-                                                height: deviceWidth * 0.2,
-                                                width: deviceWidth * 0.2,
+                                                height: deviceWidth * 0.35,
+                                                width: deviceWidth * 0.35,
+                                                resizeMode: 'contain', 
+                                               
                                             }}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />}

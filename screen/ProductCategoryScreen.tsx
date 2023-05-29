@@ -113,6 +113,20 @@ const ProductCategoryScreen = ({ route }: any) => {
                         borderBottomWidth: 1,
                         borderColor: Colors.borderColor
                     }}>
+                     <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <View style={{ width: deviceWidth * 0.1, flexDirection: 'row', alignItems: 'center', }}>
+
+                            <Image
+                                source={require('../img/iconsMenu/goback.png')}
+                                style={{
+                                    width: FontSize.large * 1.5,
+                                    height: FontSize.large * 1.5,
+                                    resizeMode: 'contain',
+                                }}
+                            />
+                        </View>
+
+                    </TouchableOpacity>
                     <Text
                         style={{
                             fontSize: FontSize.medium,
@@ -121,15 +135,21 @@ const ProductCategoryScreen = ({ route }: any) => {
                         }}>
                         {route.params.name}
                     </Text>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                    >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                        }}
-                        >
-                            x
-                        </Text>
+                    <TouchableOpacity style={{
+                    width: deviceWidth * 0.1, flexDirection: 'row', alignItems: 'center',
+                }}
+                    onPress={() => navigation.navigate('ProductSearch', { name: 'ค้นหา' })}
+                >
+                    <View style={{ padding: 10 }}  >
+                        <Image
+                            source={require('../img/iconsMenu/search.png')}
+                            style={{
+                                width: FontSize.large,
+                                height: FontSize.large,
+                                resizeMode: 'contain',
+                            }}
+                        />
+                    </View>
                     </TouchableOpacity>
                 </View>
 
@@ -187,6 +207,7 @@ const ProductCategoryScreen = ({ route }: any) => {
                                     shadowRadius: 2,
                                     height: deviceWidth * 0.3,
                                     width: deviceWidth * 0.3,
+                                    resizeMode: 'contain',
                                 }}
                                 source={require('../img/empty-box-blue-icon.png')}
                             />

@@ -67,6 +67,7 @@ export default FlatListProductScreen = ({ route }) => {
                                                     shadowRadius: 2,
                                                     height: deviceWidth * 0.2,
                                                     width: deviceWidth * 0.3,
+                                                    resizeMode: 'contain',
                                                 }}
                                                 source={require('../img/newproduct.png')}
                                             /> : <Image
@@ -77,6 +78,7 @@ export default FlatListProductScreen = ({ route }) => {
                                                     shadowRadius: 2,
                                                     height: deviceHeight * 0.2,
                                                     width: deviceWidth * 0.3,
+                                                    resizeMode: 'contain',
                                                 }}
                                                 source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                             />}

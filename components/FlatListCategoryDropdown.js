@@ -41,9 +41,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                     width: deviceWidth,
                     height: FontSize.large * 2,
                     backgroundColor: '#fff', alignItems: 'center',
-                    justifyContent: 'space-between',
                     flexDirection: 'row',
-
                     backgroundColor: Colors.borderColor
                 }}
                 onPress={() => setThisState(item)}>
@@ -58,10 +56,13 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.8,
                         shadowRadius: 2,
+                        resizeMode: 'contain',
                     }}
                     source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                 />
-                <Text>
+                <Text style={{
+                    fontFamily: 'Kanit-Light',
+                }}>
                     {item.SHWPH_TTL_CPTN}
                 </Text>
                 <View width={deviceWidth * 0.1}>
@@ -145,10 +146,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                     backgroundColor: Colors.borderColor
                                 }}
                                 onPress={() => setCategoryModel(!CategoryModel)}>
-                                <View width={deviceWidth * 0.1}>
-
-                                </View>
-
+                                <View width={deviceWidth * 0.5}>
                                 <Image
                                     style={{
                                         height: deviceWidth * 0.1,
@@ -157,14 +155,18 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                         shadowOffset: { width: 0, height: 2 },
                                         shadowOpacity: 0.8,
                                         shadowRadius: 2,
+                                        resizeMode: 'contain',
                                     }}
                                     source={{ uri: `data:image/png;base64,${CategoryItem.IMAGE64}` }}
                                 />
+                                </View>
+
+                               
+                                
+                                <View width={deviceWidth * 0.5}>
                                 <Text>
                                     {CategoryItem.SHWPH_TTL_CPTN}
                                 </Text>
-                                <View width={deviceWidth * 0.1}>
-
                                 </View>
                             </TouchableOpacity>
                         </View>

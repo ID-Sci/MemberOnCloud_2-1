@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import authReducer from './slices/authReducer'
 import configReducer from './slices/configReducer'
+import docinfoReducer from './slices/docinfoReducer'
 import emptyTankReducer from './slices/emptyTankReducer'
 import projReducer from './slices/projReducer'
 import promotionReducer from './slices/promotionReducer'
@@ -17,6 +18,7 @@ import basketReducer from './slices/basketReducer'
 const reducer = {
    authReducer,
    configReducer,
+   docinfoReducer,
    emptyTankReducer,
    projReducer,
    promotionReducer,

@@ -61,7 +61,7 @@ export default FlatListPromotion = ({ route }) => {
 
                 </View>
                 <ScrollView
-                    paddingBottom={deviceWidth * 0.05}
+                    height={deviceHeight * 0.25}
                     horizontal={true}
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
@@ -76,6 +76,15 @@ export default FlatListPromotion = ({ route }) => {
                                         justifyContent: 'center', flexDirection: 'row',
                                         height: deviceHeight * 0.2,
                                         width: deviceWidth * 0.8,
+                                        shadowColor: "#000",
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 2,
+                                        },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 3.84,
+                                        
+                                        elevation: 5,
                                         borderRadius: deviceWidth * 0.05,
                                     }}
                                     onPress={() => navigation.navigate('Temppage', { name: 'โปรโมชั่นแนะนำ', route: item })}>
@@ -87,7 +96,7 @@ export default FlatListPromotion = ({ route }) => {
                                                 shadowRadius: 2,
                                                 height: deviceHeight * 0.2,
                                                 width: deviceWidth * 0.8,
-                                                borderRadius: deviceWidth * 0.05,
+                                                borderRadius: deviceWidth * 0.05, 
                                             }}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />

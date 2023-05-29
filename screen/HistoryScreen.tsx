@@ -35,13 +35,20 @@ const HistoryScreen = () => {
     const [RedeemLoading, setRedeemLoading] = useState(true);
     const [PurchaseLoading, setPurchaseLoading] = useState(true);
     console.log(`ConfigList.UserList ${ConfigList.UserList}`)
+
     const CDateForPopup = async () => {
-        await fetch('http://worldtimeapi.org/api/timezone/Asia/Bangkok', {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+
+        console.log(configToken.WebService)
+        await fetch(configToken.WebService + '/ServerReady', {
             method: 'GET'
         })
-            .then((response) => response.json())
+            .then((response: any) => {
+                return response.headers.map.date
+            })
             .then(async (json) => {
-                let datetime = new Date(json.utc_datetime)
+                let datetime = new Date(json)
                 var day: any = datetime.getDate()
                 day = day > 9 ? day : '0' + day
                 var month: any = datetime.getMonth() + 1
@@ -60,7 +67,7 @@ const HistoryScreen = () => {
 
 
 
-            }) .catch( async (error) => {
+            }).catch(async (error) => {
                 let datetime = new Date()
                 var day: any = datetime.getDate()
                 day = day > 9 ? day : '0' + day
@@ -333,7 +340,7 @@ const HistoryScreen = () => {
                                                         </Text>
                                                     </View>
                                                     <View
-                                                       
+
                                                         style={{
                                                             width: (deviceWidth * 0.4) - 20,
                                                             flexDirection: 'row',
@@ -416,9 +423,9 @@ const HistoryScreen = () => {
                                                             </Text>
                                                         </View>
                                                         <View
-                                                           
+
                                                             style={{
-                                                                width: (deviceWidth * 0.6) - 20 ,
+                                                                width: (deviceWidth * 0.6) - 20,
                                                                 flexDirection: 'row',
                                                                 justifyContent: 'space-between'
                                                             }}>

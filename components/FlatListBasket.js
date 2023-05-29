@@ -7,7 +7,8 @@ import {
     Image,
     TouchableOpacity,
     View,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../src/styles/colors';
@@ -15,6 +16,7 @@ import { FontSize } from '../src/styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import { useAppDispatch, useAppSelector } from '../src/store/store'
 import { updateBasket, updatePrepareDocumentt } from '../src/store/slices/basketReducer';
+import { docinfoSelector } from '../src/store/slices/docinfoReducer';
 import * as Keychain from 'react-native-keychain';
 import { config, updateARcode } from '../src/store/slices/configReducer';
 
@@ -27,8 +29,12 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
     const [amount, setAmount] = useState(0)
     const [data, setData] = useState(items)
     const [dataItem, setDataItem] = useState(itemsERP)
+    const [loading, setloading] = useState(false)
+    const [createAR, setCreateAR] = useState(false)
+
     const [prepareDoc, setPrepareDoc] = useState(prepareDocument)
     const ConfigList = useAppSelector(config)
+    const docinfoType = useAppSelector(docinfoSelector).docinfoPage[0].SHWPH_TTL_ECPTN
 
     useEffect(() => {
         setData(items)
@@ -36,10 +42,14 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
         setPrepareDoc(prepareDocument)
     }, [items]);
 
+
     useEffect(() => {
         if (ConfigList.MB_LOGIN_GUID) {
+
             if (items.length > 0) {
+             
                 const ARCheck = async () => {
+
                     const { MB_CODE } = ConfigList.UserList
                     const checkLoginToken = await Keychain.getGenericPassword();
                     const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -62,20 +72,25 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 let responseData = JSON.parse(json.ResponseData);
                                 if (responseData.Ar000130.length > 0) {
                                     await dispatch(updateARcode(responseData.Ar000130[0].AR_CODE))
+
                                     await calBasket(responseData.Ar000130[0].AR_CODE)
+
                                 } else createARfile()
+                               
                             } else {
                                 Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                                    { text: `ยืนยัน`, onPress: () => setloading(false) }])
                             }
                         })
                         .catch((error) => {
                             Alert.alert(`แจ้งเตือน`, `${error}`, [
-                                { text: `ยืนยัน`, onPress: () => console.log() }])
+                                { text: `ยืนยัน`, onPress: () => setloading(false) }])
                             console.log('ERROR ' + error);
                         })
+
                 }
                 ARCheck();
+
             }
         } else {
             Alert.alert(`แจ้งเตือน`, `Login member`, [
@@ -133,9 +148,27 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     { text: `ยืนยัน`, onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
+
     }
 
     const calBasket = async (AR_CODE) => {
+        await setloading(true)
+        docinfoType == 'BK' && await calBasketSellOrder(AR_CODE)
+        docinfoType == 'CS' && await calBasketInvoice(AR_CODE)
+        docinfoType == 'DS' && await calBasketInvoice(AR_CODE)
+        await setloading(false)
+
+    }
+    const saveBasket = async () => {
+        await setloading(true) 
+         
+            docinfoType == 'BK' && await saveBasketSellOrder()
+            docinfoType == 'CS' && await saveBasketInvoice()
+            docinfoType == 'DS' && await saveBasketInvoice()
+            await setloading(false)
+        
+    }
+    const calBasketSellOrder = async (AR_CODE) => {
         let newDate = new Date()
         var d = newDate.getDate()
         var m = newDate.getMonth() + 1
@@ -147,7 +180,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     ImpTrhHeader: {
                         DI_DATE: DI_DATE,
                         DI_REF: '<เลขถัดไป>',
-                        DT_DOCCODE: 'DS',
+                        DT_DOCCODE: docinfoType,
                         DT_PROPERTIES: '307',
                         VAT_REF: '<เลขเดียวกัน>',
                         VAT_DATE: DI_DATE,
@@ -159,7 +192,102 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                 },
             ],
         }
-        console.log(" ######## calBasket  #######", param)
+        console.log(" ######## calBasketSellOrder  #######", param)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/UpdateErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'CalcSellOrderDocinfo',
+                'BPAPUS-PARAM': JSON.stringify(param),
+                'BPAPUS-FILTER': '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    await dispatch(updatePrepareDocumentt(param))
+                    console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.AROE.AROE_B_AMT)
+                    await setAmount(responseData.AROE.AROE_B_AMT)
+                } else {
+                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(`แจ้งเตือน`, `${error}`, [
+                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+    }
+
+    const saveBasketSellOrder = async () => {
+        console.log("######## saveBasketSellOrder prepareDocument >>>", prepareDocument)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/UpdateErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'SaveSellOrderDocinfo',
+                'BPAPUS-PARAM': JSON.stringify(prepareDocument),
+                'BPAPUS-FILTER': '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+
+                    dispatch(updateBasket([]))
+                    Alert.alert(`แจ้งเตือน`, `สั่งซื้อสำเร็จ`, [
+                        { text: `ยืนยัน`, onPress: () => navigation.goBack() }])
+                } else {
+                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(`แจ้งเตือน`, `${error}`, [
+                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+    }
+    const calBasketInvoice = async (AR_CODE) => {
+        let newDate = new Date()
+        var d = newDate.getDate()
+        var m = newDate.getMonth() + 1
+        var y = newDate.getFullYear()
+        let DI_DATE = y + (m <= 9 ? '0' + m : m) + d
+        const param = {
+            ErpUpdFunc: [
+                {
+                    ImpTrhHeader: {
+                        DI_DATE: DI_DATE,
+                        DI_REF: '<เลขถัดไป>',
+                        DT_DOCCODE: docinfoType,
+                        DT_PROPERTIES: '307',
+                        VAT_REF: '<เลขเดียวกัน>',
+                        VAT_DATE: DI_DATE,
+                        AR_CODE: AR_CODE,
+                        ARD_TDSC_KEYIN: '',
+                        DI_REMARK: 'MEMBER APP',
+                    },
+                    ImpTrhDetail: dataItem
+                },
+            ],
+        }
+        console.log(" ######## calBasketInvoice  #######", param)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/UpdateErp', {
@@ -181,7 +309,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updatePrepareDocumentt(param))
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.ARDETAIL.ARD_B_AMT)
-                    setAmount(responseData.ARDETAIL.ARD_B_AMT)
+                    await setAmount(responseData.ARDETAIL.ARD_B_AMT)
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => console.log() }])
@@ -194,8 +322,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             })
     }
 
-    const saveBasket = async () => {
-        console.log("######## saveBasket prepareDocument >>>", prepareDocument)
+    const saveBasketInvoice = async () => {
+        console.log("######## saveBasketInvoice prepareDocument >>>", prepareDocument)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/UpdateErp', {
@@ -215,9 +343,10 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             .then(async (json) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    navigation.goBack()
+
+                    dispatch(updateBasket([]))
                     Alert.alert(`แจ้งเตือน`, `สั่งซื้อสำเร็จ`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                        { text: `ยืนยัน`, onPress: () => navigation.goBack() }])
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => console.log() }])
@@ -265,9 +394,32 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
         setDataItem(newItem)
     }
     console.log(data.length)
+
+    const loadingScreen = () => {
+        return (
+            <View
+                style={{
+                    width: deviceWidth,
+                    height: deviceHeight,
+                    opacity: 1,
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    position: 'absolute',
+                }}>
+                <ActivityIndicator
+                    animating={true}
+                    size="large"
+                    color={Colors.lightPrimiryColor}
+                />
+            </View>
+        )
+    }
+ 
     return (data &&
         (
             <View style={{ alignItems: 'flex-end' }}>
+
                 <View style={{
                     width: deviceWidth,
                     height: deviceHeight * 0.9,
@@ -283,7 +435,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 <Image
                                     style={{
                                         width: deviceWidth * 0.8,
-
+                                        resizeMode: 'contain',
                                     }}
                                     resizeMode={'contain'}
                                     source={require('../img/empty-box-blue-icon.png')}
@@ -307,6 +459,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                         </View>
 
                     </>) : (<>
+
+
                         <ScrollView
                             style={{
                                 width: deviceWidth,
@@ -326,6 +480,15 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                         justifyContent: 'center', flexDirection: 'row',
                                                         height: deviceWidth * 0.33,
                                                         width: deviceWidth * 0.9,
+                                                        shadowColor: "#000",
+                                                        shadowOffset: {
+                                                            width: 0,
+                                                            height: 2,
+                                                        },
+                                                        shadowOpacity: 0.25,
+                                                        shadowRadius: 3.84,
+
+                                                        elevation: 5,
                                                         borderRadius: deviceWidth * 0.05,
                                                     }}
                                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
@@ -342,6 +505,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                     shadowOffset: { width: 0, height: 2 },
                                                                     shadowOpacity: 0.8,
                                                                     shadowRadius: 2,
+                                                                    resizeMode: 'contain',
                                                                     height: deviceWidth * 0.12,
                                                                     width: deviceWidth * 0.18,
                                                                 }}
@@ -352,6 +516,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                     shadowOffset: { width: 0, height: 2 },
                                                                     shadowOpacity: 0.8,
                                                                     shadowRadius: 2,
+                                                                    resizeMode: 'contain',
                                                                     height: deviceHeight * 0.12,
                                                                     width: deviceWidth * 0.18,
                                                                 }}
@@ -373,7 +538,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                 }}>
 
                                                                 <Text style={{
-                                                                    width: '85%',
+                                                                    width: '90%',
                                                                     textAlign: 'left',
                                                                 }}>
                                                                     {item.SHWC_ALIAS}
@@ -391,6 +556,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                             require('../img/iconsMenu/trash.png')
                                                                         }
                                                                         style={{
+                                                                            resizeMode: 'contain',
                                                                             width: deviceWidth * 0.04,
                                                                             height: deviceWidth * 0.05,
                                                                         }}
@@ -515,52 +681,68 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                         </ScrollView>
                         <View style={{
                             width: deviceWidth,
-                            height: deviceHeight * 0.3,
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexDirection: 'column',
-                            backgroundColor: Colors.backgroundColor,
+                            backgroundColor: Colors.fontColor2,
+                            paddingBottom: deviceHeight * 0.08,
+                            shadowColor: "#000",
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+                            elevation: 5,
+
                         }}>
                             <View
                                 style={{
 
-                                    width: deviceWidth * 0.8,
+                                    width: deviceWidth * 0.9,
                                     alignItems: 'center',
-                                    justifyContent: 'center',
+                                    justifyContent: 'space-between',
                                     flexDirection: 'row',
-                                    height: deviceHeight * 0.07,
+                                    height: FontSize.large * 2,
                                 }}
-
                             >
                                 <Text style={{
                                     fontSize: FontSize.large,
-                                    color: Colors.menuButton
+                                    fontWeight: 'bold',
+                                    color: Colors.inputText
                                 }}
                                 >
-
                                     {`ราคารวม `}
                                 </Text>
-                                <CurrencyInput
-                                    editable={false}
-                                    delimiter=","
-                                    separator="."
-                                    precision={2}
-                                    color={Colors.menuButton}
-                                    fontSize={FontSize.large}
-                                    fontWeight={'bold'}
-                                    placeholderTextColor={Colors.fontColor}
-                                    value={amount}
-                                    multiline={true}
-                                    textAlign={'center'}
-                                />
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                    color: Colors.menuButton
-                                }}
-                                >
+                                <View style={{
+                                    alignItems: 'center',
+                                    flexDirection: 'row',
+                                }}>
 
-                                    {` บาท`}
-                                </Text>
+                                    <CurrencyInput
+                                        editable={false}
+                                        delimiter=","
+                                        separator="."
+                                        precision={2}
+                                        color={loading ? Colors.borderColor : Colors.menuButton}
+                                        fontSize={FontSize.large}
+                                        fontWeight={'bold'}
+                                        placeholderTextColor={Colors.itemColor}
+                                        value={amount}
+                                        multiline={true}
+                                        textAlign={'center'}
+                                    />
+
+                                    <Text style={{
+                                        fontSize: FontSize.medium,
+                                        color: Colors.textColor
+                                    }}
+                                    >
+
+                                        {` บาท`}
+                                    </Text>
+                                </View>
+
                             </View>
                             <TouchableOpacity
                                 onPress={() => saveBasket()}
@@ -572,13 +754,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 <View
                                     style={{
 
-                                        width: deviceWidth * 0.8,
+                                        width: deviceWidth * 0.9,
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         flexDirection: 'row',
-                                        backgroundColor: Colors.menuButton,
+                                        backgroundColor: loading ? Colors.borderColor : Colors.menuButton,
                                         height: deviceHeight * 0.07,
-                                        borderRadius: deviceWidth * 0.1,
+                                        borderRadius: 10,
                                     }}
 
                                 >
@@ -592,11 +774,14 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 </View>
                             </TouchableOpacity>
                         </View>
+
                     </>)}
                 </View>
+                {loading && data.length > 0 && loadingScreen()}
             </View>
 
         )
+
     )
 }
 

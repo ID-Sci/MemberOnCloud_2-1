@@ -27,6 +27,7 @@ import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLogin
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../src/store/store';
+import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -34,6 +35,7 @@ const deviceHeight = Dimensions.get('window').height;
 const LoginScreen = () => {
     const dispatch = useAppDispatch();
     const [LoginState, setLoginState] = useState(true)
+    const [Vsersion, setVsersion] = useState(null)
     const [Phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false);
     const [PhoneParm, setPhoneParm] = useState(0)
@@ -44,8 +46,16 @@ const LoginScreen = () => {
         setPhone(val.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'))
         setPhoneParm(val.replace(/(\d{3})(\d{3})(\d{4})/, '$1$2$3'))
     }
-
+    useEffect(() => {
+        getVersionData()
+    })
+    const getVersionData = async () => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        setVsersion(configToken.upDateVsersion)
+    }
     const getLoginMbUsers = async () => {
+        setLoading(true)
         console.log(`LoginByMobile`)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -86,7 +96,7 @@ const LoginScreen = () => {
         console.log(`getProJ [Ec000400]`)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        setLoading(true)
+       
         await fetch(configToken.WebService + '/Member', {
             method: 'POST',
             body: JSON.stringify({
@@ -107,6 +117,7 @@ const LoginScreen = () => {
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: PhoneParm, MB_PW: PasswordParm, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                    
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => setLoading(false) }])
@@ -163,6 +174,7 @@ const LoginScreen = () => {
                             style={{
                                 width: undefined,
                                 height: deviceWidth / 1.5,
+                                resizeMode: 'contain',
                             }}
                             resizeMode={'contain'}
                             source={require('../img/LogoBplusMember.png')}
@@ -283,10 +295,19 @@ const LoginScreen = () => {
                                     {`  ลงทะเบียน  `}
                                 </Text>
                             </TouchableOpacity>
+
                         </View>
 
 
-
+                        <View style={{ marginTop:5,alignItems: 'center' }}>
+                            <Text style={{
+                                fontSize: FontSize.medium * 0.8,
+                                fontWeight: 'bold',
+                                color: Colors.borderColor
+                            }}>
+                                {Vsersion != null && `version ${Vsersion}`}
+                            </Text>
+                        </View>
                     </View>
 
 

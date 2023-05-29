@@ -32,11 +32,12 @@ export default FlatListPromotion = ({ route }) => {
             <View
             >
                 <View style={{
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    paddingLeft: deviceWidth * 0.05,
-                    paddingRight: deviceWidth * 0.05, 
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  paddingLeft: deviceWidth * 0.05,
+                  paddingRight: deviceWidth * 0.05,
+                  paddingBottom: deviceWidth * 0.05
                 }}>
                     <Text
                         style={{
@@ -61,6 +62,7 @@ export default FlatListPromotion = ({ route }) => {
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
+                    height={deviceHeight*0.4}
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -74,6 +76,15 @@ export default FlatListPromotion = ({ route }) => {
                                         justifyContent: 'center',
                                         borderRadius: deviceWidth * 0.05,
                                         width: deviceWidth * 0.8,
+                                        shadowColor: "#000",
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: 2,
+                                        },
+                                        shadowOpacity: 0.25,
+                                        shadowRadius: 3.84,
+                                        
+                                        elevation: 5,
                                     }}
                                         onPress={() => navigation.navigate('Temppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: item })}>
 
@@ -83,17 +94,18 @@ export default FlatListPromotion = ({ route }) => {
                                                 shadowOffset: { width: 0, height: 2 },
                                                 shadowOpacity: 0.8,
                                                 shadowRadius: 2,
-                                                height: deviceHeight * 0.2,
+                                                height: deviceHeight * 0.3,
                                                 width: deviceWidth * 0.8,
+                                                resizeMode: 'contain',
                                                 borderRadius: deviceWidth * 0.05,
                                             }}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />
-                                        <View style={{ padding: 10 }}>
+                                        {/* <View style={{ padding: 10 }}>
                                             <Text>
                                                 {item.SHWPH_EXPLAIN}
                                             </Text>
-                                        </View>
+                                        </View> */}
                                     </TouchableOpacity>
                                 </View>
 

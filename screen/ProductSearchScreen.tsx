@@ -76,6 +76,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                 style={{
                                     width: FontSize.large * 1.5,
                                     height: FontSize.large * 1.5,
+                                    resizeMode: 'contain',
                                 }}
                             />
                         </View>
@@ -92,6 +93,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                 style={{
                                     width: FontSize.large * 1.3,
                                     height: FontSize.large * 1.3,
+                                    resizeMode: 'contain',
                                 }}
                             />
                         </View>
@@ -118,6 +120,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                     style={{
                                         width: FontSize.large * 1.5,
                                         height: FontSize.large * 1.5,
+                                        resizeMode: 'contain',
                                     }}
                                 />
                             </View>
@@ -179,6 +182,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                     shadowRadius: 2,
                                     height: deviceWidth * 0.3,
                                     width: deviceWidth * 0.3,
+                                    resizeMode: 'contain',
                                 }}
                                 source={require('../img/empty-box-blue-icon.png')}
                             />

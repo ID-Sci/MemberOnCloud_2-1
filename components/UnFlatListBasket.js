@@ -41,6 +41,7 @@ export default FlatListBasket = ({ route }) => {
                             style={{
                                 width: undefined,
                                 height: deviceWidth / 1.5,
+                                resizeMode: 'contain',
                             }}
                             resizeMode={'contain'}
                             source={require('../img/empty-box-blue-icon.png')}

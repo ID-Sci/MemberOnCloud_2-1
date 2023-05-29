@@ -49,17 +49,14 @@ const TemppageScreen = ({ route }: any) => {
                         <View style={{}}>
 
                             <View
-                                style={{ 
-                                    height: deviceWidth*0.6
-                                }}>
+                                >
                                <Image
                                     style={{
                                         shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 2 },
-                                    
+                                        shadowOffset: { width: 0, height: 2 }, 
                                         shadowRadius: 2,
                                         height: deviceWidth*0.6,
-                                        width: deviceWidth, 
+                                        width: deviceWidth,  
                                     }}
                                     source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                 />

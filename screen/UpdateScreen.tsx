@@ -732,7 +732,7 @@ const UpdateScreen = ({ route }: any) => {
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
-                                    <View style={{
+                                    {/* <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
                                         <Text style={styles.textTitle}>
@@ -758,7 +758,7 @@ const UpdateScreen = ({ route }: any) => {
                                                 maxLength={17}
                                                 style={styles.textInput}></TextInput>
                                         </View>
-                                    </View>
+                                    </View> */}
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>

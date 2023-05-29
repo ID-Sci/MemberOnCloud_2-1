@@ -28,7 +28,10 @@ import Colors from '../src/styles/colors';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import FlatSlider from '../components/FlatListSlider';
 import RNRestart from 'react-native-restart';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { docinfoSelector, updateDocinfoList, clearDocinfoList, updateDocinfoPage, clearDocinfoPage } from '../src/store/slices/docinfoReducer';
 import { projSelector, updateProjList, clearProjList } from '../src/store/slices/projReducer';
 import { promotionSelector, updatePromotionList, clearPromotionList, updatePromotionPage, clearPromotionPage } from '../src/store/slices/promotionReducer';
 import { updateNotificationList, clearNotificationList, updateNotificationPage, clearNotificationPage } from '../src/store/slices/notificationReducer';
@@ -43,7 +46,7 @@ const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 const MyConfig = '/config.json';
 let MyMac = ''
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 let CState = true
 const SpaceScreen = () => {
     const dispatch = useAppDispatch();
@@ -56,7 +59,7 @@ const SpaceScreen = () => {
         if (CState)
             loadFuntion()
         else RNRestart.restart()
-    }, [CState]);
+    }, []);
 
     const loadFuntion = async () => {
         // dispatch(updateConfigList())
@@ -67,10 +70,10 @@ const SpaceScreen = () => {
         if (CState) await fetchGuidLog()
         if (CState) await setnotiItem()
         if (CState)
-        navigation.navigate('bstab')
-            //  navigation.dispatch(
-            //     navigation.replace('bstab')
-            // )
+            navigation.navigate('bstab')
+        //  navigation.dispatch(
+        //     navigation.replace('bstab')
+        // )
 
     }
 
@@ -118,9 +121,9 @@ const SpaceScreen = () => {
             "Phone": "0828845662",
             "MB_PW": "",
             "logined": "false",
-            "upDateKey": "1"
-        } 
-        if (  configToken == null || configToken.upDateKey != superObj.upDateKey) {
+            "upDateVsersion": "3.0.3"
+        }
+        if (configToken == null || configToken.upDateVsersion != superObj.upDateVsersion) {
             console.log(`new Obj >>`)
             await Keychain.setGenericPassword("config", JSON.stringify(superObj))
         }
@@ -146,6 +149,7 @@ const SpaceScreen = () => {
         })
             .then((response) => response.json())
             .then((json) => {
+                console.log(json.ReasonString)
                 console.log(json.ReasonString)
                 if (json && json.ResponseCode == '200') {
                 }
@@ -181,6 +185,7 @@ const SpaceScreen = () => {
             .then((response) => response.json())
             .then(async (json) => {
                 console.log(json.ReasonString)
+
                 if (json.ResponseCode == 200 && json.ReasonString == 'Completed') {
 
                 } else {
@@ -313,6 +318,7 @@ const SpaceScreen = () => {
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: configToken.Phone, MB_PW: configToken.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => console.log() }])
@@ -418,15 +424,18 @@ const SpaceScreen = () => {
                     let Newproduct = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NEWPRODUCT') })[0]
                     console.log(`\nPromotion [${Newproduct ? true : false}]\n +> `)
                     Newproduct && await fetchLayoutData('Newproduct', LoginList, Newproduct)
-               
+
                     let Activity = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('ACTIVITY') })[0]
                     console.log(`\nActivity [${Activity ? true : false}]\n +> `)
                     Activity && await fetchLayoutData('Activity', LoginList, Activity)
-               
+
                     let Mycard = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('MYCARD') })[0]
                     console.log(`\nMycard [${Mycard ? true : false}]\n +> `)
                     Mycard && await fetchLayoutData('Mycard', LoginList, Mycard)
 
+                    let Docinfo = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('DOCINFO') })[0]
+                    console.log(`\nDocinfo [${Docinfo ? true : false}]\n +> `)
+                    Docinfo && await fetchLayoutData('Docinfo', LoginList, Docinfo)
                 } else {
                     CState = false
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
@@ -489,7 +498,13 @@ const SpaceScreen = () => {
                         await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
                             return a.GOODS_CODE - b.GOODS_CODE;
                         })))
-                        await dispatch(updateCategoryPage(responseData.SHOWPAGE))
+                        let tempCPTNC = await getPageProJ(responseData.SHOWPAGE, LoginList)
+                        await dispatch(updateCategoryPage(tempCPTNC))
+
+                    }
+                    if (LayoutKey == 'Docinfo') {
+                        await dispatch(updateDocinfoList(responseData.SHOWLAYOUT))
+                        await dispatch(updateDocinfoPage(responseData.SHOWPAGE))
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
@@ -570,8 +585,58 @@ const SpaceScreen = () => {
 
             })
     }
+    const getPageProJ = async (categoryList: any, LoginList: object,) => {
 
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        let tempProductList: any = []
+        for (var r in categoryList) {
+            console.log(`[${r + 1}] ${categoryList[r].SHWPH_GUID}`)
+            await fetch(configToken.WebService + '/ECommerce', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                    'BPAPUS-FUNCTION': 'GetPage',
+                    'BPAPUS-PARAM':
+                        '{"SHWP_GUID": "' +
+                        categoryList[r].SHWPH_GUID +
+                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                    'BPAPUS-FILTER': '',
+                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-OFFSET': '0',
+                    'BPAPUS-FETCH': '0',
+                }),
+            })
+                .then((response) => response.json())
+                .then(async (json) => {
+                    if (json.ResponseCode == 200) {
+                        let responseData = JSON.parse(json.ResponseData);
+                        if (responseData.SHOWPAGE) {
+                            console.log(`responseData > ${responseData.SHOWPAGE}`)
+                                tempProductList.push(responseData.SHOWPAGE)
+                           
+                        }
+                    } else {
+                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
+                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                    }
+                    console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
+                })
+                .catch((error) => {
+                    Alert.alert(`แจ้งเตือน`, `${error}`, [
+                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    console.log('ERROR ' + error);
+                })
+            console.log()
+
+        }
+
+        console.log(`end getProducrALLCategory`)
+        return tempProductList
+    }
+   
     const getProducrALLCategory = async (categoryList: any, LoginList: object,) => {
 
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -627,7 +692,7 @@ const SpaceScreen = () => {
     const setnotiItem = async () => {
         try {
             const value = await AsyncStorage.getItem('noti')
-           
+
             if (value !== null) {
 
                 // value previously stored

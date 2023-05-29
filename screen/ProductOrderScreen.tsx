@@ -22,9 +22,10 @@ import Colors from '../src/styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../src/styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-import { updateBasket,basketSelector } from '../src/store/slices/basketReducer';
+import { updateBasket, basketSelector } from '../src/store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../src/store/store'
+import { config, updateARcode } from '../src/store/slices/configReducer';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -32,27 +33,46 @@ const ProductOrderScreen = ({ route }: any) => {
     const item = route.params.route
     const navigation = useNavigation()
     const dispatch = useAppDispatch();
-    const [order, setOrder] = useState(item.QTY? item.QTY : 1)
+    const [order, setOrder] = useState(item.QTY ? item.QTY : 1)
     const basketProduct = useAppSelector(basketSelector)
-
+    const ConfigList = useAppSelector(config)
     const addBasket = async (order: any) => {
-        let dateTime = new Date()
-        let addBasket = [] 
-        let newItem = {
-            ...item,
-            QTY: order,
-            KEY: item.KEY? item.KEY : dateTime.getTime()
+        if (!ConfigList.MB_LOGIN_GUID) {
+            Alert.alert(`แจ้งเตือน`, `กรุณาเข้าสู่ระบบเพื่อเพิ่มรายการสินค้า`, [
+                { text: `ยืนยัน`, onPress: () => navigation.navigate('Profile') }])
+        } else {
+            let dateTime = new Date()
+            let addBasket = []
+            let newItem = {
+                ...item,
+                QTY: order,
+                KEY: item.KEY ? item.KEY : dateTime.getTime()
+            }
+
+            let itemEdit = item.KEY ?
+                basketProduct.basketProduct.filter((filteritem: any) => { return filteritem.KEY != item.KEY })
+                : basketProduct.basketProduct
+
+            addBasket = [...itemEdit, newItem]
+            let newBasket = newSortBasketList(addBasket)
+
+            await dispatch(updateBasket(newBasket))
+            navigation.navigate("basket")
         }
 
-        let itemEdit = item.KEY?
-            basketProduct.basketProduct.filter((filteritem: any) => { return filteritem.KEY != item.KEY })
-            : basketProduct.basketProduct
-
-        addBasket = [...itemEdit,newItem]
-        await dispatch(updateBasket(addBasket))
-        navigation.goBack()
     }
+    const newSortBasketList = (BasketList: any) => {
+        return Object.values(BasketList.reduce((acc: any, cur: any) => {
+            if (acc[cur.SHWC_CODE]) {
+                acc[cur.SHWC_CODE].QTY = Number(acc[cur.SHWC_CODE].QTY) + Number(cur.QTY)
+            } else {
+                acc[cur.SHWC_CODE] = { ...cur }
+            }
+            return acc;
+        }, {}))
 
+
+    }
     return (route.params.route &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -83,6 +103,7 @@ const ProductOrderScreen = ({ route }: any) => {
                                         shadowRadius: 2,
                                         height: deviceHeight * 0.4,
                                         width: deviceWidth * 0.8,
+                                        resizeMode: 'contain',
                                         borderRadius: deviceWidth * 0.05,
                                     }}
                                     source={require('../img/newproduct.png')}
@@ -94,6 +115,7 @@ const ProductOrderScreen = ({ route }: any) => {
                                         shadowRadius: 2,
                                         height: deviceHeight * 0.4,
                                         width: deviceWidth * 0.8,
+                                        resizeMode: 'contain',
                                         borderRadius: deviceWidth * 0.05,
                                     }}
                                     source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
@@ -178,151 +200,164 @@ const ProductOrderScreen = ({ route }: any) => {
 
                     </ScrollView>
                     <View style={{
-                        width: deviceWidth,
-                        height: deviceHeight * 0.1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexDirection: 'row',
-                        backgroundColor: Colors.backgroundColor,
+                        shadowColor: "#000",
+                        shadowOffset: {
+                            width: 0,
+                            height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        elevation: 5,
                     }}>
+                        <View style={{
+                            width: deviceWidth,
+                            height: deviceHeight * 0.1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexDirection: 'row',
 
-                        <TouchableOpacity
-                            disabled={order > 1 ? false : true}
-                            onPress={() => setOrder(order - 1)}
-                            style={{
+                            backgroundColor: Colors.backgroundColor,
+                        }}>
 
-
-                            }}
-                        >
-                            <View
+                            <TouchableOpacity
+                                disabled={order > 1 ? false : true}
+                                onPress={() => setOrder(order - 1)}
                                 style={{
-                                    width: deviceWidth * 0.1,
-                                    height: deviceWidth * 0.1,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: Colors.buttonTextColor,
-                                    borderRadius: deviceWidth * 0.1,
-                                }}
 
-                            >
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                    color: order > 1 ? Colors.menuButton : Colors.borderColor
+
                                 }}
+                            >
+                                <View
+                                    style={{
+                                        width: deviceWidth * 0.1,
+                                        height: deviceWidth * 0.1,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: Colors.buttonTextColor,
+                                        borderRadius: deviceWidth * 0.1,
+                                    }}
+
                                 >
-                                    -
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-                        <View
-                            style={{
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginLeft: deviceWidth * 0.08,
-                                marginRight: deviceWidth * 0.08,
-                            }}
-
-                        >
-                            <Text style={{
-                                fontSize: FontSize.large * 2,
-                                color: Colors.menuButton
-                            }}
-                            >
-                                {order}
-                            </Text>
-                        </View>
-                        <TouchableOpacity
-                            onPress={() => setOrder(order + 1)}
-                            style={{
-
-
-                            }}
-                        >
+                                    <Text style={{
+                                        fontSize: FontSize.large,
+                                        color: order > 1 ? Colors.menuButton : Colors.borderColor
+                                    }}
+                                    >
+                                        -
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
                             <View
                                 style={{
-                                    width: deviceWidth * 0.1,
-                                    height: deviceWidth * 0.1,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    backgroundColor: Colors.buttonTextColor,
-                                    borderRadius: deviceWidth * 0.1,
+                                    marginLeft: deviceWidth * 0.08,
+                                    marginRight: deviceWidth * 0.08,
                                 }}
 
                             >
                                 <Text style={{
-                                    fontSize: FontSize.large,
+                                    fontSize: FontSize.large * 2,
                                     color: Colors.menuButton
                                 }}
                                 >
-                                    +
+                                    {order}
                                 </Text>
                             </View>
-                        </TouchableOpacity>
-
-                    </View>
-                    <View style={{
-                        width: deviceWidth,
-                        height: deviceHeight * 0.1,
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        backgroundColor: Colors.backgroundColor,
-                    }}>
-
-                        <TouchableOpacity
-                            onPress={() => addBasket(order)}
-                            style={{
-
-                                padding: deviceWidth * 0.025,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <View
+                            <TouchableOpacity
+                                onPress={() => setOrder(order + 1)}
                                 style={{
 
-                                    width: deviceWidth * 0.8,
+
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        width: deviceWidth * 0.1,
+                                        height: deviceWidth * 0.1,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: Colors.buttonTextColor,
+                                        borderRadius: deviceWidth * 0.1,
+                                    }}
+
+                                >
+                                    <Text style={{
+                                        fontSize: FontSize.large,
+                                        color: Colors.menuButton
+                                    }}
+                                    >
+                                        +
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+
+                        </View>
+                        <View style={{
+                            width: deviceWidth,
+                            height: deviceHeight * 0.1,
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            backgroundColor: Colors.backgroundColor,
+                        }}>
+
+                            <TouchableOpacity
+                                onPress={() => addBasket(order)}
+                                style={{
+
+                                    padding: deviceWidth * 0.025,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    flexDirection: 'row',
-                                    backgroundColor: Colors.menuButton,
-                                    height: deviceHeight * 0.07,
-                                    borderRadius: deviceWidth * 0.1,
                                 }}
-
                             >
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                    color: Colors.buttonTextColor
-                                }}
+                                <View
+                                    style={{
+
+                                        width: deviceWidth * 0.9,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexDirection: 'row',
+                                        backgroundColor: Colors.menuButton,
+                                        height: deviceHeight * 0.07,
+                                        borderRadius: 10,
+                                    }}
+
                                 >
+                                    <Text style={{
+                                        fontSize: FontSize.medium,
+                                        color: Colors.buttonTextColor
+                                    }}
+                                    >
 
-                                    {`ใส่ตะกร้า `}
-                                </Text>
-                                <CurrencyInput
-                                    editable={false}
-                                    delimiter=","
-                                    separator="."
-                                    precision={2}
-                                    color={Colors.buttonTextColor}
-                                    fontSize={FontSize.large}
-                                    fontWeight={'bold'}
-                                    placeholderTextColor={Colors.fontColor}
-                                    value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC * order}
-                                    multiline={true}
-                                    textAlign={'center'}
-                                />
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                    color: Colors.buttonTextColor
-                                }}
-                                >
+                                        {`ใส่ตะกร้า `}
+                                    </Text>
+                                    <CurrencyInput
+                                        editable={false}
+                                        delimiter=","
+                                        separator="."
+                                        precision={2}
+                                        color={Colors.buttonTextColor}
+                                        fontSize={FontSize.medium}
+                                        fontWeight={'bold'}
+                                        placeholderTextColor={Colors.fontColor}
+                                        value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC * order}
+                                        multiline={true}
+                                        textAlign={'center'}
+                                    />
+                                    <Text style={{
+                                        fontSize: FontSize.medium,
+                                        color: Colors.buttonTextColor
+                                    }}
+                                    >
 
-                                    {` บาท`}
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
+                                        {` บาท`}
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
 
+                        </View>
                     </View>
+
                 </View>
 
                 <TouchableOpacity

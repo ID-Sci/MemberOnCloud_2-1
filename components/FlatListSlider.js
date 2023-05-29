@@ -27,9 +27,9 @@ export default FlatSlider = ({ route }) => {
             indicatorContainerStyle={{ position: 'absolute', bottom: 20 }}
             indicatorActiveColor={'#0077c2'}
             indicatorInActiveColor={'#ffffff'}
-            indicatorActiveWidth={30}
             animation
         />
 
+        // indicatorActiveWidth={30}
         : <></>)
 }

@@ -646,7 +646,7 @@ const RegisterScreen = ({ route }: any) => {
                                     onPress={() => handlePinCode('del')}>
                                     <Image
                                         style={{
-
+                                            resizeMode: 'contain',
                                             height: FontSize.large * 2,
                                             width: FontSize.large * 2,
                                         }}
@@ -795,7 +795,7 @@ const RegisterScreen = ({ route }: any) => {
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
-                                    <View style={{
+                                    {/* <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
                                         <Text style={styles.textTitle}>
@@ -821,7 +821,7 @@ const RegisterScreen = ({ route }: any) => {
                                                 maxLength={17}
                                                 style={styles.textInput}></TextInput>
                                         </View>
-                                    </View>
+                                    </View> */}
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>

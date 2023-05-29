@@ -38,10 +38,18 @@ const deviceHeight = Dimensions.get('window').height;
 const MyCardScreen = () => {
     const ConfigList = useAppSelector(config)
     const navigation = useNavigation()
-    const [order, setOrder] = useState(1)
+    const [Vsersion, setVsersion] = useState(null)
     const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
     let MycardList = useAppSelector(mycardSelector)
+    useEffect(() => {
+        getVersionData()
+    })
+    const getVersionData = async () => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        setVsersion(configToken.upDateVsersion)
+    }
     console.log(ConfigList.UserList)
     const getlogoutMbUsers = async () => {
         console.log(`logoutMbUsers`)
@@ -83,37 +91,37 @@ const MyCardScreen = () => {
     return (
 
         <View style={{ alignItems: 'flex-end', backgroundColor: '#fff', }}>
-              {loading &&
-                    <Modal
-                        transparent={true}
-                        animationType={'none'}
-                        visible={loading}
-                        onRequestClose={() => { }}>
+            {loading &&
+                <Modal
+                    transparent={true}
+                    animationType={'none'}
+                    visible={loading}
+                    onRequestClose={() => { }}>
+                    <View
+                        style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'space-around',
+                            flexDirection: 'column',
+                        }}>
                         <View
                             style={{
-                                flex: 1,
+                                backgroundColor: '#fff',
+                                display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-around',
-                                flexDirection: 'column',
+                                height: 100,
+                                width: 100,
+                                borderRadius: deviceWidth * 0.05
                             }}>
-                            <View
-                                style={{
-                                    backgroundColor: '#fff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-around',
-                                    height: 100,
-                                    width: 100,
-                                    borderRadius: deviceWidth * 0.05
-                                }}>
-                                <ActivityIndicator
-                                    animating={loading}
-                                    size="large"
-                                    color={Colors.lightPrimiryColor} />
-                            </View>
+                            <ActivityIndicator
+                                animating={loading}
+                                size="large"
+                                color={Colors.lightPrimiryColor} />
                         </View>
-                    </Modal>
-                }
+                    </View>
+                </Modal>
+            }
             <View style={{
                 alignSelf: 'center',
                 justifyContent: 'center',
@@ -130,6 +138,7 @@ const MyCardScreen = () => {
                                 height: deviceHeight * 0.3,
                                 width: undefined,
                                 alignSelf: 'stretch',
+                                resizeMode: 'contain',
                             }}
                             resizeMode="stretch"
                             source={{ uri: `data:image/png;base64,${MycardList.mycardPage[0].IMAGE64}` }}></Image>
@@ -156,7 +165,7 @@ const MyCardScreen = () => {
                                     textShadowRadius: 1,
                                     color: 'white',
                                 }}>
-                                {ConfigList.UserList.MB_CODE}
+                                {ConfigList.UserList && ConfigList.UserList.MB_CODE}
                             </Text>
                             <Text
                                 style={{
@@ -169,7 +178,7 @@ const MyCardScreen = () => {
                                     textShadowRadius: 1,
                                     color: 'white',
                                 }}>
-                                {`${ConfigList.UserList.MB_NAME} ${ConfigList.UserList.MB_SURNME}`}
+                                {`${ConfigList.UserList && ConfigList.UserList.MB_NAME} ${ConfigList.UserList && ConfigList.UserList.MB_SURNME}`}
                             </Text>
                         </View>
 
@@ -188,10 +197,10 @@ const MyCardScreen = () => {
                             }}
                         >
                             <Text
-                            style={{
-                                fontWeight:'bold',
-                                color:Colors.darkPrimiryColor
-                            }}>
+                                style={{
+                                    fontWeight: 'bold',
+                                    color: Colors.darkPrimiryColor
+                                }}>
                                 - แก้ไข -
                             </Text>
                         </TouchableOpacity>
@@ -221,7 +230,7 @@ const MyCardScreen = () => {
                         <Text style={{ fontSize: FontSize.medium }}>
                             รหัสบัตรสมาชิก
                         </Text>
-                        <Text style={{ fontSize: FontSize.medium }}>{ConfigList.UserList.MB_CODE} </Text>
+                        <Text style={{ fontSize: FontSize.medium }}>{ConfigList.UserList && ConfigList.UserList.MB_CODE} </Text>
                     </View>
                     <View
                         style={{
@@ -232,7 +241,7 @@ const MyCardScreen = () => {
                         <Text style={{ fontSize: FontSize.medium }}>
                             แต้มสะสม
                         </Text>
-                        <Text style={{ fontSize: FontSize.medium }}> {safe_Format.pointFormat(ConfigList.UserList.MB_SH_POINT)}  </Text>
+                        <Text style={{ fontSize: FontSize.medium }}> {ConfigList.UserList && safe_Format.pointFormat(ConfigList.UserList.MB_SH_POINT)}  </Text>
                     </View>
                     <View
                         style={{
@@ -269,10 +278,14 @@ const MyCardScreen = () => {
                             วันหมดอายุบัตร
                         </Text>
                         <Text style={{ fontSize: FontSize.medium }}>
-                            {safe_Format.dateFormat(ConfigList.UserList.MB_EXPIRE)}
+                            {ConfigList.UserList && safe_Format.dateFormat(ConfigList.UserList.MB_EXPIRE)}
                         </Text>
                     </View>
-                    <View style={{ marginTop: deviceHeight * 0.1 }} >
+                    <View style={{
+                        marginTop: deviceHeight * 0.1, alignItems: 'center',
+                        justifyContent: 'center',
+                    }} >
+
                         <TouchableOpacity
                             onPress={() => getlogoutMbUsers()}
                             style={{
@@ -300,13 +313,17 @@ const MyCardScreen = () => {
                                     color: Colors.buttonTextColor
                                 }}
                                 >
-
                                     {`ออกจากระบบ`}
-
-
                                 </Text>
                             </View>
                         </TouchableOpacity>
+                        <Text style={{
+                            fontSize: FontSize.medium * 0.8,
+                            fontWeight: 'bold',
+                            color: Colors.borderColor
+                        }}>
+                            {Vsersion != null && `version ${Vsersion}`}
+                        </Text>
                     </View>
 
                 </View>

@@ -1,6 +1,7 @@
 [
-    {"endpoint": {
-        "WebService": "",
+    {
+        "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
+        "OTPService": "http://203.150.55.21:8891/BplusNotiService/BplusNotiIIS.dll",
         "ServiceID": {
             "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
             "ETransaction": "{167f0c96-86fd-488f-94d1-cc3169d60b1a}",
@@ -14,10 +15,16 @@
             "MemberDeveloper": "{44fa3ed0-dc72-4b27-9c60-cf2a8532a019}",
             "WebBasketUsers": "{c2131f0b-f20b-4e1f-9403-2b1dc2787839}",
             "MemberUsers": "{622AA43A-7822-48FD-AC49-BDB400FFC3FA}",
-            "QrPayment": "{5fdd2cd8-7a6f-4d7d-abec-263db6b0e78b}"
+            "QrPayment": "{5fdd2cd8-7a6f-4d7d-abec-263db6b0e78b}",
+            "NTFU_SVID": "{9c6dd907-45ba-43ec-872b-69b928e64be2}"
         },
+        "BPLUS_APPID": "cdaa9350-cb32-416e-a85b-6ecedd81ebdf",
         "Mac": "",
-        "Username": "",
-        "Password": ""}
+        "Username": "BUSINESS",
+        "Password": "SYSTEM64",
+        "Phone": "0828845662",
+        "MB_PW": "",
+        "logined": "false",
+        "upDateVsersion": "1"
     }
 ]

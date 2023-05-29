@@ -8,13 +8,7 @@
 import React from 'react';
 // import type { PropsWithChildren } from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+  StatusBar, 
   Dimensions,
   Image
 } from 'react-native';
@@ -51,7 +45,7 @@ import ShowTemppageScreen from './screen/ShowTemppageScreen'
 import TemppageScreen from './screen/TemppageScreen'
 import MyCardScreen from './screen/MyCardScreen'
 import ProfileScreen from './screen/ProfileScreen'
-
+import IconBasket from './screen/IconBasketTab'
 
 import { store } from './src/store/store';
 const deviceWidth = Dimensions.get('window').width;
@@ -162,7 +156,7 @@ const App = (): JSX.Element => {
   return (
     <Provider store={store}>
       <StatusBar hidden={true} />
-      <Navigator />
+      <Navigator  />
     </Provider>
 
   );
@@ -192,17 +186,7 @@ const Maintabs = () => (
           );
         } else if (route.name === 'basket') {
           return (
-            <Image
-              source={
-                focused
-                  ? require('./img/iconsMenu/shopping.png')
-                  : require('./img/iconsMenu/shopping-b.png')
-              }
-              style={{
-                width: deviceWidth * 0.075,
-                height: deviceWidth * 0.075,
-              }}
-            />
+            <IconBasket focused={focused} />
           );
         } else if (route.name === 'Profile') {
           return (

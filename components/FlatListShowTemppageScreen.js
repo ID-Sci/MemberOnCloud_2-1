@@ -44,7 +44,7 @@ export default FlatListShowTemppageScreen = ({ route }) => {
                                 <TouchableOpacity style={{
                                     backgroundColor: '#fff', alignSelf: 'center',
                                     justifyContent: 'center', flexDirection: 'row',
-                                    height: deviceWidth * 0.6,
+                                    height: deviceWidth * 0.5,
                                     width: deviceWidth * 0.9,
                                     borderRadius: deviceWidth * 0.05,
                                 }}
@@ -55,9 +55,9 @@ export default FlatListShowTemppageScreen = ({ route }) => {
                                             shadowOffset: { width: 0, height: 2 },
                                             shadowOpacity: 0.8,
                                             shadowRadius: 2,
-                                            height: deviceWidth * 0.6,
+                                            height: deviceWidth * 0.5,
                                             width: deviceWidth * 0.9,
-                                            borderRadius: deviceWidth * 0.05,
+                                            borderRadius: deviceWidth * 0.05, 
                                         }}
                                         source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                     />

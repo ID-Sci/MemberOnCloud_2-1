@@ -1,0 +1,63 @@
+
+procedure TFrmCheckerTest.GetDataFromBarcodeScanner;
+var
+  Intent : JIntent;
+  s1 : string;
+begin
+  {$IFDEF ANDROID}
+
+
+  try
+
+
+  //
+  FMessageSubscriptionID := TMessageManager.DefaultManager.SubscribeToMessage(
+      TMessageResultNotification, HandleActivityMessage);
+
+    //s1 :='com.example.parsaniahardik.kotlin_scanxing';
+    s1 :='com.bplus.bs';
+
+    Intent := TJIntent.Create;
+    Intent := SharedActivity.getPackageManager.getLaunchIntentForPackage(StringToJString(s1));
+    Intent.setFlags(0);
+    Intent.putExtra(StringToJString('MODE'),StringToJString('3RD'));
+    //SharedActivity.startActivity(Intent);
+    SharedActivity.startActivityForResult(Intent,100);
+
+  except
+    ShowMessage('กรุณาติดตั้งโปรแกรม BplusBarcodeScanner!');
+    Abort;
+  end;
+  {$ENDIF}
+
+end;
+
+function TFrmCheckerTest.OnActivityResult(RequestCode, ResultCode: Integer;
+  Data: JIntent): Boolean;
+var
+  LScanContent, LScanFormat: string;
+begin
+
+
+  Result := False;
+  {$IFDEF ANDROID}
+
+
+
+  TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, FMessageSubscriptionID);
+  FMessageSubscriptionID := 0;
+
+
+
+      if Assigned(Data) then
+      begin
+        Result := True;
+        LScanContent := JStringToString(Data.getStringExtra(StringToJString('RESULT_TEXT')));
+        LScanFormat := JStringToString(Data.getStringExtra(StringToJString('RESULT_TYPE')));
+        DataResult :=  LScanContent;
+        FormatResult := LScanFormat;
+        Timer1.Enabled:=true;
+
+      end;
+  {$ENDIF}
+end;

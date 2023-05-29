@@ -19,7 +19,7 @@ export default {
   borderColor: "#B5B7C0",
   buttonColorPrimary: "#f50052",
   textColor: "#292F39",
-  itemColor: "#1b56b6",
+  itemColor: "#FCFCFC",
   linkColor: "#0077c2",
   // buttonColor: "#f50052",
   // textColor: "#FFFFFF",
