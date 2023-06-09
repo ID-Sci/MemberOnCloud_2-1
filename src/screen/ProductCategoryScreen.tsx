@@ -20,16 +20,17 @@ import {
     Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import Colors from '../styles/colors';
+import { FontSize } from '../styles/FontSizeHelper';
 import FlatListProductScreen from '../components/FlatListProductScreen';
 
 import * as Keychain from 'react-native-keychain';
-import { config } from '../src/store/slices/configReducer';
+import { config } from '../store/slices/configReducer';
 import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
-import { categorySelector, } from '../src/store/slices/categoryReducer';
-import { useAppSelector } from '../src/store/store';
-import { newproductSelector, } from '../src/store/slices/newproductReducer';
+import { categorySelector, } from '../store/slices/categoryReducer';
+import { useAppSelector } from '../store/store';
+import { newproductSelector, } from '../store/slices/newproductReducer';
+import { styles } from '../styles/styles';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -39,7 +40,7 @@ const ProductCategoryScreen = ({ route }: any) => {
     const categoryList = useAppSelector(categorySelector)
     const newproductList = useAppSelector(newproductSelector)
     const ConfigList = useAppSelector(config)
-    const [product, setProduct] = useState([])
+    const [product, setProduct] = useState([[]])
     const [category, setCategory] = useState(route.params.route)
     const [loading, setLoading] = useState(false)
     console.log(`category >> ${category.SHWPH_GUID}`)
@@ -54,8 +55,8 @@ const ProductCategoryScreen = ({ route }: any) => {
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
 
         if (category == 'ALL') {
-     
-          setProduct(newproductList.allproductList)
+
+            setProduct(newproductList.allproductList)
 
         } else {
             await fetch(configToken.WebService + '/ECommerce', {
@@ -101,55 +102,32 @@ const ProductCategoryScreen = ({ route }: any) => {
                     height: deviceHeight
                 }}>
                 <View
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        width: deviceWidth,
-                        paddingLeft: FontSize.large,
-                        paddingRight: FontSize.large,
-                        height: FontSize.large * 2,
-                        backgroundColor: Colors.backgroundLoginColorSecondary,
-                        borderBottomWidth: 1,
-                        borderColor: Colors.borderColor
-                    }}>
-                     <TouchableOpacity onPress={() => navigation.goBack()}>
+                    style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <View style={{ width: deviceWidth * 0.1, flexDirection: 'row', alignItems: 'center', }}>
 
                             <Image
                                 source={require('../img/iconsMenu/goback.png')}
-                                style={{
-                                    width: FontSize.large * 1.5,
-                                    height: FontSize.large * 1.5,
-                                    resizeMode: 'contain',
-                                }}
+                                style={styles.icon}
                             />
                         </View>
 
                     </TouchableOpacity>
                     <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                        style={styles.header_text_title}>
                         {route.params.name}
                     </Text>
                     <TouchableOpacity style={{
-                    width: deviceWidth * 0.1, flexDirection: 'row', alignItems: 'center',
-                }}
-                    onPress={() => navigation.navigate('ProductSearch', { name: 'ค้นหา' })}
-                >
-                    <View style={{ padding: 10 }}  >
-                        <Image
-                            source={require('../img/iconsMenu/search.png')}
-                            style={{
-                                width: FontSize.large,
-                                height: FontSize.large,
-                                resizeMode: 'contain',
-                            }}
-                        />
-                    </View>
+                        width: deviceWidth * 0.1,
+                    }}
+                        onPress={() => navigation.navigate('ProductSearch' as never, { name: 'ค้นหา' } as never)}
+                    >
+                        <View style={{ padding: 10 }}  >
+                            <Image
+                                source={require('../img/iconsMenu/search.png')}
+                                style={styles.icon}
+                            />
+                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -168,15 +146,7 @@ const ProductCategoryScreen = ({ route }: any) => {
                                 flexDirection: 'column',
                             }}>
                             <View
-                                style={{
-                                    backgroundColor: '#fff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-around',
-                                    height: 100,
-                                    width: 100,
-                                    borderRadius: deviceWidth * 0.05
-                                }}>
+                                style={styles.activityIndicator}>
                                 <ActivityIndicator
                                     animating={loading}
                                     size="large"
@@ -200,20 +170,10 @@ const ProductCategoryScreen = ({ route }: any) => {
                                 justifyContent: 'center',
                             }}>
                             <Image
-                                style={{
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 2 },
-                                    shadowOpacity: 0.8,
-                                    shadowRadius: 2,
-                                    height: deviceWidth * 0.3,
-                                    width: deviceWidth * 0.3,
-                                    resizeMode: 'contain',
-                                }}
+                                style={styles.iconmainObj}
                                 source={require('../img/empty-box-blue-icon.png')}
                             />
-                            <Text style={{
-                                textAlign: 'center'
-                            }}>
+                            <Text style={styles.textLight_title}>
                                 ไม่มีสินค้าในหมวดนี้
                             </Text>
                         </View>

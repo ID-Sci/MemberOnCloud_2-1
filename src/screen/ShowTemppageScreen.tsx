@@ -18,58 +18,44 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListShowTemppageScreen from '../components/FlatListShowTemppageScreen';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 const ShowTemppageScreen = ({ route }: any) => {
     const navigation = useNavigation();
-   
+
     return (route.params.route &&
         (
             <View
                 style={{
                     width: deviceWidth,
                     height: deviceHeight,
-                    
+
                     backgroundColor: Colors.backgroundLoginColorSecondary,
-                    
+
                 }}
             >
 
                 <View
 
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        width: deviceWidth,
-                        padding: deviceHeight * 0.02,
-                        borderBottomWidth: 1,
-                        borderColor: Colors.borderColor
-                    }}>
+                    style={styles.header}>
                     <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                        style={styles.header_text_title}>
                         {route.params.name}
                     </Text>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                        }}
-                        >
-                            x
+                        <Text style={styles.header_text_title}>
+                            X
                         </Text>
                     </TouchableOpacity>
                 </View>

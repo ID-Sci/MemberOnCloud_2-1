@@ -11,7 +11,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 
 class NumberPad extends PureComponent {
   constructor(props) {

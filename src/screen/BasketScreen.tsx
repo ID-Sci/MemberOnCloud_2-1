@@ -16,13 +16,13 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import Colors from '../styles/colors';
+import { FontSize } from '../styles/FontSizeHelper';
 import UnFlatListBasket from '../components/UnFlatListBasket';
 import FlatListBasket from '../components/FlatListBasket';
-import { useAppSelector } from '../src/store/store';
-import { basketSelector } from '../src/store/slices/basketReducer';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { useAppSelector } from '../store/store';
+import { basketSelector } from '../store/slices/basketReducer';
+import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;

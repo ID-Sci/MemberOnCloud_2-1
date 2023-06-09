@@ -23,13 +23,13 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { FontSize } from '../styles/FontSizeHelper';
+import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
-import { useAppDispatch, useAppSelector } from '../src/store/store';
+import { useAppDispatch, useAppSelector } from '../store/store';
 import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
 import * as Keychain from 'react-native-keychain';

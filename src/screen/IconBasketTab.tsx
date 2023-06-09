@@ -20,12 +20,12 @@ import {
     Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import * as Keychain from 'react-native-keychain';
-import { useAppSelector } from '../src/store/store';
-import { basketSelector } from '../src/store/slices/basketReducer';
+import { useAppSelector } from '../store/store';
+import { basketSelector } from '../store/slices/basketReducer';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 

@@ -20,18 +20,19 @@ import {
     Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import Colors from '../styles/colors';
+import { FontSize } from '../styles/FontSizeHelper';
 import FlatListProductScreen from '../components/FlatListProductScreen';
 
 import * as Keychain from 'react-native-keychain';
-import { config } from '../src/store/slices/configReducer';
+import { config } from '../store/slices/configReducer';
 import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
-import { categorySelector, } from '../src/store/slices/categoryReducer';
-import { useAppSelector } from '../src/store/store';
+import { categorySelector, } from '../store/slices/categoryReducer';
+import { useAppSelector } from '../store/store';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-import { newproductSelector, } from '../src/store/slices/newproductReducer';
+import { newproductSelector, } from '../store/slices/newproductReducer';
+import { styles } from '../styles/styles';
 
 const ProductSearchScreen = ({ route }: any) => {
     const navigation = useNavigation();
@@ -98,12 +99,7 @@ const ProductSearchScreen = ({ route }: any) => {
                             />
                         </View>
                         <TextInput
-                            style={{
-                                flex: 8,
-                                borderBottomColor: Colors.borderColor,
-                                color: Colors.fontColor,
-                                fontSize: FontSize.medium,
-                            }}
+                            style={styles.inputtextLight_title}
                             placeholderTextColor={Colors.fontColorSecondary}
                             value={GOODS_CODE}
 
@@ -114,7 +110,7 @@ const ProductSearchScreen = ({ route }: any) => {
                             }} />
                         <TouchableOpacity style={{ padding: 10, }} onPress={() => navigation.navigate('Scanner', { route: 'ProductSearch', data: product })}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                                <Text style={{ fontSize: FontSize.mini * 2 }}>สแกน</Text>
+                                <Text style={styles.textLight_title}>สแกน</Text>
                                 <Image
                                     source={require('../img/iconsMenu/barcode.png')}
                                     style={{
@@ -186,9 +182,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                 }}
                                 source={require('../img/empty-box-blue-icon.png')}
                             />
-                            <Text style={{
-                                textAlign: 'center'
-                            }}>
+                            <Text style={styles.textLight_title}>
                                 ไม่มีสินค้าในหมวดนี้
                             </Text>
                         </View>

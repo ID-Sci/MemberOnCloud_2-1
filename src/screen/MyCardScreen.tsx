@@ -20,17 +20,17 @@ import {
     Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListPromotion from '../components/FlatListPromotion';
 import { BorderlessButton } from 'react-native-gesture-handler';
-import { mycardSelector, } from '../src/store/slices/mycardReducer';
-import { useAppDispatch, useAppSelector } from '../src/store/store';
-import { config, updateMB_LOGIN_GUID, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { mycardSelector, } from '../store/slices/mycardReducer';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import { config, updateMB_LOGIN_GUID, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import * as Keychain from 'react-native-keychain';
-import * as safe_Format from '../src/styles/safe_Format';
+import * as safe_Format from '../styles/safe_Format';
 import RNRestart from 'react-native-restart';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;

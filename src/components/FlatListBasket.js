@@ -11,14 +11,14 @@ import {
     ActivityIndicator
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import Colors from '../styles/colors';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-import { useAppDispatch, useAppSelector } from '../src/store/store'
-import { updateBasket, updatePrepareDocumentt } from '../src/store/slices/basketReducer';
-import { docinfoSelector } from '../src/store/slices/docinfoReducer';
+import { useAppDispatch, useAppSelector } from '../store/store'
+import { updateBasket, updatePrepareDocumentt } from '../store/slices/basketReducer';
+import { docinfoSelector } from '../store/slices/docinfoReducer';
 import * as Keychain from 'react-native-keychain';
-import { config, updateARcode } from '../src/store/slices/configReducer';
+import { config, updateARcode } from '../store/slices/configReducer';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;

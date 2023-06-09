@@ -17,9 +17,9 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import { styles } from '../styles/styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 
 
 const deviceWidth = Dimensions.get('window').width;
@@ -31,29 +31,15 @@ export default FlatListPromotion = ({ route }) => {
         (
             <View
             >
-                <View style={{
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
-                  paddingLeft: deviceWidth * 0.05,
-                  paddingRight: deviceWidth * 0.05,
-                  paddingBottom: deviceWidth * 0.05
-                }}>
-                    <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                 <View style={styles.menu_background}>
+                    <Text style={styles.menu_text_title}>
                         กิจกรรม/ประชาสัมพันธ์
                     </Text>
                     <TouchableOpacity
+                     style={styles.menu_btn}
                         onPress={() => navigation.navigate('ShowTemppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: route })}
                     >
-                        <Text style={{
-                            fontSize: FontSize.medium,
-                        }}
-                        >
+                        <Text style={styles.menu_text_title}>
                             ดูเพิ่มเติม {`>>`}
                         </Text>
                     </TouchableOpacity>
@@ -71,34 +57,11 @@ export default FlatListPromotion = ({ route }) => {
                         return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#fff', alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: deviceWidth * 0.05,
-                                        width: deviceWidth * 0.8,
-                                        shadowColor: "#000",
-                                        shadowOffset: {
-                                            width: 0,
-                                            height: 2,
-                                        },
-                                        shadowOpacity: 0.25,
-                                        shadowRadius: 3.84,
-                                        
-                                        elevation: 5,
-                                    }}
+                                    <TouchableOpacity style={ {marginBottom: deviceHeight *0.2}}
                                         onPress={() => navigation.navigate('Temppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: item })}>
 
                                         <Image
-                                            style={{
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                height: deviceHeight * 0.3,
-                                                width: deviceWidth * 0.8,
-                                                resizeMode: 'contain',
-                                                borderRadius: deviceWidth * 0.05,
-                                            }}
+                                            style={ styles.menu_activity_image}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />
                                         {/* <View style={{ padding: 10 }}>

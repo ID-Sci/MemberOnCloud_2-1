@@ -17,10 +17,11 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
+import { styles } from '../styles/styles';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -36,60 +37,27 @@ export default FlatListProductScreen = ({ route }) => {
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
-                <View style={{
-                    alignItems: 'center',
-                    paddingLeft: deviceWidth * 0.05,
-                    paddingRight: deviceWidth * 0.05,
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                }}>
+                <View style={styles.obj_list}>
                     {route.map((item, index) => {
                         return (index < 10 &&
                             <>
                                 <View style={{ padding: deviceWidth * 0.01, }}>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#fff', alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: deviceWidth * 0.42,
-                                        borderRadius: deviceWidth * 0.05,
-                                    }}
+                                    <TouchableOpacity style={styles.product_bottom_shadow}
                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
                                         <View
                                             style={{
                                                 height: deviceHeight * 0.2
                                             }}>
                                             {item.IMAGE64 == "" ? <Image
-                                                style={{
-                                                    shadowColor: '#000',
-                                                    shadowOffset: { width: 0, height: 2 },
-                                                    shadowOpacity: 0.8,
-                                                    shadowRadius: 2,
-                                                    height: deviceWidth * 0.2,
-                                                    width: deviceWidth * 0.3,
-                                                    resizeMode: 'contain',
-                                                }}
+                                                style={styles.obj_Noimage}
                                                 source={require('../img/newproduct.png')}
                                             /> : <Image
-                                                style={{
-                                                    shadowColor: '#000',
-                                                    shadowOffset: { width: 0, height: 2 },
-                                                    shadowOpacity: 0.8,
-                                                    shadowRadius: 2,
-                                                    height: deviceHeight * 0.2,
-                                                    width: deviceWidth * 0.3,
-                                                    resizeMode: 'contain',
-                                                }}
+                                                style={styles.obj_image}
                                                 source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                             />}
                                         </View>
-                                        <View
-                                            style={{
-
-                                            }}>
-                                            <Text style={{
-                                                textAlign: 'center'
-                                            }}>
+                                        <View style={{ padding: 10 }}>
+                                            <Text style={styles.textLight_title} >
                                                 {item.SHWC_ALIAS}
                                             </Text>
                                             <View
@@ -104,6 +72,7 @@ export default FlatListProductScreen = ({ route }) => {
                                                     separator="."
                                                     precision={2}
                                                     color={'red'}
+                                                    fontFamily={"Kanit-Light"}
                                                     fontSize={FontSize.medium}
                                                     placeholderTextColor={Colors.fontColor}
                                                     value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
@@ -113,29 +82,19 @@ export default FlatListProductScreen = ({ route }) => {
                                                 <Text
                                                     style={{
                                                         color: 'red',
+                                                        fontFamily:'Kanit-Light',
                                                         fontSize: FontSize.medium
                                                     }}
                                                 >
                                                     {`. - `}
                                                 </Text>
                                                 <Text
-                                                    style={{
-                                                        color: Colors.fontColor,
-                                                        fontSize: FontSize.medium
-                                                    }}
+                                                    style={styles.textLight_title}
                                                 >
                                                     {item.UTQ_NAME}
                                                 </Text>
                                             </View>
-
-
-
                                         </View>
-
-
-
-
-
                                     </TouchableOpacity>
                                 </View>
                             </>

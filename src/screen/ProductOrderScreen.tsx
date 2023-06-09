@@ -18,14 +18,14 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-import { updateBasket, basketSelector } from '../src/store/slices/basketReducer';
+import { updateBasket, basketSelector } from '../store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
-import { useAppDispatch, useAppSelector } from '../src/store/store'
-import { config, updateARcode } from '../src/store/slices/configReducer';
+import { useAppDispatch, useAppSelector } from '../store/store'
+import { config, updateARcode } from '../store/slices/configReducer';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 

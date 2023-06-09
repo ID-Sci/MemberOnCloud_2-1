@@ -10,6 +10,7 @@ export default {
   backgroundLoginColor,
   backgroundLoginColorSecondary,
   primaryColor: "#03A9F4",
+  backgroundheader:"#EFFAFA",
   lightPrimiryColor: "#80d6ff",
   darkPrimiryColor: "#0077c2",
   fontColor: "#474040",
@@ -30,6 +31,7 @@ export default {
   // backgroundColor: "#F1F1F1",
   headerColor: "#4a934a",
   headerColor2: "#E8995E",
+  
   alert: "rgba(255,0,0,0.8)",
   menuButton: "#5cb85c"
 };

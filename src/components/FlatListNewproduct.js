@@ -17,9 +17,10 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Colors from '../src/styles/colors';
+import Colors from '../styles/colors';
+import { styles } from '../styles/styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 
 const deviceWidth = Dimensions.get('window').width;
@@ -31,30 +32,16 @@ export default FlatListNewproduct = ({ route }) => {
         (
             <View
             >
-                <View style={{
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    paddingLeft: deviceWidth * 0.05,
-                    paddingRight: deviceWidth * 0.05,
-                    paddingBottom: deviceWidth * 0.05
-                }}>
-                    <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                <View style={styles.menu_background}>
+                    <Text style={styles.menu_text_title}>
                         สินค้าใหม่
                     </Text>
                     <TouchableOpacity
+                        style={styles.menu_btn}
                         onPress={() => navigation.navigate('Newproduct', { name: 'สินค้าใหม่', route: route })}
                     >
-                        <Text style={{
-                            fontSize: FontSize.medium,
-                        }}
-                        >
-                            ดูเพิ่มเติม {`>>`}
+                        <Text style={styles.menu_text_title}>
+                            ดูเพิ่มเติม
                         </Text>
                     </TouchableOpacity>
 
@@ -71,55 +58,18 @@ export default FlatListNewproduct = ({ route }) => {
                         return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
-                                    <TouchableOpacity style={{
-                                        backgroundColor: '#fff', alignItems: 'center',
-                                        justifyContent: 'center',
-                                        height: deviceWidth * 0.6,
-                                        width: deviceWidth * 0.5,
-                                        shadowColor: "#000",
-                                        shadowOffset: {
-                                            width: 0,
-                                            height: 2,
-                                        },
-                                        shadowOpacity: 0.25,
-                                        shadowRadius: 3.84,
-
-                                        elevation: 5,
-                                        borderRadius: deviceWidth * 0.05,
-                                    }}
+                                    <TouchableOpacity style={styles.newproduct_bottom_shadow}
                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
 
                                         {item.IMAGE64 == "" ? <Image
-                                            style={{
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                height: deviceWidth * 0.35,
-                                                width: deviceWidth * 0.35,
-                                                resizeMode: 'contain',
-                                            }}
+                                            style={styles.product_Noimage}
                                             source={require('../img/newproduct.png')}
                                         /> : <Image
-                                            style={{
-                                                shadowColor: '#000',
-                                                shadowOffset: { width: 0, height: 2 },
-                                                shadowOpacity: 0.8,
-                                                shadowRadius: 2,
-                                                height: deviceWidth * 0.35,
-                                                width: deviceWidth * 0.35,
-                                                resizeMode: 'contain', 
-                                               
-                                            }}
+                                        style={styles.product_image}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />}
-                                        <View
-                                            style={{
-
-                                            }}>
-                                            <Text style={{
-                                                textAlign: 'center'
-                                            }}>
+                                        <View style={{ padding: 10 }}>
+                                            <Text style={styles.product_bottom_text_title}>
                                                 {item.SHWC_ALIAS}
                                             </Text>
                                             <View
@@ -135,7 +85,7 @@ export default FlatListNewproduct = ({ route }) => {
                                                     precision={2}
                                                     color={'red'}
                                                     fontSize={FontSize.medium}
-                                                    placeholderTextColor={Colors.fontColor}
+                                                    placeholderTextColor={Colors.fontColor} 
                                                     value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
                                                     multiline={true}
                                                     textAlign={'center'}
@@ -143,16 +93,14 @@ export default FlatListNewproduct = ({ route }) => {
                                                 <Text
                                                     style={{
                                                         color: 'red',
+                                                        fontFamily:'Kanit-Light',
                                                         fontSize: FontSize.medium
                                                     }}
                                                 >
                                                     {`. - `}
                                                 </Text>
                                                 <Text
-                                                    style={{
-                                                        color: Colors.fontColor,
-                                                        fontSize: FontSize.medium
-                                                    }}
+                                                    style={styles.product_bottom_text_title}
                                                 >
                                                     {item.UTQ_NAME}
                                                 </Text>

@@ -5,8 +5,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Colors from '../src/styles/colors';
-import { FontSize } from '../src/styles/FontSizeHelper';
+import Colors from '../styles/colors';
+import { FontSize } from '../styles/FontSizeHelper';
 
 class OtpInput extends PureComponent {
   constructor(props) {

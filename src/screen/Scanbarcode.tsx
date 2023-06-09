@@ -11,16 +11,26 @@ import * as  ImagePicker from 'react-native-image-picker';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import { FontSize } from '../src/styles/FontSizeHelper';
+import { FontSize } from '../styles/FontSizeHelper';
 
 import * as Animatable from 'react-native-animatable';
 import { QRreader } from 'react-native-qr-decode-image-camera';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
 
 
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-const Scanbarcode = ({ navigation, route }: any) => {
+export interface ScanBarcodeParams {
+  route: keyof RootStackParamList,
+  data: any
+}
+type OrderDetailScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'Scanbarcode'
+>;
+const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) => {
   let checkAndroidPermission = true
   var a = 0
   useEffect(() => {
@@ -34,8 +44,8 @@ const Scanbarcode = ({ navigation, route }: any) => {
   const onSuccess = (e: any) => {
 
 
-    if (e && e.data) {
-      navigation.navigate(route.params.route, {route: route.params.data, post: e.data, data: a });
+    if (e && e.data ) {
+      navigation.navigate(route.params.route, { route: route.params.data, post: e.data, data: a });
     }
   };
 

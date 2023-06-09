@@ -25,31 +25,42 @@ import { NavigationContainer } from '@react-navigation/native';
 // import { createStackNavigator } from '@react-navigation/stack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screen/HomeScreen'
-import SpaceScreen from './screen/SpaceScreen'
-import BasketScreen from './screen/BasketScreen'
-import ProductScreen from './screen/ProductScreen'
-import ProductCategoryScreen from './screen/ProductCategoryScreen'
-import ProductSearchScreen from './screen/ProductSearchScreen'
+import HomeScreen from './src/screen/HomeScreen'
+import SpaceScreen from './src/screen/SpaceScreen'
+import BasketScreen from './src/screen/BasketScreen'
+import ProductScreen from './src/screen/ProductScreen'
+import ProductCategoryScreen from './src/screen/ProductCategoryScreen'
+import ProductSearchScreen from './src/screen/ProductSearchScreen'
 
-import ProductOrderScreen from './screen/ProductOrderScreen'
-import LoginScreen from './screen/LoginScreen'
-import RegisterScreen from './screen/RegisterScreen'
-import UpdateScreen from './screen/UpdateScreen'
-import FoegetScreen from './screen/FoegetScreen'
+import ProductOrderScreen from './src/screen/ProductOrderScreen'
+import LoginScreen from './src/screen/LoginScreen'
+import RegisterScreen from './src/screen/RegisterScreen'
+import UpdateScreen from './src/screen/UpdateScreen'
+import FoegetScreen from './src/screen/FoegetScreen'
 
-import Scanbarcode from './screen/Scanbarcode'
-import HistoryScreen from './screen/HistoryScreen'
+import Scanbarcode, { ScanBarcodeParams } from './src/screen/Scanbarcode'
+import HistoryScreen from './src/screen/HistoryScreen'
 
-import ShowTemppageScreen from './screen/ShowTemppageScreen'
-import TemppageScreen from './screen/TemppageScreen'
-import MyCardScreen from './screen/MyCardScreen'
-import ProfileScreen from './screen/ProfileScreen'
-import IconBasket from './screen/IconBasketTab'
+import ShowTemppageScreen from './src/screen/ShowTemppageScreen'
+import TemppageScreen from './src/screen/TemppageScreen'
+import MyCardScreen from './src/screen/MyCardScreen'
+import ProfileScreen from './src/screen/ProfileScreen'
+import IconBasket from './src/screen/IconBasketTab'
 
 import { store } from './src/store/store';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
+export type RootStackParamList = {
+  bstab: undefined;
+  Scanbarcode: ScanBarcodeParams
+  // ... and so on
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
 
 const Navigator = () => {
   const MainStack = createNativeStackNavigator();
@@ -175,8 +186,8 @@ const Maintabs = () => (
             <Image
               source={
                 focused
-                  ? require('./img/iconsMenu/home.png')
-                  : require('./img/iconsMenu/home-b.png')
+                  ? require('./src/img/iconsMenu/home.png')
+                  : require('./src/img/iconsMenu/home-b.png')
               }
               style={{
                 width: deviceWidth * 0.075,
@@ -193,8 +204,8 @@ const Maintabs = () => (
             <Image
               source={
                 focused
-                  ? require('./img/iconsMenu/user.png')
-                  : require('./img/iconsMenu/user-b.png')
+                  ? require('./src/img/iconsMenu/user.png')
+                  : require('./src/img/iconsMenu/user-b.png')
               }
               style={{
                 width: deviceWidth * 0.075,

@@ -15,12 +15,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/FontAwesome';
 import { useSelector } from 'react-redux';
 
-import { FontSize } from '../src/styles/FontSizeHelper';
-import { config, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../src/store/slices/configReducer';
+import { FontSize } from '../styles/FontSizeHelper';
+import { config, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/native';
-import { useAppDispatch, useAppSelector } from '../src/store/store';
-import * as safe_Format from '../src/styles/safe_Format';
+import { useAppDispatch, useAppSelector } from '../store/store';
+import * as safe_Format from '../styles/safe_Format';
 
 import * as Keychain from 'react-native-keychain';
 const deviceWidth = Dimensions.get('window').width;

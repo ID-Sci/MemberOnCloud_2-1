@@ -10,11 +10,11 @@ type authState = {
 }
 
 type LoginListType = {
-   user: string
+   BPAPUS_GUID: string,  
 }
 
 const testObject = {
-   user: ""
+   BPAPUS_GUID: ""
 }
 
 const initialState: authState = {
@@ -45,16 +45,10 @@ export const configReducer = createSlice({
          state.LoginList = action.payload;
       },
       clearLoginList: (state: authState) => {
-         state.LoginList = {};
+         state.LoginList = { BPAPUS_GUID: ""};
       },
    },
 })
-
-
-
-
-
-
 
 export const { updateUserList, clearUserList, updateLoginList, clearLoginList, updateMB_LOGIN_GUID, updateARcode } = configReducer.actions;
 export const config = (store: RootState) => store.configReducer;
