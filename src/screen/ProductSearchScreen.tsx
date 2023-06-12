@@ -44,7 +44,7 @@ const ProductSearchScreen = ({ route }: any) => {
     const [productState, setProductState] = useState(false)
     const [loading, setLoading] = useState(false)
     useEffect(() => {
-        if (route.params?.post) {
+        if ( route.params?.post) {
             setGOODS_CODE(route.params.post)
             setProductState(true)
         }
@@ -99,7 +99,7 @@ const ProductSearchScreen = ({ route }: any) => {
                             />
                         </View>
                         <TextInput
-                            style={styles.inputtextLight_title}
+                            style={styles.input_GOODS_CODE_Light_title}
                             placeholderTextColor={Colors.fontColorSecondary}
                             value={GOODS_CODE}
 

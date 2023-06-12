@@ -32,6 +32,7 @@ import { config, updateMB_LOGIN_GUID, updateUserList, clearUserList, updateLogin
 import * as Keychain from 'react-native-keychain';
 import * as safe_Format from '../styles/safe_Format';
 import RNRestart from 'react-native-restart';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -156,7 +157,7 @@ const MyCardScreen = () => {
                             <Text
                                 style={{
                                     shadowColor: 'black',
-                                    fontWeight: 'bold',
+                                    fontFamily: 'Kanit-Bold',
                                     shadowOpacity: 0.8,
                                     shadowRadius: 3,
                                     elevation: 5,
@@ -169,6 +170,7 @@ const MyCardScreen = () => {
                             </Text>
                             <Text
                                 style={{
+                                    fontFamily: 'Kanit-Light',
                                     shadowColor: 'black',
                                     shadowOpacity: 0.8,
                                     shadowRadius: 3,
@@ -198,10 +200,11 @@ const MyCardScreen = () => {
                         >
                             <Text
                                 style={{
-                                    fontWeight: 'bold',
+
+                                    fontFamily: 'Kanit-Bold',
                                     color: Colors.darkPrimiryColor
                                 }}>
-                                - แก้ไข -
+                                - ข้อมูลส่วนตัว -
                             </Text>
                         </TouchableOpacity>
 
@@ -227,10 +230,10 @@ const MyCardScreen = () => {
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                         }}>
-                        <Text style={{ fontSize: FontSize.medium }}>
+                        <Text style={styles.textLight}>
                             รหัสบัตรสมาชิก
                         </Text>
-                        <Text style={{ fontSize: FontSize.medium }}>{ConfigList.UserList && ConfigList.UserList.MB_CODE} </Text>
+                        <Text style={styles.textLight}>{ConfigList.UserList && ConfigList.UserList.MB_CODE} </Text>
                     </View>
                     <View
                         style={{
@@ -238,10 +241,10 @@ const MyCardScreen = () => {
                             marginTop: 5,
                             justifyContent: 'space-between',
                         }}>
-                        <Text style={{ fontSize: FontSize.medium }}>
+                        <Text style={styles.textLight}>
                             แต้มสะสม
                         </Text>
-                        <Text style={{ fontSize: FontSize.medium }}> {ConfigList.UserList && safe_Format.pointFormat(ConfigList.UserList.MB_SH_POINT)}  </Text>
+                        <Text style={styles.textLight}> {ConfigList.UserList && safe_Format.pointFormat(ConfigList.UserList.MB_SH_POINT)}  </Text>
                     </View>
                     <View
                         style={{
@@ -249,18 +252,14 @@ const MyCardScreen = () => {
                             marginTop: 5,
                             justifyContent: 'space-between',
                         }}>
-                        <Text style={{ fontSize: FontSize.medium }}>
+                        <Text style={styles.textLight}>
                             แต้มวันนี้ ( มีผลวันถัดไป )
                         </Text>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('History')}
                         >
                             <Text
-                                style={{
-                                    color: '#0288D1',
-                                    textDecorationLine: 'underline',
-                                    fontSize: FontSize.medium,
-                                }}>
+                                style={styles.textLink}>
                                 รายละเอียด
                             </Text>
                         </TouchableOpacity>
@@ -274,10 +273,10 @@ const MyCardScreen = () => {
                             borderBottomColor: 'black',
 
                         }}>
-                        <Text style={{ fontSize: FontSize.medium }}>
+                        <Text style={styles.textLight}>
                             วันหมดอายุบัตร
                         </Text>
-                        <Text style={{ fontSize: FontSize.medium }}>
+                        <Text style={styles.textLight}>
                             {ConfigList.UserList && safe_Format.dateFormat(ConfigList.UserList.MB_EXPIRE)}
                         </Text>
                     </View>
@@ -309,6 +308,7 @@ const MyCardScreen = () => {
 
                             >
                                 <Text style={{
+                                    fontFamily: 'Kanit-Bold',
                                     fontSize: FontSize.large,
                                     color: Colors.buttonTextColor
                                 }}
@@ -318,8 +318,8 @@ const MyCardScreen = () => {
                             </View>
                         </TouchableOpacity>
                         <Text style={{
+                            fontFamily: 'Kanit-Bold',
                             fontSize: FontSize.medium * 0.8,
-                            fontWeight: 'bold',
                             color: Colors.borderColor
                         }}>
                             {Vsersion != null && `version ${Vsersion}`}

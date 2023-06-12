@@ -24,6 +24,7 @@ import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListPromotion from '../components/FlatListPromotion';
 import { BorderlessButton } from 'react-native-gesture-handler';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -42,73 +43,42 @@ const TemppageScreen = ({ route }: any) => {
                     <ScrollView
                         style={{
                             width: deviceWidth,
-                            height: deviceHeight ,
+                            height: deviceHeight,
                             backgroundColor: '#fff',
-                        }}
-                    >
-                        <View style={{}}>
+                        }}>
+                        < >
 
                             <View
-                                >
-                               <Image
+                            >
+                                <Image
                                     style={{
                                         shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 2 }, 
+                                        shadowOffset: { width: 0, height: 2 },
                                         shadowRadius: 2,
-                                        height: deviceWidth*0.6,
-                                        width: deviceWidth,  
+                                        height: deviceHeight * 0.3,
                                     }}
                                     source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                 />
                             </View>
-                             <View
+                            <View
                                 style={{
                                     padding: deviceWidth * 0.1
                                 }}>
-                                <View
-                                    style={{
-                                    
-                                    }}
-                                >
-                                    <Text style={{
-                                        fontSize: FontSize.medium,
-                                        fontWeight: 'bold',
-                                        color: Colors.fontColor
 
-                                    }}>
-                                       {item.SHWPH_EXPLAIN}
-                                    </Text>
-                                </View>
+                                <Text style={styles.text_btn}>
+                                    {item.SHWPH_EXPLAIN}
+                                </Text>
+
                             </View>
-                        </View>
+                        </ >
                     </ScrollView>
                 </View>
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
-                    style={{
-
-                        padding: deviceWidth * 0.025,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'absolute',
-                    }}
+                    style={styles.back_btn}
                 >
-                    <View
-                        style={{
-                            height: deviceWidth * 0.1,
-                            width: deviceWidth * 0.1,
-                            alignItems: 'center',
-                            backgroundColor: '#fff',
-
-                            borderRadius: deviceWidth * 0.1,
-                        }}
-
-                    >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                            color: Colors.fontColor
-                        }}
-                        >
+                    <View style={styles.back_btn_view}>
+                        <Text style={styles.back_text_title}>
                             x
                         </Text>
                     </View>

@@ -44,9 +44,7 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 // import { Language, changeLanguage } from '../src/translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-const MyConfig = '/config.json';
-let MyMac = ''
-
+const MyConfig = '/config.json'; 
 let CState = true
 const SpaceScreen = () => {
     const dispatch = useAppDispatch();
@@ -63,7 +61,7 @@ const SpaceScreen = () => {
 
     const loadFuntion = async () => {
         // dispatch(updateConfigList())
-        if (CState) await getMac()
+
         if (CState) await setConfig()
         if (CState) await UnRegister()
         if (CState) await Register()
@@ -78,9 +76,51 @@ const SpaceScreen = () => {
     }
 
     const getMac = async () => {
+       
+    
+        try {
+            let mac = await DeviceInfo.getMacAddress();
+    
+            if (isValidMac(mac)) {
+                console.log(await DeviceInfo.getDeviceName());
+                console.log('\nmachine > > ' + mac);
+                return mac;
+            }
+    
+            let wifiMac = await NetworkInfo.getBSSID();
+    
+            if (isValidMac(wifiMac)) {
+                console.log('\nmachine(wifi) > > ' + wifiMac);
+                return wifiMac;
+            }
+    
+            let deviceId = DeviceInfo.getUniqueId();
+    
+            if (isValidDeviceId(deviceId)) {
+                console.log('\ndeviceId > > ' + JSON.stringify(deviceId));
+                return deviceId;
+            }
+    
+            let uuid = generateUUID();
+            return uuid;
+        } catch (error) {
+            console.error(error);
+            let uuid = generateUUID();
+            return uuid;
+        }
+    };
+    
+    const isValidMac = (mac) => {
+        return mac && mac.length > 0 && mac !== "02:00:00:00:00:00" && typeof(mac) !== 'object';
+    };
+    
+    const isValidDeviceId = (deviceId) => {
+        return deviceId && deviceId.length > 0 && deviceId !== "02:00:00:00:00:00" && typeof(deviceId) !== 'object';
+    };
+    
+    const generateUUID = () => {
         let uuid = '';
         const characters = '0123456789abcdef';
-
         for (let i = 0; i < 36; i++) {
             if (i === 8 || i === 13 || i === 18 || i === 23) {
                 uuid += '-';
@@ -88,31 +128,13 @@ const SpaceScreen = () => {
                 uuid += characters[Math.floor(Math.random() * characters.length)];
             }
         }
-
-
-        await DeviceInfo.getMacAddress().then((mac) => {
-            console.log(DeviceInfo.getDeviceName())
-            console.log('\nmachine > > ' + mac)
-            if (mac.length > 0 && mac != "02:00:00:00:00:00") MyMac = mac
-            else NetworkInfo.getBSSID().then((macwifi: any) => {
-                console.log('\nmachine(wifi) > > ' + macwifi)
-                if (macwifi.length > 0 && macwifi != "02:00:00:00:00:00") MyMac = macwifi
-                else {
-                    const deviceId: any = DeviceInfo.getUniqueId();
-                    console.log('\ndeviceId > > ' + deviceId)
-                    if (deviceId.length > 0 && deviceId != "02:00:00:00:00:00") MyMac = deviceId
-                    else {
-                        MyMac = uuid
-                    }
-                }
-            }).catch((e) => MyMac = uuid)
-        }).catch((e) => MyMac = uuid)
-    }
+    
+        return uuid;
+    };
     const setConfig = async () => {
         //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null 
         let superObj = {
             "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
             "OTPService": "http://203.150.55.21:8891/BplusNotiService/BplusNotiIIS.dll",
@@ -133,7 +155,7 @@ const SpaceScreen = () => {
                 "NTFU_SVID": "{9c6dd907-45ba-43ec-872b-69b928e64be2}"
             },
             "BPLUS_APPID": "cdaa9350-cb32-416e-a85b-6ecedd81ebdf",
-            "Mac": MyMac,
+            "Mac": await getMac(),
             "Username": "BUSINESS",
             "Password": "SYSTEM64",
             "Phone": "0828845662",
@@ -141,6 +163,7 @@ const SpaceScreen = () => {
             "logined": "false",
             "upDateVsersion": "3.0.3"
         }
+        console.log(` JSON.stringify(superObj) ${ JSON.stringify(superObj.Mac)}`)
         if (configToken == null || configToken.upDateVsersion != superObj.upDateVsersion) {
             console.log(`new Obj >>`)
             await Keychain.setGenericPassword("config", JSON.stringify(superObj))

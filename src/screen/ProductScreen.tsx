@@ -24,6 +24,7 @@ import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListProductScreen from '../components/FlatListProductScreen';
 import { BorderlessButton } from 'react-native-gesture-handler';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -51,19 +52,13 @@ const ProductScreen = ({ route }: any) => {
                         borderColor: Colors.borderColor
                     }}>
                     <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                        style={styles.header_text_title}>
                         {route.params.name}
                     </Text>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                        }}
+                        <Text style={styles.header_text_title}
                         >
                             x
                         </Text>

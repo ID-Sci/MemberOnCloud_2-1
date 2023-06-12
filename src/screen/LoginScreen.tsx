@@ -29,12 +29,13 @@ import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
 const LoginScreen = () => {
     const dispatch = useAppDispatch();
-    const [LoginState, setLoginState] = useState(true)
+    const [showPassword, setShowPassword] = useState(false)
     const [Vsersion, setVsersion] = useState(null)
     const [Phone, setPhone] = useState('')
     const [loading, setLoading] = useState(false);
@@ -91,12 +92,13 @@ const LoginScreen = () => {
                     { text: `ยืนยัน`, onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
+        setLoading(false)
     }
     const getMemberInfo = async (MB_LOGIN_GUID: any) => {
         console.log(`getProJ [Ec000400]`)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-       
+
         await fetch(configToken.WebService + '/Member', {
             method: 'POST',
             body: JSON.stringify({
@@ -117,7 +119,7 @@ const LoginScreen = () => {
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: PhoneParm, MB_PW: PasswordParm, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    
+
                 } else {
                     Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                         { text: `ยืนยัน`, onPress: () => setLoading(false) }])
@@ -189,21 +191,13 @@ const LoginScreen = () => {
                             padding: 20,
                         }}>
                         <View>
-                            <Text style={{ alignSelf: 'center' }}>
+                            <Text style={styles.textLight_title}>
                                 ลงทะเบียนรับโปรดีๆ มากมาย
                             </Text>
                         </View>
                         <View style={{ height: 40, flexDirection: 'row' }}>
                             <TextInput
-                                style={{
-                                    flex: 8,
-                                    marginLeft: 10,
-                                    borderBottomColor: Colors.borderColor,
-                                    color: Colors.fontColor,
-                                    paddingVertical: 7,
-                                    fontSize: FontSize.medium,
-                                    borderBottomWidth: 0.7,
-                                }}
+                                style={styles.inputtextLight_title}
                                 value={Phone}
                                 onChangeText={(val) => {
                                     setPhoneNum(val);
@@ -215,26 +209,30 @@ const LoginScreen = () => {
 
                             ></TextInput>
                         </View>
-                        <View style={{ height: 40, flexDirection: 'row' }}>
+                        <View style={{ height: 40, flexDirection: 'row', alignItems: 'center', }}>
                             <TextInput
-                                style={{
-                                    flex: 8,
-                                    marginLeft: 10,
-                                    borderBottomColor: Colors.borderColor,
-                                    color: Colors.fontColor,
-                                    paddingVertical: 7,
-                                    fontSize: FontSize.medium,
-                                    borderBottomWidth: 0.7,
-                                }}
+                                style={styles.inputtextLight_title}
                                 value={PasswordParm}
                                 onChangeText={(val) => {
                                     setPasswordParm(val);
                                 }}
-                                secureTextEntry={true}
+                                secureTextEntry={!showPassword}
                                 keyboardType="default"
                                 placeholder={'รหัสผ่าน ..'}
                                 placeholderTextColor={Colors.fontColorSecondary}
                             ></TextInput>
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                <Image
+                                    style={{
+                                        width: 30,
+                                        height: 30,
+                                        resizeMode: 'contain',
+                                    }}
+                                    resizeMode={'contain'}
+                                    source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
+                                />
+                            </TouchableOpacity>
+
                         </View>
                         <TouchableOpacity
                             onPress={() => getLoginMbUsers()}
@@ -258,11 +256,7 @@ const LoginScreen = () => {
                                 }}
 
                             >
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                    color: Colors.buttonTextColor
-                                }}
-                                >
+                                <Text style={styles.text_btn} >
 
                                     {`เข้าสู่ระบบ`}
 
@@ -276,7 +270,6 @@ const LoginScreen = () => {
                                 justifyContent: 'center',
                                 flexDirection: 'row',
                             }}
-
                         >
                             <TouchableOpacity
                                 onPress={() => navigation.navigate('Foeget', { name: 'ลืมรหัสผ่าน' })}
@@ -299,7 +292,7 @@ const LoginScreen = () => {
                         </View>
 
 
-                        <View style={{ marginTop:5,alignItems: 'center' }}>
+                        <View style={{ marginTop: 5, alignItems: 'center' }}>
                             <Text style={{
                                 fontSize: FontSize.medium * 0.8,
                                 fontWeight: 'bold',

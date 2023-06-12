@@ -85,6 +85,7 @@ export default FlatListNewproduct = ({ route }) => {
                                                     precision={2}
                                                     color={'red'}
                                                     fontSize={FontSize.medium}
+                                                    fontFamily={'Kanit-Light'}
                                                     placeholderTextColor={Colors.fontColor} 
                                                     value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
                                                     multiline={true}

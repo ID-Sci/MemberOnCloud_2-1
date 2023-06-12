@@ -26,6 +26,7 @@ import { updateBasket, basketSelector } from '../store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store'
 import { config, updateARcode } from '../store/slices/configReducer';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -132,8 +133,8 @@ const ProductOrderScreen = ({ route }: any) => {
                                     }}
                                 >
                                     <Text style={{
+                                        fontFamily: 'Kanit-Bold',
                                         fontSize: FontSize.medium,
-                                        fontWeight: 'bold',
                                         color: Colors.headerColor
 
                                     }}>
@@ -151,20 +152,20 @@ const ProductOrderScreen = ({ route }: any) => {
                                             precision={2}
                                             color={Colors.headerColor}
                                             fontSize={FontSize.large}
-                                            fontWeight={'bold'}
+                                            fontFamily={'Kanit-Bold'}
                                             placeholderTextColor={Colors.fontColor}
                                             value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
                                             multiline={true}
                                             textAlign={'center'}
                                         />
-
-                                        <Text
-                                            style={{
-                                                color: Colors.fontColor,
-                                                fontWeight: 'bold',
-                                                fontSize: FontSize.medium
-                                            }}
-                                        >
+                                        <Text style={{
+                                            fontFamily: 'Kanit-Bold',
+                                            fontSize: FontSize.medium,
+                                            color: Colors.headerColor
+                                        }}>
+                                            {`.- `}
+                                        </Text>
+                                        <Text style={styles.textLight_title}>
                                             {`บาท`}
                                         </Text>
                                     </View>
@@ -177,17 +178,11 @@ const ProductOrderScreen = ({ route }: any) => {
                                             borderColor: Colors.borderColor
                                         }}>
                                         <Text
-                                            style={{
-                                                color: Colors.fontColor,
-                                                fontSize: FontSize.medium
-                                            }}>
+                                            style={styles.textLight_title}>
                                             {`รายละเอียดสินค้า`}
                                         </Text>
                                         <Text
-                                            style={{
-                                                color: Colors.fontColor,
-                                                fontSize: FontSize.medium
-                                            }}>
+                                            style={styles.textLight_title}>
                                             {item.SHWC_EDIT_FEATURE}
                                         </Text>
                                     </View>
@@ -222,10 +217,6 @@ const ProductOrderScreen = ({ route }: any) => {
                             <TouchableOpacity
                                 disabled={order > 1 ? false : true}
                                 onPress={() => setOrder(order - 1)}
-                                style={{
-
-
-                                }}
                             >
                                 <View
                                     style={{
@@ -239,6 +230,7 @@ const ProductOrderScreen = ({ route }: any) => {
 
                                 >
                                     <Text style={{
+                                        fontFamily: 'Kanit-Bold',
                                         fontSize: FontSize.large,
                                         color: order > 1 ? Colors.menuButton : Colors.borderColor
                                     }}
@@ -257,6 +249,7 @@ const ProductOrderScreen = ({ route }: any) => {
 
                             >
                                 <Text style={{
+                                    fontFamily: 'Kanit-Light',
                                     fontSize: FontSize.large * 2,
                                     color: Colors.menuButton
                                 }}
@@ -266,10 +259,6 @@ const ProductOrderScreen = ({ route }: any) => {
                             </View>
                             <TouchableOpacity
                                 onPress={() => setOrder(order + 1)}
-                                style={{
-
-
-                                }}
                             >
                                 <View
                                     style={{
@@ -283,6 +272,7 @@ const ProductOrderScreen = ({ route }: any) => {
 
                                 >
                                     <Text style={{
+                                        fontFamily: 'Kanit-Bold',
                                         fontSize: FontSize.large,
                                         color: Colors.menuButton
                                     }}
@@ -293,41 +283,17 @@ const ProductOrderScreen = ({ route }: any) => {
                             </TouchableOpacity>
 
                         </View>
-                        <View style={{
-                            width: deviceWidth,
-                            height: deviceHeight * 0.1,
-                            alignItems: 'center',
-                            justifyContent: 'flex-end',
-                            backgroundColor: Colors.backgroundColor,
-                        }}>
+                        <View style={styles.order}>
 
                             <TouchableOpacity
                                 onPress={() => addBasket(order)}
-                                style={{
-
-                                    padding: deviceWidth * 0.025,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
+                                style={styles.order_btn}
                             >
                                 <View
-                                    style={{
-
-                                        width: deviceWidth * 0.9,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexDirection: 'row',
-                                        backgroundColor: Colors.menuButton,
-                                        height: deviceHeight * 0.07,
-                                        borderRadius: 10,
-                                    }}
+                                    style={styles.order_view}
 
                                 >
-                                    <Text style={{
-                                        fontSize: FontSize.medium,
-                                        color: Colors.buttonTextColor
-                                    }}
-                                    >
+                                    <Text style={styles.order_text}>
 
                                         {`ใส่ตะกร้า `}
                                     </Text>
@@ -338,17 +304,14 @@ const ProductOrderScreen = ({ route }: any) => {
                                         precision={2}
                                         color={Colors.buttonTextColor}
                                         fontSize={FontSize.medium}
+                                        fontFamily={'Kanit-Light'}
                                         fontWeight={'bold'}
                                         placeholderTextColor={Colors.fontColor}
                                         value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC * order}
                                         multiline={true}
                                         textAlign={'center'}
                                     />
-                                    <Text style={{
-                                        fontSize: FontSize.medium,
-                                        color: Colors.buttonTextColor
-                                    }}
-                                    >
+                                    <Text style={styles.order_text}>
 
                                         {` บาท`}
                                     </Text>
@@ -362,30 +325,10 @@ const ProductOrderScreen = ({ route }: any) => {
 
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
-                    style={{
-
-                        padding: deviceWidth * 0.025,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'absolute',
-                    }}
+                    style={styles.back_btn}
                 >
-                    <View
-                        style={{
-                            height: deviceWidth * 0.1,
-                            width: deviceWidth * 0.1,
-                            alignItems: 'center',
-                            backgroundColor: '#fff',
-
-                            borderRadius: deviceWidth * 0.1,
-                        }}
-
-                    >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                            color: Colors.fontColor
-                        }}
-                        >
+                    <View style={styles.back_btn_view}>
+                        <Text style={styles.back_text_title}>
                             x
                         </Text>
                     </View>

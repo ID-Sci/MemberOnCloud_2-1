@@ -19,6 +19,7 @@ import { updateBasket, updatePrepareDocumentt } from '../store/slices/basketRedu
 import { docinfoSelector } from '../store/slices/docinfoReducer';
 import * as Keychain from 'react-native-keychain';
 import { config, updateARcode } from '../store/slices/configReducer';
+import { styles } from '../styles/styles';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -47,7 +48,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
         if (ConfigList.MB_LOGIN_GUID) {
 
             if (items.length > 0) {
-             
+
                 const ARCheck = async () => {
 
                     const { MB_CODE } = ConfigList.UserList
@@ -76,7 +77,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                     await calBasket(responseData.Ar000130[0].AR_CODE)
 
                                 } else createARfile()
-                               
+
                             } else {
                                 Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
                                     { text: `ยืนยัน`, onPress: () => setloading(false) }])
@@ -160,13 +161,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
     }
     const saveBasket = async () => {
-        await setloading(true) 
-         
-            docinfoType == 'BK' && await saveBasketSellOrder()
-            docinfoType == 'CS' && await saveBasketInvoice()
-            docinfoType == 'DS' && await saveBasketInvoice()
-            await setloading(false)
-        
+        await setloading(true)
+
+        docinfoType == 'BK' && await saveBasketSellOrder()
+        docinfoType == 'CS' && await saveBasketInvoice()
+        docinfoType == 'DS' && await saveBasketInvoice()
+        await setloading(false)
+
     }
     const calBasketSellOrder = async (AR_CODE) => {
         let newDate = new Date()
@@ -415,7 +416,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             </View>
         )
     }
- 
+
     return (data &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -453,7 +454,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                             alignContent: 'center',
                             position: 'absolute',
                         }}>
-                            <Text style={{ alignSelf: 'center', fontWeight: 'bold' }}>
+                            <Text style={styles.product_bottom_text}>
                                 ไม่พบรายการสินค้า
                             </Text>
                         </View>
@@ -475,80 +476,36 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                         return (index < 10 &&
                                             <>
                                                 <View style={{ padding: deviceWidth * 0.01 }}>
-                                                    <TouchableOpacity style={{
-                                                        backgroundColor: '#fff', alignSelf: 'center',
-                                                        justifyContent: 'center', flexDirection: 'row',
-                                                        height: deviceWidth * 0.33,
-                                                        width: deviceWidth * 0.9,
-                                                        shadowColor: "#000",
-                                                        shadowOffset: {
-                                                            width: 0,
-                                                            height: 2,
-                                                        },
-                                                        shadowOpacity: 0.25,
-                                                        shadowRadius: 3.84,
-
-                                                        elevation: 5,
-                                                        borderRadius: deviceWidth * 0.05,
-                                                    }}
+                                                    <TouchableOpacity style={styles.basket_bg_btn}
                                                         onPress={() => navigation.navigate('ProductOrder', { route: item })}>
                                                         <View
-                                                            style={{
-                                                                width: '25%',
-                                                                height: deviceHeight * 0.2,
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                            }}>
+                                                            style={styles.basket_img_view}>
                                                             {item.IMAGE64 == "" ? <Image
-                                                                style={{
-                                                                    shadowColor: '#000',
-                                                                    shadowOffset: { width: 0, height: 2 },
-                                                                    shadowOpacity: 0.8,
-                                                                    shadowRadius: 2,
-                                                                    resizeMode: 'contain',
-                                                                    height: deviceWidth * 0.12,
-                                                                    width: deviceWidth * 0.18,
-                                                                }}
+                                                                style={styles.basket_img}
                                                                 source={require('../img/newproduct.png')}
                                                             /> : <Image
-                                                                style={{
-                                                                    shadowColor: '#000',
-                                                                    shadowOffset: { width: 0, height: 2 },
-                                                                    shadowOpacity: 0.8,
-                                                                    shadowRadius: 2,
-                                                                    resizeMode: 'contain',
-                                                                    height: deviceHeight * 0.12,
-                                                                    width: deviceWidth * 0.18,
-                                                                }}
+                                                                style={styles.basket_img}
                                                                 source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                                             />}
                                                         </View>
 
                                                         <View
-                                                            style={{
-                                                                width: '75%',
-                                                                paddingVertical: 20,
-                                                                paddingHorizontal: 20,
-                                                                justifyContent: 'space-between',
-                                                            }}>
+                                                            style={styles.basket_obj_view}>
                                                             <View
                                                                 style={{
                                                                     flexDirection: 'row',
                                                                     justifyContent: 'space-between',
                                                                 }}>
 
-                                                                <Text style={{
-                                                                    width: '90%',
-                                                                    textAlign: 'left',
-                                                                }}>
+                                                                <Text style={styles.textLight}>
                                                                     {item.SHWC_ALIAS}
                                                                 </Text>
                                                                 <TouchableOpacity
                                                                     onPress={() => onPressDelete(item.KEY)}
                                                                     style={{
                                                                         padding: 2,
-                                                                        width: deviceWidth * 0.08,
-                                                                        height: deviceWidth * 0.06,
+                                                                        width: deviceWidth * 0.1,
+                                                                        height: deviceWidth * 0.1,
                                                                     }}
                                                                 >
                                                                     <Image
@@ -584,10 +541,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                     textAlign={'center'}
                                                                 />
                                                                 <Text
-                                                                    style={{
-                                                                        color: 'red',
-                                                                        fontSize: FontSize.medium
-                                                                    }}
+                                                                    style={styles.textLight_red}
                                                                 >
                                                                     {`. - `}
                                                                 </Text>
@@ -618,6 +572,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
                                                                         >
                                                                             <Text style={{
+                                                                                fontFamily: 'Kanit-Light',
                                                                                 fontSize: FontSize.large,
                                                                                 color: item.QTY > 1 ? Colors.menuButton : Colors.borderColor
                                                                             }}
@@ -636,6 +591,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
                                                                     >
                                                                         <Text style={{
+                                                                            fontFamily: 'Kanit-Light',
                                                                             fontSize: FontSize.medium,
                                                                             color: Colors.menuButton
                                                                         }}
@@ -660,6 +616,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
                                                                         >
                                                                             <Text style={{
+                                                                                fontFamily: 'Kanit-Light',
                                                                                 fontSize: FontSize.large,
                                                                                 color: Colors.menuButton
                                                                             }}
@@ -707,8 +664,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 }}
                             >
                                 <Text style={{
+                                    fontFamily: 'Kanit-Bold',
                                     fontSize: FontSize.large,
-                                    fontWeight: 'bold',
                                     color: Colors.inputText
                                 }}
                                 >
@@ -726,6 +683,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                         precision={2}
                                         color={loading ? Colors.borderColor : Colors.menuButton}
                                         fontSize={FontSize.large}
+                                        fontFamily={'Kanit-Bold'}
                                         fontWeight={'bold'}
                                         placeholderTextColor={Colors.itemColor}
                                         value={amount}
@@ -734,6 +692,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                     />
 
                                     <Text style={{
+                                        fontFamily: 'Kanit-Bold',
                                         fontSize: FontSize.medium,
                                         color: Colors.textColor
                                     }}
@@ -765,6 +724,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
                                 >
                                     <Text style={{
+
+                                        fontFamily: 'Kanit-Light',
                                         fontSize: FontSize.large,
                                         color: Colors.buttonTextColor
                                     }}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import {
   StyleSheet, Platform, Dimensions, View, Text, Alert, TouchableOpacity,
+  Image,
   ScrollView,
   TouchableNativeFeedback,
 } from 'react-native';
@@ -12,7 +13,7 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { FontSize } from '../styles/FontSizeHelper';
-
+import { styles } from '../styles/styles';
 import * as Animatable from 'react-native-animatable';
 import { QRreader } from 'react-native-qr-decode-image-camera';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -44,7 +45,7 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
   const onSuccess = (e: any) => {
 
 
-    if (e && e.data ) {
+    if (e && e.data) {
       navigation.navigate(route.params.route, { route: route.params.data, post: e.data, data: a });
     }
   };
@@ -111,7 +112,6 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
                 iterationCount="infinite"
                 duration={1700}
                 easing="linear"
-
               />
             </View>
 
@@ -136,7 +136,14 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
               navigation.goBack();
             }}
             style={styles.buttonTouchable1}>
-            <Icon name="angle-left" size={30} color={'black'} />
+            <Image
+              source={require('../img/iconsMenu/goback.png')}
+              style={{
+                width: FontSize.large * 1.5,
+                height: FontSize.large * 1.5,
+                resizeMode: 'contain',
+              }}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={chooseFile}
@@ -157,97 +164,7 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
   );
 };
 
-const overlayColor = "rgba(0,0,0,0.5)"; // this gives us a black color with a 50% transparency
-
-const rectDimensions = deviceWidth * 0.65; // this is equivalent to 255 from a 393 device width
-const rectBorderWidth = deviceWidth * 0.005; // this is equivalent to 2 from a 393 device width
-const rectBorderColor = "red";
-
-const scanBarWidth = deviceWidth * 0.46; // this is equivalent to 180 from a 393 device width
-const scanBarHeight = deviceWidth * 0.0025; //this is equivalent to 1 from a 393 device width
-const scanBarColor = "#22ff00";
-
-const iconScanColor = "blue";
-
-const styles = StyleSheet.create({
-  rectangleContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "transparent"
-  },
-
-  rectangle: {
-    height: rectDimensions,
-    width: rectDimensions,
-    borderWidth: rectBorderWidth,
-    borderColor: rectBorderColor,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "transparent"
-  },
-
-  topOverlay: {
-    flex: 1,
-    height: deviceWidth,
-    width: deviceWidth,
-    backgroundColor: overlayColor,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-
-  bottomOverlay: {
-    flex: 1,
-    height: deviceWidth,
-    width: deviceWidth,
-    backgroundColor: overlayColor,
-    paddingBottom: deviceWidth * 0.25
-  },
-
-  leftAndRightOverlay: {
-    height: deviceWidth * 0.65,
-    width: deviceWidth,
-    backgroundColor: overlayColor
-  },
-
-  scanBar: {
-    width: scanBarWidth,
-    height: scanBarHeight,
-    backgroundColor: scanBarColor
-  },
 
 
-
-  centerText: {
-    flex: 1,
-    fontSize: FontSize.medium,
-    padding: 32,
-    color: '#777',
-  },
-  textBold: {
-    fontWeight: '500',
-    color: '#000',
-  },
-  buttonText: {
-    fontSize: FontSize.medium,
-    color: 'black',
-
-  },
-  buttonTouchable1: {
-    alignSelf: 'flex-start',
-    flex: 1,
-    marginVertical: 10,
-    marginHorizontal: 5,
-    //padding: 16,
-  },
-  buttonTouchable2: {
-    alignSelf: 'flex-end',
-    marginVertical: 10,
-    marginHorizontal: 5,
-
-    //flex:1
-    //padding: 16,
-  },
-});
 
 export default Scanbarcode 
