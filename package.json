@@ -37,6 +37,7 @@
     "react-native-flatlist-slider": "^1.0.6",
     "react-native-gesture-handler": "^2.9.0",
     "react-native-gradle-plugin": "^0.71.17",
+    "react-native-i18n": "^2.0.15",
     "react-native-image-picker": "^5.3.1",
     "react-native-image-slider-show": "^1.0.3",
     "react-native-keychain": "^8.1.1",

@@ -21,8 +21,9 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import * as safe_Format from '../styles/safe_Format';
-
+import { Language, changeLanguage } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
+import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 const HistoryScreen = () => {
@@ -121,14 +122,14 @@ const HistoryScreen = () => {
                     console.log(responseRedeem)
                     setRedeem(responseRedeem.ShowMemberRedeem)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
 
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
 
@@ -161,14 +162,14 @@ const HistoryScreen = () => {
                     console.log(responsePurchase)
                     setPurchase(responsePurchase.ShowMemberPurchase)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
 
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
         await setPurchaseLoading(false)
@@ -189,30 +190,15 @@ const HistoryScreen = () => {
         >
             <View
 
-                style={{
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    width: deviceWidth,
-                    padding: deviceHeight * 0.02,
-                    backgroundColor: Colors.backgroundLoginColorSecondary,
-                    borderBottomWidth: 1,
-                    borderColor: Colors.borderColor
-                }}>
+                style={styles.header}>
                 <Text
-                    style={{
-                        fontSize: FontSize.medium,
-                        color: Colors.menuButton,
-                        fontWeight: 'bold',
-                    }}>
-                    รายละเอียด
+                    style={styles.header_text_title}>
+                    {Language.t('profileCard.detail')}
                 </Text>
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
                 >
-                    <Text style={{
-                        fontSize: FontSize.large,
-                    }}
+                    <Text style={styles.header_text_Xtitle}
                     >
                         x
                     </Text>
@@ -221,7 +207,6 @@ const HistoryScreen = () => {
             <View
                 style={{
                     backgroundColor: 'white',
-
                     flex: 1,
                     flexDirection: 'column',
                 }}>
@@ -243,11 +228,12 @@ const HistoryScreen = () => {
                         >
                             <Text
                                 style={{
+                                    fontFamily:'Kanit-Bold',
                                     color: HistoryTab == true ? '#0288D1' : 'black',
                                     paddingLeft: 20,
                                     fontSize: FontSize.medium,
                                 }}>
-                                ประวัติการซื้อ
+                                {Language.t('history.purchaseHistoryTabTitle')}
                             </Text>
                         </TouchableOpacity>
                         <Text style={{}}>
@@ -258,11 +244,12 @@ const HistoryScreen = () => {
                             <Text
 
                                 style={{
+                                    fontFamily:'Kanit-Bold',
                                     color: HistoryTab == true ? 'black' : '#0288D1',
                                     paddingRight: 20,
                                     fontSize: FontSize.medium,
                                 }}>
-                                ประวัติการแลกแต้ม
+                              {Language.t('history.redeemHistoryTabTitle')}
                             </Text>
                         </TouchableOpacity>
 
@@ -286,23 +273,17 @@ const HistoryScreen = () => {
                                                 marginBottom: 1
                                             }}
                                         >
-                                            <Text style={{
-                                                color: 'black',
-                                                fontSize: FontSize.medium,
-                                            }}>
-                                                เลขอ้างอิง # {items.MBP_REF}
+                                            <Text style={styles.textLight}>
+                                            {Language.t('history.Ref')} # {items.MBP_REF}
                                             </Text>
-                                            <View style={{ marginTop: deviceHeight * 0.25 }}>
+                                            <View >
                                                 <View
                                                     style={{
                                                         flexDirection: 'row',
                                                     }} >
                                                     <View style={{ width: (deviceWidth * 0.6) - 20 }}>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
-                                                            วันที่ซื้อ
+                                                        <Text style={styles.textLight}>
+                                                        {Language.t('history.purchaseDate')}
                                                         </Text>
                                                     </View>
                                                     <View
@@ -312,16 +293,10 @@ const HistoryScreen = () => {
                                                             flexDirection: 'row',
                                                             justifyContent: 'space-between'
                                                         }}>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
-                                                            ยอดแต้ม
+                                                        <Text style={styles.textLight}>
+                                                        {Language.t('history.pointBalance')}
                                                         </Text>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
+                                                        <Text style={styles.textLight}>
                                                             {safe_Format.pointFormat(items.MBP_POINT)}
                                                         </Text>
                                                     </View>
@@ -332,11 +307,8 @@ const HistoryScreen = () => {
                                                         flexDirection: 'row',
                                                     }} >
                                                     <View style={{ width: (deviceWidth * 0.6) - 20 }}>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
-                                                            {safe_Format.dateFormat(items.MBP_DATE)} เวลา {safe_Format.timeFormat(items.MBP_TIME)}
+                                                        <Text style={styles.textLight}>
+                                                            {safe_Format.dateFormat(items.MBP_DATE)} {Language.t('history.time')} {safe_Format.timeFormat(items.MBP_TIME)}
                                                         </Text>
                                                     </View>
                                                     <View
@@ -346,16 +318,10 @@ const HistoryScreen = () => {
                                                             flexDirection: 'row',
                                                             justifyContent: 'space-between'
                                                         }}>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
-                                                            ยอดบิล
+                                                        <Text style={styles.textLight}>
+                                                        {Language.t('history.billAmount')}
                                                         </Text>
-                                                        <Text style={{
-                                                            color: 'black',
-                                                            fontSize: FontSize.medium,
-                                                        }}>
+                                                        <Text style={styles.textLight}>
                                                             {safe_Format.currencyFormat(items.MBP_RDM)}
                                                         </Text>
                                                     </View>
@@ -370,15 +336,13 @@ const HistoryScreen = () => {
                                         borderBottomWidth: 0.2,
                                         marginBottom: 1,
                                         width: deviceWidth,
+                                        marginTop:deviceHeight*0.4,
                                         alignItems: 'center',
                                     }}
                                 >
 
-                                    <Text style={{
-                                        color: 'black',
-                                        fontSize: FontSize.medium,
-                                    }}>
-                                        ไม่พบข้อมูล
+                                    <Text style={styles.textLight}>
+                                    {Language.t('history.nodata')}
                                     </Text>
 
                                 </View>
@@ -400,26 +364,21 @@ const HistoryScreen = () => {
                                                 style={{
                                                     padding: 10,
                                                     borderBottomColor: '#000000',
-                                                    borderBottomWidth: 0.2,
+                                                    borderBottomWidth: 1,
+
                                                 }}
                                             >
-                                                <Text style={{
-                                                    color: 'black',
-                                                    fontSize: FontSize.medium,
-                                                }}>
-                                                    เลขอ้างอิง # {items.MBP_REF}
+                                                <Text style={styles.textLight}>
+                                                {Language.t('history.Ref')} # {items.MBP_REF}
                                                 </Text>
-                                                <View style={{ marginTop: deviceHeight * 0.25 }}>
+                                                <View >
                                                     <View
                                                         style={{
                                                             flexDirection: 'row',
                                                         }} >
                                                         <View style={{ width: (deviceWidth * 0.4) - 20 }}>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}>
-                                                                แต้มในการแลก
+                                                            <Text style={styles.textLight}>
+                                                            {Language.t('history.pointsExchange')}
                                                             </Text>
                                                         </View>
                                                         <View
@@ -429,15 +388,9 @@ const HistoryScreen = () => {
                                                                 flexDirection: 'row',
                                                                 justifyContent: 'space-between'
                                                             }}>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}></Text>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}>
-                                                                {safe_Format.pointFormat(items.MBP_POINT)} พอยท์
+                                                            <Text style={styles.textLight}></Text>
+                                                            <Text style={styles.textLight}>
+                                                                {safe_Format.pointFormat(items.MBP_POINT)} {Language.t('history.points')}
                                                             </Text>
                                                         </View>
 
@@ -447,11 +400,8 @@ const HistoryScreen = () => {
                                                             flexDirection: 'row',
                                                         }} >
                                                         <View style={{ width: (deviceWidth * 0.4) - 20 }}>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}>
-                                                                ใช้งานเมื่อ
+                                                            <Text style={styles.textLight}>
+                                                            {Language.t('history.activeWhen')}
                                                             </Text>
                                                         </View>
                                                         <View
@@ -461,15 +411,9 @@ const HistoryScreen = () => {
                                                                 flexDirection: 'row',
                                                                 justifyContent: 'space-between'
                                                             }}>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}></Text>
-                                                            <Text style={{
-                                                                color: 'black',
-                                                                fontSize: FontSize.medium,
-                                                            }}>
-                                                                {safe_Format.dateFormat(items.MBP_DATE)} เวลา {safe_Format.timeFormat(items.MBP_TIME)}
+                                                            <Text style={styles.textLight}></Text>
+                                                            <Text style={styles.textLight}>
+                                                                {safe_Format.dateFormat(items.MBP_DATE)} {Language.t('history.time')} {safe_Format.timeFormat(items.MBP_TIME)}
                                                             </Text>
                                                         </View>
                                                     </View>
@@ -484,6 +428,7 @@ const HistoryScreen = () => {
                                             borderBottomWidth: 0.2,
                                             marginBottom: 1,
                                             width: deviceWidth,
+                                            marginTop:deviceHeight*0.4,
                                             alignItems: 'center',
                                         }}
                                     >
@@ -492,7 +437,7 @@ const HistoryScreen = () => {
                                             color: 'black',
                                             fontSize: FontSize.medium,
                                         }}>
-                                            ไม่พบข้อมูล
+                                            {Language.t('history.nodata')}
                                         </Text>
 
                                     </View>

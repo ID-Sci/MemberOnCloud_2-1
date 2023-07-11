@@ -54,7 +54,7 @@ const ShowTemppageScreen = ({ route }: any) => {
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={styles.header_text_title}>
+                        <Text style={styles.header_text_Xtitle}>
                             X
                         </Text>
                     </TouchableOpacity>

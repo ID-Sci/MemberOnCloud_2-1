@@ -1,64 +1,93 @@
-export const months_th = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",];
-export const months_th_mini = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",];
- 
-export const monthFormat = (month :any) => {
-    return months_th[Number(month) - 1];
+import { Language, changeLanguage } from '../translations/I18n';
+export const months_th = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+export const months_th_mini = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+export const months_en = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+export const months_en_mini = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+
+export const monthFormat = (month: any) => {
+    return Language.getLang() == 'th' ? months_th[Number(month) - 1] : months_en[Number(month) - 1];
 }
-export const currencyFormat = (num:any) => {
-    if (num == 0) return '-'
+export const currencyFormat = (num: any) => {
+    if (num == 0) return '0.00'
     else return Number(num).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
-export const pointFormat = (num:any) => {
+export const pointFormat = (num: any) => {
     if (num == 0) return '-'
     else return Number(num).toFixed(0).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
-export const sumTabledata = (item:any) => {
+export const sumTabledata = (item: any) => {
     var sumItem = 0;
     for (var i in item) {
         sumItem += Number(item[i])
     }
     return sumItem;
 }
-export const timeFormat= (time:any) => {
- 
+export const timeFormat = (time: any) => {
+
     return time.substring(0, 2) + ':' + time.substring(2, 4)
 }
-export const dateFormat = (date:any) => {
+export const dateFormat = (date: any) => {
     var x = new Date()
     var year = x.getFullYear()
     var inputyear = Number(date.substring(0, 4))
-    if (inputyear <= Number(x.getFullYear())) inputyear += 543
-    return date.substring(6, 8) + ' ' + months_th_mini[Number(date.substring(4, 6)) - 1] + ' ' + inputyear
+    if (inputyear <= Number(x.getFullYear())) Language.getLang() == 'th' ? inputyear += 543 : inputyear
+    return date.substring(6, 8) + ' ' + (Language.getLang() == 'th' ? months_th_mini[Number(date.substring(4, 6)) - 1] : months_en_mini[Number(date.substring(4, 6)) - 1]) + ' ' + inputyear
 }
-export const checkDate = (temp_date:any) => {
+export const checkDate = (temp_date: any) => {
     if (temp_date.toString().search(':') == -1) {
         var tempdate = temp_date.split('-')
         temp_date = new Date(tempdate[2] + '-' + tempdate[1] + '-' + tempdate[0])
     }
     return temp_date
 }
-export const setnewdateF = (date:any) => {
+export const setnewdateF = (date: any) => {
     var x = new Date(date);
 
-    var day:any = x.getDate()
+    var day: any = x.getDate()
     if (day < 10)
         day = '0' + day.toString()
 
-    var month:any = x.getMonth() + 1
+    var month: any = x.getMonth() + 1
     if (month < 10)
         month = '0' + month.toString()
 
     var year = x.getFullYear()
     return year + '' + month + '' + day
 }
-export const Radio_menu = (index:any, val:any) => {
+export const formatCurrency = (amount: number): string => {
+    const roundedAmount = Math.round(amount * 100) / 100; // Round to two decimal places
+    const parts = roundedAmount.toFixed(2).split(".");
+    const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const decimalPart = parts[1] ? "." + adjustDecimal(parts[1]) : "";
 
-    var x:any = new Date();
-    var day:any = x.getDate();
-    var month:any = x.getMonth() + 1
-    var year:any = x.getFullYear()
-    var sdate:any = ''
-    var edate:any = ''
+    return integerPart + decimalPart;
+}
+function adjustDecimal(decimal: string): string {
+    if (decimal.length === 1) {
+        return decimal + "0"; // Pad with zero if only one digit after the decimal point
+    } else if (decimal.length === 2) {
+        return decimal;
+    } else {
+        const decimalLength = decimal.length;
+        const lastDigit = Number(decimal[decimalLength - 1]);
+
+        if (lastDigit >= 5) {
+            const roundedDecimal = Math.round(Number(decimal.slice(0, decimalLength - 1)));
+            return roundedDecimal.toString();
+        } else {
+            return decimal.slice(0, decimalLength - 1);
+        }
+    }
+}
+
+export const Radio_menu = (index: any, val: any) => {
+
+    var x: any = new Date();
+    var day: any = x.getDate();
+    var month: any = x.getMonth() + 1
+    var year: any = x.getFullYear()
+    var sdate: any = ''
+    var edate: any = ''
 
     if (val == 'lastyear') {
         year = year - 1
@@ -92,7 +121,7 @@ export const Base64 = {
     _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
     // public method for encoding
-    encode: function (input:any) {
+    encode: function (input: any) {
         var output = "";
         var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
         var i = 0;
@@ -125,11 +154,11 @@ export const Base64 = {
     },
 
     // public method for decoding
-    decode: function (input:any) {
-        var output:any = "";
-        var chr1:any, chr2:any, chr3:any;
-        var enc1:any, enc2:any, enc3:any, enc4:any;
-        var i:any = 0;
+    decode: function (input: any) {
+        var output: any = "";
+        var chr1: any, chr2: any, chr3: any;
+        var enc1: any, enc2: any, enc3: any, enc4: any;
+        var i: any = 0;
 
         input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
 
@@ -160,7 +189,7 @@ export const Base64 = {
     },
 
     // private method for UTF-8 encoding
-    _utf8_encode: function (string:any) {
+    _utf8_encode: function (string: any) {
         string = string.replace(/\r\n/g, "\n");
         var utftext = "";
 
@@ -185,13 +214,13 @@ export const Base64 = {
     },
 
     // private method for UTF-8 decoding
-    _utf8_decode: function (utftext:any) {
-        var string:any = "";
-        var i:any = 0;
-        var c:any =0
-        var c1:any =0
-        var c2:any = 0;
-        var c3:any= 0;
+    _utf8_decode: function (utftext: any) {
+        var string: any = "";
+        var i: any = 0;
+        var c: any = 0
+        var c1: any = 0
+        var c2: any = 0;
+        var c3: any = 0;
         while (i < utftext.length) {
 
             c = utftext.charCodeAt(i);

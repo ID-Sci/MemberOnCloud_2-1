@@ -36,6 +36,8 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
 import * as Keychain from 'react-native-keychain';
+import { styles } from '../styles/styles';
+import { Language } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 const defaultCountDown = 60;
@@ -54,7 +56,7 @@ const RegisterScreen = ({ route }: any) => {
 
     const [code, setCode] = useState('')
     const [OTPpassword, setOTPpassword] = useState('');
-
+    const [showPassword, setShowPassword] = useState(false)
     let clockCall: any = 0;
 
 
@@ -73,8 +75,8 @@ const RegisterScreen = ({ route }: any) => {
         if (countdown === 1) {
             clearInterval(clockCall);
             Alert.alert(
-                'แจ้งเตือน',
-                'OTP หมดอายุ โปรดกด \"ตกลง\"\nเพื่อรับ OTP อีกครั้ง', [{ text: 'ตกลง', onPress: () => otpRequest() }]);
+                Language.t('notiAlert.header'),
+                Language.t('register.OTPexpired'), [{ text: Language.t('alert.ok'), onPress: () => otpRequest() }]);
         } else if (countdown === 0) {
 
         } else {
@@ -108,7 +110,7 @@ const RegisterScreen = ({ route }: any) => {
         MB_ADDR_2: '',
         MB_ADDR_3: '',
         MB_POST: '',
-        MB_I_CARD: '',
+        MB_I_CARD: '.',
         MB_EMAIL: '',
         MB_CNTRY_CODE: '66',
         MB_REG_MOBILE: '',
@@ -126,10 +128,7 @@ const RegisterScreen = ({ route }: any) => {
             C = false
             console.log(`MB_SURNME`)
         }
-        if (!newData.MB_I_CARD) {
-            C = false
-            console.log(`MB_I_CARD`)
-        }
+
         if (!newData.MB_REG_MOBILE) {
             C = false
             console.log(`MB_REG_MOBILE`)
@@ -167,7 +166,7 @@ const RegisterScreen = ({ route }: any) => {
             otpRequest()
         } else {
             Alert.alert(
-                'พบข้อผิดพลาด', 'กรุณาระบุข้อมูลให้ถูกต้อง', [{ text: 'ตกลง', onPress: () => console.log(C) }]);
+                Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => console.log(C) }]);
         }
     }
     const otpRequest = async () => {
@@ -187,7 +186,7 @@ const RegisterScreen = ({ route }: any) => {
             }),
             body: JSON.stringify({
                 NTFU_OTP_MESSAGE:
-                    'รหัสยืนยันการยืนยันตน Member' + 'OTP-Ref: ' + otpPassword,
+                    Language.t('register.verificationCode') + 'OTP-Ref: ' + otpPassword,
                 NTFU_CNTRY_CODE: '66',
                 NTFU_MOBILE: newData.MB_REG_MOBILE,
                 NTFU_DISPLAY: 'Display',
@@ -202,7 +201,7 @@ const RegisterScreen = ({ route }: any) => {
             .then((json) => {
                 if (json[0].NTFU_GUID) {
                     console.log(`otp Request Success => { ${otpPassword} }`);
-                    Alert.alert('', `ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ\nเบอร์มือถือ (+66) ${Phone}`, [{ text: 'ตกลง', onPress: () => setLoading(false) }]);
+                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }]);
                 }
             })
             .catch((error) => {
@@ -210,7 +209,7 @@ const RegisterScreen = ({ route }: any) => {
 
 
                 Alert.alert(
-                    'พบข้อผิดพลาด', error, [{ text: 'ตกลง', onPress: () => BackHandler.exitApp() }]);
+                    Language.t('alert.errorTitle'), error, [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }]);
                 console.log('checkIPAddress>>', error);
 
                 setLoading(false)
@@ -262,8 +261,7 @@ const RegisterScreen = ({ route }: any) => {
                     newData.MB_ADDR_3 +
                     '","MB_POST": "' +
                     newData.MB_POST +
-                    '","MB_I_CARD": "' +
-                    newData.MB_I_CARD +
+
                     '","MB_EMAIL": "' +
                     newData.MB_EMAIL +
                     '","MB_CNTRY_CODE":"' +
@@ -280,14 +278,14 @@ const RegisterScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     LoginByMobile()
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     };
@@ -317,14 +315,14 @@ const RegisterScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
 
             });
@@ -357,13 +355,13 @@ const RegisterScreen = ({ route }: any) => {
                     navigation.goBack()
                     setLoading(false)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -408,8 +406,7 @@ const RegisterScreen = ({ route }: any) => {
                     newData.MB_ADDR_3 +
                     '","MB_POST": "' +
                     newData.MB_POST +
-                    '","MB_I_CARD": "' +
-                    newData.MB_I_CARD +
+
                     '","MB_EMAIL": "' +
                     newData.MB_EMAIL +
                     '","MB_CNTRY_CODE":"' +
@@ -425,13 +422,13 @@ const RegisterScreen = ({ route }: any) => {
                 if (json && json.ResponseCode == '200') {
 
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -466,8 +463,8 @@ const RegisterScreen = ({ route }: any) => {
                 getNewMemberMbUsers()
             }
             else {
-                Alert.alert(`แจ้งเตือน`, `รหัสไม่ถูกต้อง`, [
-                    { text: `ยืนยัน`, onPress: () => setPinCode('') }])
+                Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.invalidCode'), [
+                    { text: Language.t('alert.confirm'), onPress: () => setPinCode('') }])
             }
         }
     }
@@ -513,24 +510,11 @@ const RegisterScreen = ({ route }: any) => {
                 {Regis ? (<>
                     <View style={{ flex: 0.6, }}>
                         <View style={{ flex: 1, marginTop: 60, justifyContent: 'center' }}>
-                            <Text
-
-                                style={{
-                                    fontSize: FontSize.large,
-                                    alignSelf: 'center',
-                                    color: Colors.textColor,
-                                }}>
-                                {`ยืนยันการลงทะเบียนเรียบร้อย`}
+                            <Text style={styles.textLight_title}>
+                                {Language.t('register.confirmRegistration')}
                             </Text>
-                            <Text
-
-                                style={{
-                                    textAlign: 'center',
-                                    fontSize: FontSize.medium,
-                                    alignSelf: 'center',
-                                    color: Colors.textColor,
-                                }}>
-                                {` ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ (+66) ${Phone}`}
+                            <Text style={styles.textLight_title}>
+                                {`${Language.t('register.informOtp')} (+66) ${Phone}`}
 
                             </Text>
                             <OtpInput digit={4} pinCode={code ? pinCode : pinCode} />
@@ -538,17 +522,8 @@ const RegisterScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     onPress={() => _PressResend()}
                                     style={{ alignSelf: 'center' }}>
-                                    <Text
-                                        style={[
-                                            {
-                                                fontSize: FontSize.medium,
-                                                alignSelf: 'center',
-                                                color: Colors.backgroundLoginColor,
-                                                textDecorationLine: 'underline',
-                                            },
-
-                                        ]}>
-                                        {`ส่ง OTP ใหม่อีกครั้ง ${countdown}`}
+                                    <Text style={styles.textLink}>
+                                        {`${Language.t('register.resendOtp')} ${countdown}`}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -560,21 +535,21 @@ const RegisterScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('1')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         1
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('2')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         2
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('3')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         3
                                     </Text>
                                 </TouchableOpacity>
@@ -583,21 +558,21 @@ const RegisterScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('4')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         4
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('5')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         5
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('6')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         6
                                     </Text>
                                 </TouchableOpacity>
@@ -606,21 +581,21 @@ const RegisterScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('7')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         7
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('8')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         8
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('9')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         9
                                     </Text>
                                 </TouchableOpacity>
@@ -630,14 +605,14 @@ const RegisterScreen = ({ route }: any) => {
 
                                     style={styles.box}
                                 >
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
 
                                     </Text>
                                 </View>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('0')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         0
                                     </Text>
                                 </TouchableOpacity>
@@ -658,41 +633,24 @@ const RegisterScreen = ({ route }: any) => {
                     </View></>) : (
                     <>
                         <View
-                            style={{
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexDirection: 'row',
-                                width: deviceWidth,
-                                padding: deviceHeight * 0.02,
-                                backgroundColor: Colors.backgroundLoginColorSecondary,
-                                borderBottomWidth: 1,
-                                borderColor: Colors.borderColor
-                            }}>
-                            <Text
-                                style={{
-                                    fontSize: FontSize.medium,
-                                    color: Colors.menuButton,
-                                    fontWeight: 'bold',
-                                }}>
+                            style={styles.header}>
+                            <Text style={styles.header_text_title}>
                                 {route.params.name}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => navigation.goBack()}
                             >
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                }}
-                                >
+                                <Text style={styles.header_text_Xtitle}>
                                     x
                                 </Text>
                             </TouchableOpacity>
                         </View>
 
                         <KeyboardAvoidingView keyboardVerticalOffset={2} behavior={'height'}>
-                            <ScrollView >
+                            <ScrollView>
                                 <View style={{ padding: deviceWidth * 0.05 }}>
-                                    <Text style={styles.textTitle}>
-                                        คำนำหน้า
+                                    <Text style={styles.textLight}>
+                                        {Language.t('profile.title')}
                                     </Text>
                                     <View style={{
                                         backgroundColor: Colors.backgroundColorSecondary,
@@ -708,7 +666,7 @@ const RegisterScreen = ({ route }: any) => {
                                         <Picker
                                             style={{
                                                 backgroundColor: Colors.backgroundColorSecondary,
-
+                                                fontFamily: 'Kanit-Light',
                                                 width: deviceWidth * 0.8,
                                             }}
                                             mode="dropdown"
@@ -721,6 +679,7 @@ const RegisterScreen = ({ route }: any) => {
                                             }}
                                             itemStyle={{
                                                 width: 50,
+                                                fontFamily: 'Kanit-Light',
                                             }}>
 
                                             <Picker.Item label="นาย" value="นาย" />
@@ -738,8 +697,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ชื่อ
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.firstName')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -760,7 +719,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_NAME: item,
                                                 })}
-                                                placeholder={`ชื่อ`}
+                                                placeholder={Language.t('profile.firstName')}
 
                                                 style={styles.textInput}></TextInput>
                                         </View>
@@ -768,8 +727,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            นามสกุล
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.lastName')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -790,7 +749,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_SURNME: item,
                                                 })}
-                                                placeholder={`นามสกุล`}
+                                                placeholder={Language.t('profile.lastName')}
 
                                                 style={styles.textInput}></TextInput>
                                         </View>
@@ -798,7 +757,7 @@ const RegisterScreen = ({ route }: any) => {
                                     {/* <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
+                                        <Text style={styles.textLight}>
                                             เลขประจำตัวประชาชน
                                         </Text>
                                         <View style={{
@@ -825,8 +784,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            เบอร์โทร
+                                        <Text style={styles.textLight}>
+                                            {Language.t('register.mobileNo')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -853,8 +812,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            วันเกิด
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.birthday')}
                                         </Text>
                                         <View style={{
 
@@ -883,8 +842,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ที่อยู่-ถนน
+                                        <Text style={styles.textLight}>
+                                            {`${Language.t('profile.address')}-${Language.t('profile.road')}`}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -905,7 +864,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_1: item,
                                                 })}
-                                                placeholder={`ที่อยู่-ถนน`}
+                                                placeholder={`${Language.t('profile.address')}-${Language.t('profile.road')}`}
 
                                                 style={styles.textInput}></TextInput>
                                         </View>
@@ -913,8 +872,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ตำบล/แขวง และ อำเภอ/เขต
+                                        <Text style={styles.textLight}>
+                                            {`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -935,15 +894,15 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_2: item,
                                                 })}
-                                                placeholder={`ตำบล/แขวง และ อำเภอ/เขต`}
+                                                placeholder={`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            จังหวัด
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.province')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -964,7 +923,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_3: item,
                                                 })}
-                                                placeholder={`จังหวัด`}
+                                                placeholder={Language.t('profile.province')}
 
                                                 style={styles.textInput}></TextInput>
                                         </View>
@@ -972,8 +931,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            รหัสไปรษณีย์
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.postCode')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -995,7 +954,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_POST: item,
                                                 })}
-                                                placeholder={`รหัสไปรษณีย์`}
+                                                placeholder={Language.t('profile.postCode')}
 
                                                 style={styles.textInput}></TextInput>
                                         </View>
@@ -1003,8 +962,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            อีเมล์
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.email')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -1025,7 +984,7 @@ const RegisterScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_EMAIL: item,
                                                 })}
-                                                placeholder={`อีเมล์`}
+                                                placeholder={Language.t('profile.email')}
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
@@ -1033,8 +992,8 @@ const RegisterScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            รหัสผ่าน
+                                        <Text style={styles.textLight}>
+                                            {Language.t('register.password')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -1046,28 +1005,40 @@ const RegisterScreen = ({ route }: any) => {
                                             paddingBottom: 10,
                                             borderColor: newData.MB_PW == newData.MB_CPW ? 'gray' : 'red',
                                             borderWidth: 0.7,
+                                            alignItems: 'center',
                                             flexDirection: 'row',
                                         }}>
                                             <TextInput
                                                 placeholderTextColor={Colors.fontColorSecondary}
                                                 value={newData.MB_PW}
                                                 keyboardType="default"
-                                                secureTextEntry={true}
+                                                secureTextEntry={!showPassword}
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
                                                     MB_PW: item,
                                                 })}
 
-                                                placeholder={`รหัสผ่าน`}
+                                                placeholder={Language.t('register.password')}
 
                                                 style={styles.textInput}></TextInput>
+                                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                                <Image
+                                                    style={{
+                                                        width: 30,
+                                                        height: 30,
+                                                        resizeMode: 'contain',
+                                                    }}
+                                                    resizeMode={'contain'}
+                                                    source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
+                                                />
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ยืนยันรหัสผ่าน
+                                        <Text style={styles.textLight}>
+                                            {Language.t('register.confirmPassword')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -1085,12 +1056,12 @@ const RegisterScreen = ({ route }: any) => {
                                                 placeholderTextColor={Colors.fontColorSecondary}
                                                 value={newData.MB_CPW}
                                                 keyboardType="default"
-                                                secureTextEntry={true}
+                                                secureTextEntry={!showPassword}
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
                                                     MB_CPW: item,
                                                 })}
-                                                placeholder={`ยืนยันรหัสผ่าน`}
+                                                placeholder={Language.t('register.confirmPassword')}
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
@@ -1102,25 +1073,18 @@ const RegisterScreen = ({ route }: any) => {
                                             padding: deviceWidth * 0.025,
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                        }}
-                                    >
-                                        <View
-                                            style={{
-                                                width: deviceWidth * 0.9,
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                flexDirection: 'row',
-                                                backgroundColor: Colors.menuButton,
-                                                height: deviceHeight * 0.07,
-                                                borderRadius: deviceWidth * 0.1,
-                                            }}
-                                        >
-                                            <Text style={{
-                                                fontSize: FontSize.large,
-                                                color: Colors.buttonTextColor
-                                            }}
-                                            >
-                                                {`ลงทะเบียน`}
+                                        }}>
+                                        <View style={{
+                                            width: deviceWidth * 0.9,
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexDirection: 'row',
+                                            backgroundColor: Colors.menuButton,
+                                            height: deviceHeight * 0.07,
+                                            borderRadius: deviceWidth * 0.1,
+                                        }}>
+                                            <Text style={styles.text_btn}>
+                                                {Language.t('register.registration')}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -1135,67 +1099,5 @@ const RegisterScreen = ({ route }: any) => {
     )
 }
 
-const styles = StyleSheet.create({
-    container1: {
-
-        paddingBottom: 0,
-        flex: 1,
-        flexDirection: 'column',
-
-    },
-    container2: {
-        width: deviceWidth,
-        height: '100%',
-        position: 'absolute',
-        backgroundColor: 'white',
-        flex: 1,
-    },
-    button: {
-        marginTop: 10,
-        padding: 5,
-        marginBottom: 20,
-        alignItems: 'center',
-        backgroundColor: Colors.buttonColorPrimary,
-        borderRadius: 10,
-    },
-    textTitle: {
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textTitle2: {
-        alignSelf: 'center',
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textButton: {
-        color: Colors.fontColor2,
-        fontSize: FontSize.medium,
-        padding: 10,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-    },
-    textInput: {
-        flex: 8,
-        color: Colors.fontColor,
-        fontSize: FontSize.medium,
-        height: 'auto',
-        borderBottomWidth: 0.7,
-    },
-    row: {
-        flexDirection: 'row',
-        flex: 0.25,
-        backgroundColor: 'white',
-    },
-    box: {
-        flex: 1 / 3,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // borderWidth: 0.3,
-        // borderColor: "#BDBDBD"
-    },
-    text: {
-        fontSize: FontSize.large,
-    }
-});
 
 export default RegisterScreen

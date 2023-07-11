@@ -28,6 +28,7 @@ import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import RNRestart from 'react-native-restart';
+import { Language } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
 import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
@@ -81,15 +82,15 @@ const LoginScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     getMemberInfo(responseData.MB_LOGIN_GUID)
                     // Alert.alert(`สำเร็จ`, `${json.ReasonString}`, [
-                    //     { text: `ยืนยัน`, onPress: () => console.log() }])
+                    //     { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
         setLoading(false)
@@ -121,13 +122,13 @@ const LoginScreen = () => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
 
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -192,7 +193,7 @@ const LoginScreen = () => {
                         }}>
                         <View>
                             <Text style={styles.textLight_title}>
-                                ลงทะเบียนรับโปรดีๆ มากมาย
+                                {Language.t('register.header2')}
                             </Text>
                         </View>
                         <View style={{ height: 40, flexDirection: 'row' }}>
@@ -218,7 +219,7 @@ const LoginScreen = () => {
                                 }}
                                 secureTextEntry={!showPassword}
                                 keyboardType="default"
-                                placeholder={'รหัสผ่าน ..'}
+                                placeholder={`${Language.t('register.password')}..`}
                                 placeholderTextColor={Colors.fontColorSecondary}
                             ></TextInput>
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -258,7 +259,7 @@ const LoginScreen = () => {
                             >
                                 <Text style={styles.text_btn} >
 
-                                    {`เข้าสู่ระบบ`}
+                                    {Language.t('login.buttonLogin')}
 
 
                                 </Text>
@@ -272,20 +273,20 @@ const LoginScreen = () => {
                             }}
                         >
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('Foeget', { name: 'ลืมรหัสผ่าน' })}
+                                onPress={() => navigation.navigate('Foeget', { name: Language.t('register.forgotPassword') })}
                             >
                                 <Text style={{ alignSelf: 'center', borderBottomWidth: 1, paddingBottom: 1, fontWeight: '900' }}>
-                                    {`  ลืมรหัสผ่าน  `}
+                                    {`  ${Language.t('register.forgotPassword')}  `}
                                 </Text>
                             </TouchableOpacity>
                             <Text
                                 style={{ alignSelf: 'center', fontWeight: '900' }}
                             >{` | `}</Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('Register', { name: 'ลงทะเบียน' })}
+                                onPress={() => navigation.navigate('Register', { name: Language.t('register.registration') })}
                             >
                                 <Text style={{ alignSelf: 'center', borderBottomWidth: 1, paddingBottom: 1, fontWeight: '900' }}>
-                                    {`  ลงทะเบียน  `}
+                                    {`  ${Language.t('register.registration')}  `}
                                 </Text>
                             </TouchableOpacity>
 
@@ -305,7 +306,33 @@ const LoginScreen = () => {
 
 
                 </View>
+                <View style={{
+                    width: deviceWidth,
+                    position: 'absolute',
+                    alignItems: 'flex-end',
+                    padding: 10
+                }}>
+                    <TouchableOpacity
+                        style={{
+                            flexDirection: 'row',
+                            alignItems:'baseline'
+                        }}
+                        onPress={() => navigation.navigate('SelLanguage')}>
+                        <Text style={styles.textLight}>
+                            {Language.getLang()}
+                        </Text>
+                        <Image
+                            style={{
+                                width: 30,
+                                height: 30,
+                                resizeMode: 'contain',
+                            }}
+                            resizeMode={'contain'}
+                            source={require('../img/iconsMenu/world.png')}
+                        />
 
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         )
     )

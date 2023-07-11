@@ -47,7 +47,7 @@ import { activitySelector, updateActivityList, clearActivityList, updateActivity
 import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, clearMycardPage } from '../store/slices/mycardReducer';
 import { newproductSlice, updateNewproductList, updateAllproductList, clearAllproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
-
+import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 let images: Array<[]> = []
@@ -81,7 +81,7 @@ const HomeScreen = ({ route }: any) => {
     }, [])
 
     useEffect(() => {
-        console.log(timeLeft)
+
         const intervalId = setInterval(() => {
             decrementClock();
         }, 1000);
@@ -115,10 +115,10 @@ const HomeScreen = ({ route }: any) => {
         console.log(notificationList.notificationPage.length.toString())
         await AsyncStorage.setItem('noti', notificationList.notificationPage.length.toString())
         await setNotivalue(notificationList.notificationPage.length.toString())
-        await navigation.navigate('ShowTemppage' as never, { name: 'แจ้งเตือน', route: notificationList.notificationPage } as never)
+        await navigation.navigate('ShowTemppage' as never, { name: Language.t('notiAlert.header'), route: notificationList.notificationPage } as never)
     }
     const getProducrCategory = async (item: any) => {
-        navigation.navigate('ProductCategory' as never, { name: 'หมวดหมู่', route: item } as never)
+        navigation.navigate('ProductCategory' as never, { name: Language.t('product.category'), route: item } as never)
     }
 
     const onRefresh = async () => {
@@ -154,13 +154,13 @@ const HomeScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -190,13 +190,13 @@ const HomeScreen = ({ route }: any) => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
 
@@ -235,20 +235,20 @@ const HomeScreen = ({ route }: any) => {
                         }
                     } else {
                         CState = false
-                        Alert.alert(`แจ้งเตือน`, `ไม่พบโครงการ`, [
-                            { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                        Alert.alert(Language.t('notiAlert.header'), `ไม่พบโครงการ`, [
+                            { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                     }
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 console.log('ERROR ' + error);
             })
         await setnotiItem()
@@ -317,16 +317,16 @@ const HomeScreen = ({ route }: any) => {
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
             .catch((error) => {
                 console.error('FetchDataProject >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
@@ -357,7 +357,7 @@ const HomeScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     if (LayoutKey == 'Banner') {
                         await responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return a.SHWLD_SEQ - b.SHWLD_SEQ;
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
                         }).map((Banneritem: any) => {
                             let objImage: any = {
                                 image: `data:image/png;base64,${Banneritem.IMAGE64}`
@@ -406,15 +406,15 @@ const HomeScreen = ({ route }: any) => {
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
                 console.error('GetLayout >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
@@ -452,16 +452,16 @@ const HomeScreen = ({ route }: any) => {
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
             .catch((error) => {
                 console.error('GetLayout >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
@@ -501,15 +501,15 @@ const HomeScreen = ({ route }: any) => {
                         }
                     } else if (json.ResponseCode == 610) RNRestart.restart()
                     else {
-                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
                 })
                 .catch((error) => {
-                    Alert.alert(`แจ้งเตือน`, `${error}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     console.log('ERROR ' + error);
                 })
 
@@ -552,15 +552,15 @@ const HomeScreen = ({ route }: any) => {
 
                         }
                     } else {
-                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
                 })
                 .catch((error) => {
-                    Alert.alert(`แจ้งเตือน`, `${error}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     console.log('ERROR ' + error);
                 })
             console.log()
@@ -585,6 +585,7 @@ const HomeScreen = ({ route }: any) => {
             await AsyncStorage.setItem('noti', '0')
         }
     }
+
     return (
         <View  >
             <View style={{ width: deviceWidth, height: deviceHeight }}>
@@ -694,7 +695,7 @@ const HomeScreen = ({ route }: any) => {
 
                     elevation: 5,
                 }}
-                    onPress={() => navigation.navigate('ProductSearch'as never, { name: 'ค้นหา' }as never)}
+                    onPress={() => navigation.navigate('ProductSearch' as never, { name: Language.t('menu.search') } as never)}
                 >
                     <View style={{ padding: 10 }}  >
                         <Image
@@ -715,11 +716,11 @@ const HomeScreen = ({ route }: any) => {
                             fontSize: FontSize.medium,
                         }}
                     >
-                        {`ค้นหา ` + '..'}
+                        {`${Language.t('menu.search')} ` + '..'}
                     </Text>
                     <View style={{ padding: 10, }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                            <Text style={{ fontFamily: 'Kanit', fontSize: FontSize.medium }}>สแกน</Text>
+                            <Text style={{ fontFamily: 'Kanit', fontSize: FontSize.medium }}>{Language.t('menu.scan')}</Text>
                             <Image
                                 source={require('../img/iconsMenu/barcode.png')}
                                 style={{
@@ -778,13 +779,9 @@ const HomeScreen = ({ route }: any) => {
                                 </Text>
                             </View>
                         )}
-
                     </TouchableOpacity>
-
                 </View>
-
             </View>
-
         </View>
     )
 }

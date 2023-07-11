@@ -18,9 +18,10 @@ import { useAppDispatch, useAppSelector } from '../store/store'
 import { updateBasket, updatePrepareDocumentt } from '../store/slices/basketReducer';
 import { docinfoSelector } from '../store/slices/docinfoReducer';
 import * as Keychain from 'react-native-keychain';
-import { config, updateARcode } from '../store/slices/configReducer';
+import { Language, changeLanguage } from '../translations/I18n';
+import { config, updateARcode, updateUserOe } from '../store/slices/configReducer';
+import * as safe_Format from '../styles/safe_Format';
 import { styles } from '../styles/styles';
-
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -79,13 +80,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                 } else createARfile()
 
                             } else {
-                                Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                                    { text: `ยืนยัน`, onPress: () => setloading(false) }])
+                                Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                                    { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
                             }
                         })
                         .catch((error) => {
-                            Alert.alert(`แจ้งเตือน`, `${error}`, [
-                                { text: `ยืนยัน`, onPress: () => setloading(false) }])
+                            Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                                { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
                             console.log('ERROR ' + error);
                         })
 
@@ -94,8 +95,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
 
             }
         } else {
-            Alert.alert(`แจ้งเตือน`, `Login member`, [
-                { text: `ยืนยัน`, onPress: () => console.log() }])
+            Alert.alert(Language.t('notiAlert.header'), `Login member`, [
+                { text: Language.t('alert.confirm'), onPress: () => console.log() }])
         }
 
     }, [dataItem]);
@@ -140,13 +141,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     await dispatch(updateARcode(responseData.AR_CODE))
                     await calBasket(responseData.AR_CODE)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
 
@@ -217,13 +218,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.AROE.AROE_B_AMT)
                     await setAmount(responseData.AROE.AROE_B_AMT)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -251,16 +252,16 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     let responseData = JSON.parse(json.ResponseData);
 
                     dispatch(updateBasket([]))
-                    Alert.alert(`แจ้งเตือน`, `สั่งซื้อสำเร็จ`, [
-                        { text: `ยืนยัน`, onPress: () => navigation.goBack() }])
+                    Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
+                        { text: Language.t('alert.confirm'), onPress: () => navigation.goBack() }])
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -312,13 +313,13 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.ARDETAIL.ARD_B_AMT)
                     await setAmount(responseData.ARDETAIL.ARD_B_AMT)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -346,16 +347,17 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     let responseData = JSON.parse(json.ResponseData);
 
                     dispatch(updateBasket([]))
-                    Alert.alert(`แจ้งเตือน`, `สั่งซื้อสำเร็จ`, [
-                        { text: `ยืนยัน`, onPress: () => navigation.goBack() }])
+                    fetchData()
+                    Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
+                        { text: Language.t('alert.confirm'), onPress: () => navigation.goBack() }])
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -416,7 +418,165 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             </View>
         )
     }
+    const fetchData = async () => {
 
+        console.log(`FETCH /LookupErp /Ar000130 => ${ConfigList.UserList.MB_CODE}`);
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+
+        await fetch(configToken.WebService + '/LookupErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'Ar000130',
+                'BPAPUS-PARAM': '',
+                "BPAPUS-FILTER": '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json.ResponseCode)
+                if (json.ResponseCode == '200') {
+                    let responseRedeem = JSON.parse(json.ResponseData).Ar000130.filter((filterItem) => { return filterItem.AR_MBCODE == ConfigList.UserList.MB_CODE })
+                    // 
+                    console.log(responseRedeem.length)
+                    if (responseRedeem.length > 0)
+                        fetchOE(responseRedeem[0].AR_CODE)
+
+                } else {
+
+                }
+
+            })
+            .catch((error) => {
+
+                console.log('ERROR ' + error);
+            });
+
+    }
+    const fetchOE = async (AR_CODE) => {
+        console.log(`FETCH /LookupErp /Oe002304 => ${AR_CODE}`);
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        let Oe002304 = [{
+            Oe002304: {},
+            Oe002304Info: {}
+        }]
+        let Oe000304 = []
+        await fetch(configToken.WebService + '/LookupErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'Oe002304',
+                'BPAPUS-PARAM': '',
+                "BPAPUS-FILTER": '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json.ResponseCode)
+                if (json.ResponseCode == '200') {
+                    let responseRedeem = JSON.parse(json.ResponseData).Oe002304.filter((filterItem) => { return filterItem.AR_CODE == AR_CODE })
+                    console.log(responseRedeem.length)
+                    if (responseRedeem.length > 0)
+                        Oe002304 = responseRedeem
+                } else {
+
+                }
+
+            })
+            .catch((error) => {
+
+                console.log('ERROR ' + error);
+            });
+        console.log(`FETCH /LookupErp /Oe000304 => ${AR_CODE}`);
+        await fetch(configToken.WebService + '/LookupErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'Oe000304',
+                'BPAPUS-PARAM': '',
+                "BPAPUS-FILTER": '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json.ResponseCode)
+                if (json.ResponseCode == '200') {
+                    let responseRedeem = JSON.parse(json.ResponseData).Oe000304.filter((filterItem) => { return filterItem.AR_CODE == AR_CODE })
+                    console.log(responseRedeem.length)
+
+                    if (responseRedeem.length > 0)
+                        Oe000304 = responseRedeem
+                } else {
+
+                }
+
+            })
+            .catch((error) => {
+
+                console.log('ERROR ' + error);
+            });
+        let tempObj = []
+        console.log(`Oe002304 >> ${Oe002304.length}`)
+        console.log(`Oe000304 >> ${Oe000304.length}`)
+        const combinedArray = Oe002304.concat(Oe000304);
+
+        console.log(`combinedArray >> ${combinedArray.length}`)
+        await combinedArray.sort((a, b) => {
+            return b.DI_DATE - a.DI_DATE;
+        });
+        for (var i in combinedArray) {
+            tempObj.push(await GetInvoiceDocinfo(combinedArray[i]))
+        }
+
+
+        await dispatch(updateUserOe(tempObj))
+
+
+    }
+    const GetInvoiceDocinfo = async (OeKEY) => {
+
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        let responseData = []
+        await fetch(configToken.WebService + '/UpdateErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'GetInvoiceDocinfo',
+                'BPAPUS-PARAM': '{\"DI_KEY\":\"' + OeKEY.DI_KEY + '\"}',
+                'BPAPUS-FILTER': "",
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                responseData = JSON.parse(json.ResponseData);
+
+            })
+            .catch((error) => {
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            });
+        return responseData
+    }
     return (data &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -455,7 +615,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                             position: 'absolute',
                         }}>
                             <Text style={styles.product_bottom_text}>
-                                ไม่พบรายการสินค้า
+                                {Language.t('product.notFound')}
                             </Text>
                         </View>
 
@@ -498,7 +658,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                 }}>
 
                                                                 <Text style={styles.textLight}>
-                                                                    {item.SHWC_ALIAS}
+                                                                    {Language.getLang() == 'th' ? item.SHWC_ALIAS : item.SHWC_EALIAS}
                                                                 </Text>
                                                                 <TouchableOpacity
                                                                     onPress={() => onPressDelete(item.KEY)}
@@ -528,22 +688,11 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                                                     alignItems: 'center',
                                                                     justifyContent: 'space-between',
                                                                 }}>
-                                                                <CurrencyInput
-                                                                    editable={false}
-                                                                    delimiter=","
-                                                                    separator="."
-                                                                    precision={2}
-                                                                    color={'red'}
-                                                                    fontSize={FontSize.medium}
-                                                                    placeholderTextColor={Colors.fontColor}
-                                                                    value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
-                                                                    multiline={true}
-                                                                    textAlign={'center'}
-                                                                />
+
                                                                 <Text
                                                                     style={styles.textLight_red}
                                                                 >
-                                                                    {`. - `}
+                                                                    {`${item.NORMARPLU_U_PRC == '' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC)} .- `}
                                                                 </Text>
 
                                                                 <View style={{
@@ -669,28 +818,21 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                     color: Colors.inputText
                                 }}
                                 >
-                                    {`ราคารวม `}
+                                    {Language.t('product.totalPrice')}
                                 </Text>
                                 <View style={{
                                     alignItems: 'center',
                                     flexDirection: 'row',
                                 }}>
 
-                                    <CurrencyInput
-                                        editable={false}
-                                        delimiter=","
-                                        separator="."
-                                        precision={2}
-                                        color={loading ? Colors.borderColor : Colors.menuButton}
-                                        fontSize={FontSize.large}
-                                        fontFamily={'Kanit-Bold'}
-                                        fontWeight={'bold'}
-                                        placeholderTextColor={Colors.itemColor}
-                                        value={amount}
-                                        multiline={true}
-                                        textAlign={'center'}
-                                    />
 
+                                    <Text style={{
+                                        fontFamily: 'Kanit-Bold',
+                                        fontSize: FontSize.large,
+                                        color: Colors.headerColor
+                                    }}>
+                                        {`${amount == '' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(amount)}`}
+                                    </Text>
                                     <Text style={{
                                         fontFamily: 'Kanit-Bold',
                                         fontSize: FontSize.medium,
@@ -698,7 +840,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                     }}
                                     >
 
-                                        {` บาท`}
+                                        {` ${Language.t('product.thb')}`}
                                     </Text>
                                 </View>
 
@@ -730,7 +872,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                         color: Colors.buttonTextColor
                                     }}
                                     >
-                                        {`สั่งซื้อ`}
+                                        {Language.t('product.order')}
                                     </Text>
                                 </View>
                             </TouchableOpacity>

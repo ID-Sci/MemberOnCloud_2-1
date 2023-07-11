@@ -1,5 +1,5 @@
 import React from 'react-native';
-// import I18n from 'react-native-i18n';
+  import I18n from 'react-native-i18n';
 
 // Import all locales
 import en from './en.json';

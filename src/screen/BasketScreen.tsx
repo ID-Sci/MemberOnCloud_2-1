@@ -22,7 +22,10 @@ import UnFlatListBasket from '../components/UnFlatListBasket';
 import FlatListBasket from '../components/FlatListBasket';
 import { useAppSelector } from '../store/store';
 import { basketSelector } from '../store/slices/basketReducer';
+import * as safe_Format from '../styles/safe_Format';
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
+import { styles } from '../styles/styles';
+import { Language } from '../translations/I18n';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -42,39 +45,21 @@ const BasketScreen = ({ route }: any) => {
 
                 <View
 
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        width: deviceWidth,
-                        padding: deviceHeight * 0.02,
-                        backgroundColor: Colors.backgroundLoginColorSecondary,
-                        borderBottomWidth: 1,
-                        borderColor: Colors.borderColor
-                    }}>
-                    <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
-                        ตะกร้าของฉัน
+                    style={styles.header}>
+                    <Text style={styles.header_text_title}>
+                        {Language.t('product.myBasket')}
                     </Text>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                        }}
-                        >
+                        <Text style={styles.header_text_Xtitle}>
                             x
                         </Text>
                     </TouchableOpacity>
                 </View>
-                {ConfigList.MB_LOGIN_GUID?
-                <FlatListBasket items={basketProduct.basketProduct} itemsERP={basketProduct.basketProductERP} prepareDocument={basketProduct.prepareDocument} />:
-                <UnFlatListBasket route={{}} />}
-              
+                {ConfigList.MB_LOGIN_GUID ?
+                    <FlatListBasket items={basketProduct.basketProduct} itemsERP={basketProduct.basketProductERP} prepareDocument={basketProduct.prepareDocument} /> :
+                    <UnFlatListBasket route={{}} />}
             </View>)
     )
 }

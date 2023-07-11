@@ -33,6 +33,7 @@ import * as Keychain from 'react-native-keychain';
 import * as safe_Format from '../styles/safe_Format';
 import RNRestart from 'react-native-restart';
 import { styles } from '../styles/styles';
+import { Language } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -79,13 +80,13 @@ const MyCardScreen = () => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                     setLoading(false)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -190,7 +191,7 @@ const MyCardScreen = () => {
                         alignItems: 'center',
                     }}>
                         <TouchableOpacity
-                            onPress={() => navigation.navigate('Updateuser', { name: 'แก้ไขข้อมูลส่วนตัว' })}
+                            onPress={() => navigation.navigate('Updateuser', { name: Language.t('profile.editProfile') })}
                             style={{
 
                                 padding: deviceWidth * 0.025,
@@ -204,7 +205,7 @@ const MyCardScreen = () => {
                                     fontFamily: 'Kanit-Bold',
                                     color: Colors.darkPrimiryColor
                                 }}>
-                                - ข้อมูลส่วนตัว -
+                                - {Language.t('profile.header')} -
                             </Text>
                         </TouchableOpacity>
 
@@ -214,9 +215,7 @@ const MyCardScreen = () => {
 
 
             </View>
-            <ScrollView
-
-            >
+            <ScrollView>
 
 
                 <View style={{
@@ -231,7 +230,7 @@ const MyCardScreen = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={styles.textLight}>
-                            รหัสบัตรสมาชิก
+                            {Language.t('profileCard.code')}
                         </Text>
                         <Text style={styles.textLight}>{ConfigList.UserList && ConfigList.UserList.MB_CODE} </Text>
                     </View>
@@ -242,7 +241,7 @@ const MyCardScreen = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={styles.textLight}>
-                            แต้มสะสม
+                            {Language.t('profileCard.rewardPoint')}
                         </Text>
                         <Text style={styles.textLight}> {ConfigList.UserList && safe_Format.pointFormat(ConfigList.UserList.MB_SH_POINT)}  </Text>
                     </View>
@@ -253,14 +252,31 @@ const MyCardScreen = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Text style={styles.textLight}>
-                            แต้มวันนี้ ( มีผลวันถัดไป )
+                            {Language.t('profileCard.rewardPointToday')}
                         </Text>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('History')}
                         >
-                            <Text
-                                style={styles.textLink}>
-                                รายละเอียด
+                            <Text style={styles.textLink}>
+                                {Language.t('profileCard.detail')}
+                            </Text>
+                        </TouchableOpacity>
+
+                    </View>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            justifyContent: 'space-between',
+                        }}>
+                        <Text style={styles.textLight}>
+                            {Language.t('profileCard.myPurchase')}
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('PurchaseHistory')}
+                        >
+                            <Text style={styles.textLink}>
+                                {Language.t('profileCard.viewOrderHistory')}
                             </Text>
                         </TouchableOpacity>
 
@@ -274,17 +290,39 @@ const MyCardScreen = () => {
 
                         }}>
                         <Text style={styles.textLight}>
-                            วันหมดอายุบัตร
+                            {Language.t('profileCard.dateOfExpiry')}
                         </Text>
                         <Text style={styles.textLight}>
                             {ConfigList.UserList && safe_Format.dateFormat(ConfigList.UserList.MB_EXPIRE)}
                         </Text>
                     </View>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('SelLanguage')}
+                        style={{
+                            flexDirection: 'row',
+                            marginTop: 5,
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            borderBottomColor: 'black',
+
+                        }}>
+                        <View >
+                            <Text style={styles.textLight}>
+                                {Language.t('menu.language')}
+                            </Text>
+                            <Text style={styles.textLightborder} >
+                                {Language.t('menu.lang')}
+                            </Text>
+                        </View>
+
+                        <Text style={styles.textBold}>
+                            {`>`}
+                        </Text>
+                    </TouchableOpacity>
                     <View style={{
                         marginTop: deviceHeight * 0.1, alignItems: 'center',
                         justifyContent: 'center',
                     }} >
-
                         <TouchableOpacity
                             onPress={() => getlogoutMbUsers()}
                             style={{
@@ -313,7 +351,7 @@ const MyCardScreen = () => {
                                     color: Colors.buttonTextColor
                                 }}
                                 >
-                                    {`ออกจากระบบ`}
+                                    {Language.t('menu.logout')}
                                 </Text>
                             </View>
                         </TouchableOpacity>

@@ -24,9 +24,11 @@ import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import { updateBasket, basketSelector } from '../store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
+import { Language, changeLanguage } from '../translations/I18n';
 import { useAppDispatch, useAppSelector } from '../store/store'
 import { config, updateARcode } from '../store/slices/configReducer';
 import { styles } from '../styles/styles';
+import * as safe_Format from '../styles/safe_Format';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -39,8 +41,8 @@ const ProductOrderScreen = ({ route }: any) => {
     const ConfigList = useAppSelector(config)
     const addBasket = async (order: any) => {
         if (!ConfigList.MB_LOGIN_GUID) {
-            Alert.alert(`แจ้งเตือน`, `กรุณาเข้าสู่ระบบเพื่อเพิ่มรายการสินค้า`, [
-                { text: `ยืนยัน`, onPress: () => navigation.navigate('Profile') }])
+            Alert.alert(Language.t('notiAlert.header'), Language.t('product.notLogin'), [
+                { text: Language.t('alert.confirm'), onPress: () => navigation.navigate('Profile') }])
         } else {
             let dateTime = new Date()
             let addBasket = []
@@ -138,52 +140,40 @@ const ProductOrderScreen = ({ route }: any) => {
                                         color: Colors.headerColor
 
                                     }}>
-                                        {item.SHWC_ALIAS}
+                                        {Language.getLang() == 'th' ? item.SHWC_ALIAS : item.SHWC_EALIAS}
                                     </Text>
                                     <View
                                         style={{
                                             flexDirection: 'row',
-                                            alignItems: 'center'
+                                            alignItems: 'baseline'
                                         }}>
-                                        <CurrencyInput
-                                            editable={false}
-                                            delimiter=","
-                                            separator="."
-                                            precision={2}
-                                            color={Colors.headerColor}
-                                            fontSize={FontSize.large}
-                                            fontFamily={'Kanit-Bold'}
-                                            placeholderTextColor={Colors.fontColor}
-                                            value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
-                                            multiline={true}
-                                            textAlign={'center'}
-                                        />
+
                                         <Text style={{
                                             fontFamily: 'Kanit-Bold',
-                                            fontSize: FontSize.medium,
+                                            fontSize: FontSize.large,
                                             color: Colors.headerColor
                                         }}>
-                                            {`.- `}
+                                            {`${item.NORMARPLU_U_PRC == '' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC)} ${Language.t('product.thb')}.- `}
                                         </Text>
                                         <Text style={styles.textLight_title}>
-                                            {`บาท`}
+                                            {Language.t('product.thb')}
                                         </Text>
                                     </View>
                                 </View>
                                 {item.SHWC_EDIT_FEATURE != '' && (
                                     <View
-                                        style={{
-                                            borderBottomWidth: 2,
-                                            marginTop: deviceHeight * 0.01,
-                                            borderColor: Colors.borderColor
+                                        style={{ 
+                                            marginTop: deviceHeight * 0.01, 
                                         }}>
                                         <Text
-                                            style={styles.textLight_title}>
-                                            {`รายละเอียดสินค้า`}
+                                            style={styles.textBold}>
+                                            {Language.t('product.productDetails')}
                                         </Text>
                                         <Text
-                                            style={styles.textLight_title}>
-                                            {item.SHWC_EDIT_FEATURE}
+                                            style={styles.textLight}>
+                                            {item.SHWC_EDIT_FEATURE.split('EN:').length > 1 ? Language.getLang() == 'th' ? item.SHWC_EDIT_FEATURE.split('EN:')[0]
+                                                : item.SHWC_EDIT_FEATURE.split('EN:')[1]
+                                                : item.SHWC_EDIT_FEATURE.split('EN:')[0]}
                                         </Text>
                                     </View>
                                 )}
@@ -295,25 +285,7 @@ const ProductOrderScreen = ({ route }: any) => {
                                 >
                                     <Text style={styles.order_text}>
 
-                                        {`ใส่ตะกร้า `}
-                                    </Text>
-                                    <CurrencyInput
-                                        editable={false}
-                                        delimiter=","
-                                        separator="."
-                                        precision={2}
-                                        color={Colors.buttonTextColor}
-                                        fontSize={FontSize.medium}
-                                        fontFamily={'Kanit-Light'}
-                                        fontWeight={'bold'}
-                                        placeholderTextColor={Colors.fontColor}
-                                        value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC * order}
-                                        multiline={true}
-                                        textAlign={'center'}
-                                    />
-                                    <Text style={styles.order_text}>
-
-                                        {` บาท`}
+                                        {`${Language.t('product.addToCart')} ${item.NORMARPLU_U_PRC == '' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC * order)} ${Language.t('product.thb')}`}
                                     </Text>
                                 </View>
                             </TouchableOpacity>

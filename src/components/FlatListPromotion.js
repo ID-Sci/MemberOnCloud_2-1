@@ -21,7 +21,7 @@ import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import { styles } from '../styles/styles';
-
+import { Language, changeLanguage } from '../translations/I18n';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -33,15 +33,15 @@ export default FlatListPromotion = ({ route }) => {
             <>
                 <View style={styles.menu_background}>
                     <Text style={styles.menu_text_title}>
-                        โปรโมชั่นแนะนำ
+                        {Language.t('promotion.header')}
                     </Text>
 
                     <TouchableOpacity
                         style={styles.menu_btn}
-                        onPress={() => navigation.navigate('ShowTemppage', { name: 'โปรโมชั่นแนะนำ', route: route })}
+                        onPress={() => navigation.navigate('ShowTemppage', { name: Language.t('promotion.header'), route: route })}
                     >
                         <Text style={styles.menu_text_title}>
-                            ดูเพิ่มเติม
+                            {Language.t('promotion.seeMore')}
                         </Text>
                     </TouchableOpacity>
 
@@ -58,7 +58,7 @@ export default FlatListPromotion = ({ route }) => {
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
                                     <TouchableOpacity style={styles.promotin_btn}
-                                        onPress={() => navigation.navigate('Temppage', { name: 'โปรโมชั่นแนะนำ', route: item })}>
+                                        onPress={() => navigation.navigate('Temppage', { name: Language.t('promotion.header'), route: item })}>
                                         <Image
                                             style={styles.promotin_btn}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}

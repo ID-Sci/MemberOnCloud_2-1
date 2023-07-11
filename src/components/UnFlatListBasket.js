@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '../store/store'
 import { updateBasket, updatePrepareDocumentt } from '../store/slices/basketReducer';
 import * as Keychain from 'react-native-keychain';
 import { config, updateARcode } from '../store/slices/configReducer';
+import { Language } from '../translations/I18n';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -47,7 +48,7 @@ export default FlatListBasket = ({ route }) => {
                             source={require('../img/empty-box-blue-icon.png')}
                         />
                             <Text style={{ alignSelf: 'center' }}>
-                               กรุณาเข้าสู่ระบบเพื่อเพิ่มรายการสินค้า
+                               {Language.t('product.notLogin')}
                             </Text>
                         </View>
                          
@@ -78,10 +79,7 @@ export default FlatListBasket = ({ route }) => {
                                     color: Colors.buttonTextColor
                                 }}
                                 >
-
-                                    {`เข้าสู่ระบบ`}
-
-
+                                    {Language.t('login.buttonLogin')}
                                 </Text>
                             </View>
                         </TouchableOpacity>

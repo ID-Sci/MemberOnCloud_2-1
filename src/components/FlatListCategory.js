@@ -17,7 +17,7 @@ import {
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { Language, changeLanguage } from '../translations/I18n';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import * as Keychain from 'react-native-keychain';
@@ -48,7 +48,7 @@ export default FlatListCategory = ({ route, onPressCategory }) => {
                                 />
                             </TouchableOpacity>
                             <Text style={styles.category_bottom_text_title}>
-                                {`${item.SHWPH_TTL_CPTN}`}
+                                {Language.getLang() == 'th'?`${item.SHWPH_TTL_CPTN}`:`${item.SHWPH_TTL_ECPTN}`}
                             </Text>
                         </View>
                     </>
@@ -70,7 +70,7 @@ export default FlatListCategory = ({ route, onPressCategory }) => {
 
                 </TouchableOpacity>
                 <Text style={styles.category_bottom_text_title}>
-                    {`ทั้งหมด`}
+                    {Language.getLang() == 'th'?`ทั้งหมด`:`ALL`}
                 </Text>
             </View>
         </ScrollView>)

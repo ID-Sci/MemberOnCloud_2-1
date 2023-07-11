@@ -39,18 +39,7 @@ const ProductScreen = ({ route }: any) => {
                 }}
             >
 
-                <View
-
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        width: deviceWidth,
-                        padding: deviceHeight * 0.02,
-                        backgroundColor: Colors.backgroundLoginColorSecondary,
-                        borderBottomWidth: 1,
-                        borderColor: Colors.borderColor
-                    }}>
+                <View style={styles.header}>
                     <Text
                         style={styles.header_text_title}>
                         {route.params.name}
@@ -58,7 +47,7 @@ const ProductScreen = ({ route }: any) => {
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={styles.header_text_title}
+                        <Text style={styles.header_text_Xtitle}
                         >
                             x
                         </Text>

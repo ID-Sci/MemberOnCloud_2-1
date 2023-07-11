@@ -8,7 +8,7 @@
 import React from 'react';
 // import type { PropsWithChildren } from 'react';
 import {
-  StatusBar, 
+  StatusBar,
   Dimensions,
   Image
 } from 'react-native';
@@ -40,8 +40,11 @@ import FoegetScreen from './src/screen/FoegetScreen'
 
 import Scanbarcode, { ScanBarcodeParams } from './src/screen/Scanbarcode'
 import HistoryScreen from './src/screen/HistoryScreen'
-
+import PurchaseHistoryScreen from './src/screen/PurchaseHistoryScreen'
+import PurchaseHistoryScreenInfo from './src/screen/PurchaseHistoryScreenInfo'
 import ShowTemppageScreen from './src/screen/ShowTemppageScreen'
+import SelLanguageScreen from './src/screen/SelLanguageScreen'
+
 import TemppageScreen from './src/screen/TemppageScreen'
 import MyCardScreen from './src/screen/MyCardScreen'
 import ProfileScreen from './src/screen/ProfileScreen'
@@ -58,7 +61,7 @@ export type RootStackParamList = {
 
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList { }
   }
 }
 
@@ -131,12 +134,28 @@ const Navigator = () => {
           name="History"
           component={HistoryScreen}
         />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="PurchaseHistory"
+          component={PurchaseHistoryScreen}
+        />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="PurchaseHistoryInfo"
+          component={PurchaseHistoryScreenInfo}
+        />
 
         <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="ShowTemppage"
           component={ShowTemppageScreen}
         />
+        <MainStack.Screen
+          options={{ headerShown: false, animation: 'slide_from_bottom' }}
+          name="SelLanguage"
+          component={SelLanguageScreen}
+        />
+
         <MainStack.Screen
           options={{ headerShown: false, animation: 'slide_from_bottom' }}
           name="Temppage"
@@ -167,7 +186,7 @@ const App = (): JSX.Element => {
   return (
     <Provider store={store}>
       <StatusBar hidden={true} />
-      <Navigator  />
+      <Navigator />
     </Provider>
 
   );

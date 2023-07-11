@@ -90,6 +90,12 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Bold',
     textAlign: 'center'
   },
+  header_text_Xtitle: {
+    color: Colors.lightPrimiryColor,
+    fontFamily: 'Kanit-Bold',
+    fontSize:FontSize.xlarge,
+    textAlign: 'center'
+  },
   input_GOODS_CODE_Light_title: {
     flex: 8,
     borderBottomColor: Colors.borderColor,
@@ -112,6 +118,13 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Light',
     textAlign: 'center'
   },
+  textBold_title: {
+    color: Colors.fontColor,
+    fontSize:FontSize.large,
+    fontFamily: 'Kanit-Bold',
+    textAlign: 'center'
+  },
+
   textLight_titlered: {
     color: 'red',
     fontFamily: 'Kanit-Light',
@@ -120,6 +133,11 @@ export const styles = StyleSheet.create({
   textLight: {
     color: Colors.fontColor,
     fontFamily: 'Kanit-Light'
+  },
+  textLightborder: {
+    color: Colors.borderColor,
+    fontFamily: 'Kanit-Light',
+    textAlign: 'center'
   },
   textLink:{
     color: '#0288D1',
@@ -312,8 +330,7 @@ text_btn:{
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 3.84, 
   },
   rectangleContainer: {
     flex: 1,
@@ -371,12 +388,7 @@ text_btn:{
     padding: 32,
     color: '#777',
   },
-  textBold: {
-
-    fontFamily: 'Kanit-Bold',
-    fontWeight: '500',
-    color: '#000',
-  },
+ 
   buttonText: {
 
     fontFamily: 'Kanit-Bold',
@@ -442,7 +454,7 @@ text_btn:{
     borderRadius: 10,
   },
   order_text: {
-    fontFamily: 'Kanit-Light',
+    fontFamily: 'Kanit-Bold',
     fontSize: FontSize.medium,
     color: Colors.buttonTextColor
   },
@@ -483,5 +495,28 @@ text_btn:{
   basket_obj_view:{  width: deviceWidth*0.7,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    justifyContent: 'space-between',}
+    justifyContent: 'space-between',
+  },
+  textInput: {
+    flex: 8,
+    color: Colors.fontColor,
+    fontSize: FontSize.medium,
+    height: 'auto',
+    borderBottomWidth: 0.7,
+    fontFamily: 'Kanit-Light',
+},
+row: {
+    flexDirection: 'row',
+    flex: 0.25,
+    backgroundColor: 'white',
+    fontFamily: 'Kanit-Light',
+},
+box: {
+    flex: 1 / 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'Kanit-Light',
+    // borderWidth: 0.3,
+    // borderColor: "#BDBDBD"
+},
 });

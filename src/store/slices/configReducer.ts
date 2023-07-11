@@ -6,7 +6,8 @@ type authState = {
    UserList: Object,
    LoginList: LoginListType,
    MB_LOGIN_GUID: String,
-   AR_CODE: String
+   AR_CODE: String,
+   Oe:any
 }
 
 type LoginListType = {
@@ -21,7 +22,8 @@ const initialState: authState = {
    UserList: {},
    LoginList: testObject,
    MB_LOGIN_GUID: '',
-   AR_CODE: ''
+   AR_CODE: '',
+   Oe:[]
 }
 
 
@@ -38,6 +40,9 @@ export const configReducer = createSlice({
       updateUserList: (state: authState, action: PayloadAction<any>) => {
          state.UserList = action.payload;
       },
+      updateUserOe: (state: authState, action: PayloadAction<any>) => {
+         state.Oe = action.payload;
+      },
       clearUserList: (state: authState) => {
          state.UserList = {};
       },
@@ -50,6 +55,6 @@ export const configReducer = createSlice({
    },
 })
 
-export const { updateUserList, clearUserList, updateLoginList, clearLoginList, updateMB_LOGIN_GUID, updateARcode } = configReducer.actions;
+export const { updateUserList, clearUserList,updateUserOe, updateLoginList, clearLoginList, updateMB_LOGIN_GUID, updateARcode } = configReducer.actions;
 export const config = (store: RootState) => store.configReducer;
 export default configReducer.reducer;

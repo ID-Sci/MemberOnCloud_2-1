@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
-
+import { Language, changeLanguage } from '../translations/I18n';
 import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -54,7 +54,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                         alignItems: 'flex-start'
                     }}>
                     <Text style={styles.category_bottom_text}>
-                        {item.SHWPH_TTL_CPTN}
+                    {Language.getLang() == 'th'?`${item.SHWPH_TTL_CPTN}`:`${item.SHWPH_TTL_ECPTN}`}
                     </Text>
                 </View>
             </TouchableOpacity>
@@ -128,7 +128,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                         alignItems: 'flex-start'
                                     }}>
                                     <Text style={styles.category_bottom_text}>
-                                        {CategoryItem.SHWPH_TTL_CPTN}
+                                    {Language.getLang() == 'th'?`${CategoryItem.SHWPH_TTL_CPTN}`:`${CategoryItem.SHWPH_TTL_ECPTN}`}
                                     </Text>
                                 </View>
                             </TouchableOpacity>

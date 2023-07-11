@@ -18,6 +18,7 @@ import * as Animatable from 'react-native-animatable';
 import { QRreader } from 'react-native-qr-decode-image-camera';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
+import { Language } from '../translations/I18n';
 
 
 
@@ -52,7 +53,7 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
 
   const chooseFile = () => {
     let options: any = {
-      title: 'เลือกรูปภาพ',
+      title: Language.t('tool.SelectImg'),
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -149,7 +150,7 @@ const Scanbarcode: React.FC<OrderDetailScreenProps> = ({ navigation, route }) =>
             onPress={chooseFile}
             style={styles.buttonTouchable2}>
             <Text style={styles.buttonText}>
-              เลือกรูปภาพ
+              {Language.t('tool.SelectImg')}
             </Text>
           </TouchableOpacity>
         </View>

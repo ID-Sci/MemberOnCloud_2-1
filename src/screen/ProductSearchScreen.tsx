@@ -23,7 +23,7 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import { FontSize } from '../styles/FontSizeHelper';
 import FlatListProductScreen from '../components/FlatListProductScreen';
-
+import { Language, changeLanguage } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
 import { config } from '../store/slices/configReducer';
 import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
@@ -44,7 +44,7 @@ const ProductSearchScreen = ({ route }: any) => {
     const [productState, setProductState] = useState(false)
     const [loading, setLoading] = useState(false)
     useEffect(() => {
-        if ( route.params?.post) {
+        if (route.params?.post) {
             setGOODS_CODE(route.params.post)
             setProductState(true)
         }
@@ -103,14 +103,14 @@ const ProductSearchScreen = ({ route }: any) => {
                             placeholderTextColor={Colors.fontColorSecondary}
                             value={GOODS_CODE}
 
-                            placeholder={`ค้นหา` + '..'}
+                            placeholder={`${Language.t('menu.search')}` + '..'}
                             onSubmitEditing={() => setProductState(true)}
                             onChangeText={(val) => {
                                 setGOODS_CODE(val)
                             }} />
                         <TouchableOpacity style={{ padding: 10, }} onPress={() => navigation.navigate('Scanner', { route: 'ProductSearch', data: product })}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                                <Text style={styles.textLight_title}>สแกน</Text>
+                                <Text style={styles.textLight_title}>{Language.t('menu.scan')}</Text>
                                 <Image
                                     source={require('../img/iconsMenu/barcode.png')}
                                     style={{
@@ -157,12 +157,12 @@ const ProductSearchScreen = ({ route }: any) => {
                         </View>
                     </Modal>
                 }
-                <View style={{ 
+                <View style={{
                     height: deviceHeight - FontSize.large * 3,
                 }}>
 
                     {product && product.length > 0 && productState ? (
-                        <FlatListProductScreen route={product.filter((filteritem: any) => { return filteritem.GOODS_CODE.includes(GOODS_CODE) || filteritem.SHWC_ALIAS.includes(GOODS_CODE) })} />
+                        <FlatListProductScreen route={product.filter((filteritem: any) => { return filteritem.GOODS_CODE.includes(GOODS_CODE) ||  filteritem.SHWC_ALIAS.includes(GOODS_CODE) || filteritem.SHWC_EALIAS.includes(GOODS_CODE) })} />
                     ) : !loading && productState && (
                         <View
                             style={{
@@ -183,7 +183,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                 source={require('../img/empty-box-blue-icon.png')}
                             />
                             <Text style={styles.textLight_title}>
-                                ไม่มีสินค้าในหมวดนี้
+                            {Language.t('menu.notFound')}
                             </Text>
                         </View>
                     )}

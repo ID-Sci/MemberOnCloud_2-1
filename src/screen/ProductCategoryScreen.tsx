@@ -31,7 +31,7 @@ import { categorySelector, } from '../store/slices/categoryReducer';
 import { useAppSelector } from '../store/store';
 import { newproductSelector, } from '../store/slices/newproductReducer';
 import { styles } from '../styles/styles';
-
+import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -81,13 +81,13 @@ const ProductCategoryScreen = ({ route }: any) => {
                         let responseData = JSON.parse(json.ResponseData);
                         setProduct(responseData.SHOWCONTENT)
                     } else {
-                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     }
                 })
                 .catch((error) => {
-                    Alert.alert(`แจ้งเตือน`, `${error}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     console.log('ERROR ' + error);
                 })
 
@@ -174,7 +174,7 @@ const ProductCategoryScreen = ({ route }: any) => {
                                 source={require('../img/empty-box-blue-icon.png')}
                             />
                             <Text style={styles.textLight_title}>
-                                ไม่มีสินค้าในหมวดนี้
+                               {Language.t('menu.notFound')}
                             </Text>
                         </View>
                     )}

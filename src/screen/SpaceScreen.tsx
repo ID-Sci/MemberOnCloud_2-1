@@ -41,10 +41,10 @@ import { activitySelector, updateActivityList, clearActivityList, updateActivity
 import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, clearMycardPage } from '../store/slices/mycardReducer';
 import { newproductSlice, updateNewproductList, updateAllproductList, clearAllproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
-// import { Language, changeLanguage } from '../src/translations/I18n';
+import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
-const MyConfig = '/config.json'; 
+const MyConfig = '/config.json';
 let CState = true
 const SpaceScreen = () => {
     const dispatch = useAppDispatch();
@@ -68,39 +68,38 @@ const SpaceScreen = () => {
         if (CState) await fetchGuidLog()
         if (CState) await setnotiItem()
         if (CState)
-            navigation.navigate('bstab')
-        //  navigation.dispatch(
-        //     navigation.replace('bstab')
-        // )
+            navigation.dispatch(
+                navigation.replace('bstab')
+            )
 
     }
 
     const getMac = async () => {
-       
-    
+
+
         try {
             let mac = await DeviceInfo.getMacAddress();
-    
+
             if (isValidMac(mac)) {
                 console.log(await DeviceInfo.getDeviceName());
                 console.log('\nmachine > > ' + mac);
                 return mac;
             }
-    
+
             let wifiMac = await NetworkInfo.getBSSID();
-    
+
             if (isValidMac(wifiMac)) {
                 console.log('\nmachine(wifi) > > ' + wifiMac);
                 return wifiMac;
             }
-    
+
             let deviceId = DeviceInfo.getUniqueId();
-    
+
             if (isValidDeviceId(deviceId)) {
                 console.log('\ndeviceId > > ' + JSON.stringify(deviceId));
                 return deviceId;
             }
-    
+
             let uuid = generateUUID();
             return uuid;
         } catch (error) {
@@ -109,15 +108,14 @@ const SpaceScreen = () => {
             return uuid;
         }
     };
-    
     const isValidMac = (mac) => {
-        return mac && mac.length > 0 && mac !== "02:00:00:00:00:00" && typeof(mac) !== 'object';
+        return mac && mac.length > 0 && mac !== "02:00:00:00:00:00" && typeof (mac) !== 'object';
     };
-    
+
     const isValidDeviceId = (deviceId) => {
-        return deviceId && deviceId.length > 0 && deviceId !== "02:00:00:00:00:00" && typeof(deviceId) !== 'object';
+        return deviceId && deviceId.length > 0 && deviceId !== "02:00:00:00:00:00" && typeof (deviceId) !== 'object';
     };
-    
+
     const generateUUID = () => {
         let uuid = '';
         const characters = '0123456789abcdef';
@@ -128,13 +126,13 @@ const SpaceScreen = () => {
                 uuid += characters[Math.floor(Math.random() * characters.length)];
             }
         }
-    
+
         return uuid;
     };
     const setConfig = async () => {
         //npx react-native-rename "Travel App" -b "com.junedomingo.travelapp"
         const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null 
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         let superObj = {
             "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
             "OTPService": "http://203.150.55.21:8891/BplusNotiService/BplusNotiIIS.dll",
@@ -161,9 +159,11 @@ const SpaceScreen = () => {
             "Phone": "0828845662",
             "MB_PW": "",
             "logined": "false",
+            "Language": Language.getLang(),
             "upDateVsersion": "3.0.3"
         }
-        console.log(` JSON.stringify(superObj) ${ JSON.stringify(superObj.Mac)}`)
+        changeLanguage(configToken?.Language ? configToken.Language : Language.getLang())
+        console.log(` JSON.stringify(superObj) ${JSON.stringify(superObj.Mac)}`)
         if (configToken == null || configToken.upDateVsersion != superObj.upDateVsersion) {
             console.log(`new Obj >>`)
             await Keychain.setGenericPassword("config", JSON.stringify(superObj))
@@ -199,8 +199,8 @@ const SpaceScreen = () => {
             .catch((error) => {
                 console.log(error)
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
             });
     }
 
@@ -234,15 +234,15 @@ const SpaceScreen = () => {
                     let temp_error = 'error_ser.' + json.ResponseCode;
                     console.log('>> ', json)
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
                 console.log('ERROR ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             });
     };
@@ -285,8 +285,8 @@ const SpaceScreen = () => {
                     let temp_error = 'error_ser.' + json.ResponseCode;
                     console.log('>> ', temp_error)
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -296,8 +296,8 @@ const SpaceScreen = () => {
 
                 }
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
             })
     }
 
@@ -325,13 +325,13 @@ const SpaceScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(LoginList, responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -361,13 +361,13 @@ const SpaceScreen = () => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
 
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -401,19 +401,19 @@ const SpaceScreen = () => {
                         await FetchDataProject(LoginList, responseData.Ec000400[0])
                     } else {
                         CState = false
-                        Alert.alert(`แจ้งเตือน`, `ไม่พบโครงการ`, [
-                            { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                        Alert.alert(Language.t('notiAlert.header'), `ไม่พบโครงการ`, [
+                            { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                     }
                 } else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 console.log('ERROR ' + error);
             })
     }
@@ -422,6 +422,7 @@ const SpaceScreen = () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`FetchDataProject`)
+        
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -479,16 +480,16 @@ const SpaceScreen = () => {
                     Docinfo && await fetchLayoutData('Docinfo', LoginList, Docinfo)
                 } else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
             .catch((error) => {
                 console.error('FetchDataProject >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
@@ -497,6 +498,27 @@ const SpaceScreen = () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`fetchLayoutData ${LayoutKey}`)
+        let fullDay: any = ''
+        try {
+            const response = await fetch(configToken.WebService  + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
+                method: 'GET'
+            });
+
+            const datetime = response.headers.get('date');
+
+
+            const x = new Date(datetime);
+            const year = x.getFullYear().toString();
+            const month = (x.getMonth() + 1).toString().padStart(2, '0');
+            const day = x.getDate().toString().padStart(2, '0');
+            fullDay = year + month + day;
+
+
+        } catch (error) {
+            console.log('ERROR at fetchContent 1>> ' + error);
+
+        }
+        console.log(`fullDay >> ${fullDay}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -519,7 +541,7 @@ const SpaceScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     if (LayoutKey == 'Banner') {
                         await responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return a.SHWLD_SEQ - b.SHWLD_SEQ;
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
                         }).map((Banneritem: any) => {
                             let objImage: any = {
                                 image: `data:image/png;base64,${Banneritem.IMAGE64}`
@@ -549,7 +571,9 @@ const SpaceScreen = () => {
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
-                        await dispatch(updatePromotionPage(responseData.SHOWPAGE))
+                        await dispatch(updatePromotionPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                        })))
                     }
                     if (LayoutKey == 'Activity') {
                         await dispatch(updateActivityList(responseData.SHOWLAYOUT))
@@ -568,15 +592,15 @@ const SpaceScreen = () => {
                     //    console.log(responseData)
                 } else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
                 console.error('GetLayout >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
@@ -613,19 +637,20 @@ const SpaceScreen = () => {
                     //console.log(responseData)
                 } else {
                     CState = false
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
             .catch((error) => {
                 console.error('GetLayout >> ' + error);
                 CState = false
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => BackHandler.exitApp() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
     }
+
     const getPageProJ = async (categoryList: any, LoginList: object,) => {
 
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -659,15 +684,15 @@ const SpaceScreen = () => {
 
                         }
                     } else {
-                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
                 })
                 .catch((error) => {
-                    Alert.alert(`แจ้งเตือน`, `${error}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     console.log('ERROR ' + error);
                 })
             console.log()
@@ -711,15 +736,15 @@ const SpaceScreen = () => {
                             })
                         }
                     } else {
-                        Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                            { text: `ยืนยัน`, onPress: () => console.log() }])
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
                 })
                 .catch((error) => {
-                    Alert.alert(`แจ้งเตือน`, `${error}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                     console.log('ERROR ' + error);
                 })
             console.log()

@@ -17,12 +17,17 @@
   },
   "register": {
     "header": "Register",
+    "header2": "Register to receive many good promotions",
     "idCard": "ID Card",
     "mobileNo": "Mobile No",
     "password": "Password",
+    "secretPassword": "รหัสผ่านลับ",
+    "forgotPassword":"Secret password",
+    "verificationCode":"Member verification code",
     "day": "Date",
     "month": "Month",
     "year": "Year",
+    "registration":"registration",
     "confirmPassword": "Confirm Password",
     "validationEmptyIdCard": "Please enter the ID card.",
     "validationIncorrectIdCard": "Incorrect ID card.",
@@ -40,6 +45,7 @@
     "error614": "Member information is incorrect.",
     "error615": "No license or license expire.",
     "select": "Please choose",
+    "invalidCode":"Invalid code",
     "titleHeader": "Please fill in the information",
     "alertNextInterestedTitle": "Tell us, what interests you",
     "alertNextInterested": "Tell us which area you are interested in. Specify at least 1 category so we can find the best promotion for you.",
@@ -67,13 +73,40 @@
     "profile": "Profile",
     "history": "Purchase / Redeem History",
     "changeLanguage": "Change Language",
-    "language": "English",
+    "language": "language",
     "logout": "Logout",
     "alertLogoutMessage": "Do you want to log out?",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search":"search",
+    "scan":"scan",
+    "notFound":"There are no products in this category.",
+    "lang":"English"
+  },
+  "promotion": {
+    "header": "recommended promotion",
+    "seeMore":"see more"
+
+  },
+  "product":{
+    "newProduct": "new product",
+    "category":"category",
+    "seeMore":"see more",
+    "addToCart":"Add to cart",
+    "thb": "THB",
+    "productDetails":"Product details",
+    "myBasket":"My basket",
+    "notLogin":"Please login to add product list.",
+    "notFound":"Product not found",
+    "totalPrice":"Total price",
+    "order":"Order"
+  },
+  "a/pr":{
+    "header": "Activities/Public Relations",
+    "seeMore":"see more"
   },
   "profile": {
     "header": "Profile",
+    "editProfile":"Edit profile",
     "headerPersonalInformation": "Personal information",
     "code": "Code",
     "status": "Status",
@@ -82,11 +115,12 @@
     "gender": "Gender",
     "birthday": "Birthday",
     "address": "Address",
-    "road": "road",
-    "subdistrict": "subdistrict",
-    "district": "district",
-    "province": "province",
+    "road": "Road",
+    "subdistrict": "Subdistrict",
+    "district": "District",
+    "province": "Province",
     "postCode": "Post code",
+    "and":"And",
     "edit": "Edit",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -108,7 +142,8 @@
     "billAmount":"bill amount",
     "pointsExchange":"points to exchange",
     "points":"point(s)",
-    "activeWhen":"active when"
+    "activeWhen":"active when",
+    "orderList":"Order list"
   },
   "changeLanguage": {
     "header": "Change Language",
@@ -136,7 +171,9 @@
     "rewardPoint": "Reward Point",
     "dateOfExpiry": "Date of expiry",
     "rewardPointToday": "Reward Point Today ( effective the next day. )",
-    "detail": "Detail"
+    "detail": "Detail",
+    "myPurchase":"My purchase",
+    "viewOrderHistory":"View order history"
   },
   "privilageForMember": {
     "header": "About card"
@@ -168,7 +205,8 @@
   },
   "notiAlert": {
     "header": "Notification",
-    "connectBusiness":"Please connect the business."
+    "connectBusiness":"Please connect the business",
+    "orderSuccess":"Order success"
   },
   "alert": {
     "errorTitle": "Error",
@@ -176,14 +214,16 @@
     "next": "Next",
     "ok": "Ok",
     "incorrect ":"Incorrect information",
-    "savesucceed": "Save the information successfully.",
+    "savesucceed": "Save the information successfully",
     "succeed":"Succeed",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "errorDetail": "Data not found",
-    "internetError": "Please check your internet connection"
+    "internetError": "Please check your internet connection",
+    "changeLanguage":"Do you want to change the language?",
+    "specifyInformation":"Please specify the required information"
   },
-  "selectBase": {
+  "tool": {
     "header": "Set up database",
     "editheader": "\nPress \"Edit\" to edit ",
     "lebel": "Please Specify",

@@ -26,12 +26,15 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
+import { styles } from '../styles/styles';
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
+import { Language } from '../translations/I18n';
+import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -52,7 +55,7 @@ const FoegetScreen = ({ route }: any) => {
         })
 
     }
-
+    const [showPassword, setShowPassword] = useState(false)
 
     const [newData, setNewData] = useState({
         MB_CNTRY_CODE: '66',
@@ -83,17 +86,17 @@ const FoegetScreen = ({ route }: any) => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
 
-                    Alert.alert(`สำเร็จ`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setGetNewpassword(true) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setGetNewpassword(true) }])
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
         await setloading(false)
@@ -135,14 +138,14 @@ const FoegetScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     SetPassword(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
         await setloading(false)
@@ -181,14 +184,14 @@ const FoegetScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     getMemberInfo(LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
         await setloading(false)
@@ -215,18 +218,19 @@ const FoegetScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    Alert.alert(`สำเร็จ`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID)) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID)) }])
                     const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PASSWORD, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                    await RNRestart.restart()
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => console.log() }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => console.log() }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
     }
@@ -234,19 +238,19 @@ const FoegetScreen = ({ route }: any) => {
     const checkScreen = () => {
         return (
 
-            <ScrollView >
+            <ScrollView>
 
                 <View style={{ padding: deviceWidth * 0.05 }}>
 
                     <KeyboardAvoidingView behavior={'height'}>
-                        <ScrollView   >
+                        <ScrollView>
 
 
                             <View style={{
                                 marginTop: deviceWidth * 0.05
                             }}>
-                                <Text style={styles.textTitle}>
-                                    เบอร์โทร
+                                <Text style={styles.textLight}>
+                                    {Language.t('register.mobileNo')}
                                 </Text>
                                 <View style={{
                                     backgroundColor: Colors.backgroundColorSecondary,
@@ -293,12 +297,9 @@ const FoegetScreen = ({ route }: any) => {
                                     }}
 
                                 >
-                                    <Text style={{
-                                        fontSize: FontSize.large,
-                                        color: Colors.buttonTextColor
-                                    }}
+                                    <Text style={styles.text_btn}
                                     >
-                                        {`ยืนยัน`}
+                                        {Language.t('alert.confirm')}
                                     </Text>
 
                                 </View>
@@ -313,16 +314,17 @@ const FoegetScreen = ({ route }: any) => {
     const confirmScreen = () => {
         return (
 
-            <ScrollView >
+            <ScrollView>
+            
                 <View style={{ padding: deviceWidth * 0.05 }}>
 
                     <KeyboardAvoidingView behavior={'height'}>
-                        <ScrollView   >
+                        <ScrollView>
                             <View style={{
                                 marginTop: deviceWidth * 0.05
                             }}>
-                                <Text style={styles.textTitle}>
-                                    รหัสลับ
+                                <Text style={styles.textLight}>
+                                    {Language.t('register.forgotPassword')}
                                 </Text>
                                 <View style={{
                                     backgroundColor: Colors.backgroundColorSecondary,
@@ -339,14 +341,13 @@ const FoegetScreen = ({ route }: any) => {
                                     <TextInput
                                         placeholderTextColor={Colors.fontColorSecondary}
                                         value={newData.MB_PASSWORD}
-                                        keyboardType="default"
                                         secureTextEntry={true}
                                         onChangeText={(item: any) => setNewData({
                                             ...newData,
                                             MB_PASSWORD: item,
                                         })}
 
-                                        placeholder={`รหัสลับ`}
+                                        placeholder={Language.t('register.forgotPassword')}
 
                                         style={styles.textInput}></TextInput>
                                 </View>
@@ -355,8 +356,8 @@ const FoegetScreen = ({ route }: any) => {
                             <View style={{
                                 marginTop: deviceWidth * 0.05
                             }}>
-                                <Text style={styles.textTitle}>
-                                    รหัสผ่านใหม่
+                                <Text style={styles.textLight}>
+                                    {Language.t('register.password')}
                                 </Text>
                                 <View style={{
                                     backgroundColor: Colors.backgroundColorSecondary,
@@ -367,29 +368,40 @@ const FoegetScreen = ({ route }: any) => {
                                     height: 'auto',
                                     paddingBottom: 10,
                                     borderColor: newData.MB_PW == newData.MB_CPW ? 'gray' : 'red',
-                                    borderWidth: 0.7,
+                                    borderWidth: 0.7, alignItems: 'center',
                                     flexDirection: 'row',
                                 }}>
                                     <TextInput
                                         placeholderTextColor={Colors.fontColorSecondary}
                                         value={newData.MB_PW}
                                         keyboardType="default"
-                                        secureTextEntry={true}
+                                        secureTextEntry={!showPassword}
                                         onChangeText={(item: any) => setNewData({
                                             ...newData,
                                             MB_PW: item,
                                         })}
 
-                                        placeholder={`รหัสผ่าน`}
+                                        placeholder={Language.t('register.password')}
 
                                         style={styles.textInput}></TextInput>
+                                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                        <Image
+                                            style={{
+                                                width: 30,
+                                                height: 30,
+                                                resizeMode: 'contain',
+                                            }}
+                                            resizeMode={'contain'}
+                                            source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
+                                        />
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                             <View style={{
                                 marginTop: deviceWidth * 0.05
                             }}>
-                                <Text style={styles.textTitle}>
-                                    ยืนยันรหัสผ่านใหม่
+                                <Text style={styles.textLight}>
+                                    {Language.t('register.confirmPassword')}
                                 </Text>
                                 <View style={{
                                     backgroundColor: Colors.backgroundColorSecondary,
@@ -407,12 +419,12 @@ const FoegetScreen = ({ route }: any) => {
                                         placeholderTextColor={Colors.fontColorSecondary}
                                         value={newData.MB_CPW}
                                         keyboardType="default"
-                                        secureTextEntry={true}
+                                        secureTextEntry={!showPassword}
                                         onChangeText={(item: any) => setNewData({
                                             ...newData,
                                             MB_CPW: item,
                                         })}
-                                        placeholder={`ยืนยันรหัสผ่าน`}
+                                        placeholder={Language.t('register.confirmPassword')}
                                         style={styles.textInput}></TextInput>
                                 </View>
                             </View>
@@ -440,13 +452,10 @@ const FoegetScreen = ({ route }: any) => {
                                     }}
 
                                 >
-                                    <Text style={{
-                                        fontSize: FontSize.large,
-                                        color: Colors.buttonTextColor
-                                    }}
+                                    <Text style={styles.text_btn}
                                     >
 
-                                        {`ยืนยัน`}
+                                        {Language.t('alert.confirm')}
                                     </Text>
 
                                 </View>
@@ -454,7 +463,7 @@ const FoegetScreen = ({ route }: any) => {
                         </ScrollView>
                     </KeyboardAvoidingView>
                 </View>
-
+                
             </ScrollView>
         )
     }
@@ -490,31 +499,14 @@ const FoegetScreen = ({ route }: any) => {
 
                 <View
 
-                    style={{
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexDirection: 'row',
-                        width: deviceWidth,
-                        padding: deviceHeight * 0.02,
-                        backgroundColor: Colors.backgroundLoginColorSecondary,
-                        borderBottomWidth: 1,
-                        borderColor: Colors.borderColor
-                    }}>
-                    <Text
-                        style={{
-                            fontSize: FontSize.medium,
-                            color: Colors.menuButton,
-                            fontWeight: 'bold',
-                        }}>
+                    style={styles.header}>
+                    <Text style={styles.header_text_title} >
                         {route.params.name}
                     </Text>
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}
                     >
-                        <Text style={{
-                            fontSize: FontSize.large,
-                        }}
-                        >
+                        <Text style={styles.header_text_Xtitle} >
                             x
                         </Text>
                     </TouchableOpacity>
@@ -527,54 +519,5 @@ const FoegetScreen = ({ route }: any) => {
     )
 }
 
-const styles = StyleSheet.create({
-    container1: {
-
-        paddingBottom: 0,
-        flex: 1,
-        flexDirection: 'column',
-
-    },
-    container2: {
-        width: deviceWidth,
-        height: '100%',
-        position: 'absolute',
-        backgroundColor: 'white',
-        flex: 1,
-    },
-    button: {
-        marginTop: 10,
-        padding: 5,
-        marginBottom: 20,
-        alignItems: 'center',
-        backgroundColor: Colors.buttonColorPrimary,
-        borderRadius: 10,
-    },
-    textTitle: {
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textTitle2: {
-        alignSelf: 'center',
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textButton: {
-        color: Colors.fontColor2,
-        fontSize: FontSize.medium,
-        padding: 10,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-    },
-    textInput: {
-        flex: 8,
-
-
-        color: Colors.fontColor,
-        fontSize: FontSize.medium,
-        height: 'auto',
-        borderBottomWidth: 0.7,
-    },
-});
 
 export default FoegetScreen 

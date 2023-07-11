@@ -25,6 +25,7 @@ import CurrencyInput from 'react-native-currency-input';
 import FlatListPromotion from '../components/FlatListPromotion';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { styles } from '../styles/styles';
+import { Language } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -32,7 +33,7 @@ const TemppageScreen = ({ route }: any) => {
     const navigation = useNavigation()
     const [order, setOrder] = useState(1)
     const item = route.params.route
-    console.log(item.SHWC_GUID)
+
     return (route.params.route &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -65,8 +66,10 @@ const TemppageScreen = ({ route }: any) => {
                                     padding: deviceWidth * 0.1
                                 }}>
 
-                                <Text style={styles.text_btn}>
-                                    {item.SHWPH_EXPLAIN}
+                                <Text style={styles.textLight}>
+                                    {item.SHWPH_EXPLAIN.split('EN:').length > 1 ? Language.getLang() == 'th' ? item.SHWPH_EXPLAIN.split('EN:')[0]
+                                        : item.SHWPH_EXPLAIN.split('EN:')[1]
+                                        : item.SHWPH_EXPLAIN.split('EN:')[0]}
                                 </Text>
 
                             </View>

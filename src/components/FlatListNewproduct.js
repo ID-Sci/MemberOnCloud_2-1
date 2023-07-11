@@ -22,7 +22,8 @@ import { styles } from '../styles/styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
-
+import * as safe_Format from '../styles/safe_Format';
+import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
@@ -34,17 +35,16 @@ export default FlatListNewproduct = ({ route }) => {
             >
                 <View style={styles.menu_background}>
                     <Text style={styles.menu_text_title}>
-                        สินค้าใหม่
+                        {Language.t('product.newProduct')}
                     </Text>
                     <TouchableOpacity
                         style={styles.menu_btn}
-                        onPress={() => navigation.navigate('Newproduct', { name: 'สินค้าใหม่', route: route })}
+                        onPress={() => navigation.navigate('Newproduct', { name: Language.t('product.newProduct'), route: route })}
                     >
                         <Text style={styles.menu_text_title}>
-                            ดูเพิ่มเติม
+                            {Language.t('product.seeMore')}
                         </Text>
                     </TouchableOpacity>
-
                 </View>
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
@@ -55,6 +55,7 @@ export default FlatListNewproduct = ({ route }) => {
                     showsHorizontalScrollIndicator={false}
                 >
                     {route.map((item, index) => {
+
                         return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
@@ -65,12 +66,12 @@ export default FlatListNewproduct = ({ route }) => {
                                             style={styles.product_Noimage}
                                             source={require('../img/newproduct.png')}
                                         /> : <Image
-                                        style={styles.product_image}
+                                            style={styles.product_image}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />}
                                         <View style={{ padding: 10 }}>
                                             <Text style={styles.product_bottom_text_title}>
-                                                {item.SHWC_ALIAS}
+                                                {Language.getLang() == 'th' ? item.SHWC_ALIAS : item.SHWC_EALIAS}
                                             </Text>
                                             <View
                                                 style={{
@@ -78,27 +79,16 @@ export default FlatListNewproduct = ({ route }) => {
                                                     justifyContent: 'center',
                                                     alignItems: 'center'
                                                 }}>
-                                                <CurrencyInput
-                                                    editable={false}
-                                                    delimiter=","
-                                                    separator="."
-                                                    precision={2}
-                                                    color={'red'}
-                                                    fontSize={FontSize.medium}
-                                                    fontFamily={'Kanit-Light'}
-                                                    placeholderTextColor={Colors.fontColor} 
-                                                    value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
-                                                    multiline={true}
-                                                    textAlign={'center'}
-                                                />
+                                                    
+                                               
                                                 <Text
                                                     style={{
                                                         color: 'red',
-                                                        fontFamily:'Kanit-Light',
+                                                        fontFamily: 'Kanit-Light',
                                                         fontSize: FontSize.medium
                                                     }}
                                                 >
-                                                    {`. - `}
+                                                   ฿{safe_Format.formatCurrency(item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC)}{`. - `}
                                                 </Text>
                                                 <Text
                                                     style={styles.product_bottom_text_title}

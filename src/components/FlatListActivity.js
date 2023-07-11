@@ -20,7 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles/styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
-
+import { Language, changeLanguage } from '../translations/I18n';
 
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
@@ -31,16 +31,16 @@ export default FlatListPromotion = ({ route }) => {
         (
             <View
             >
-                 <View style={styles.menu_background}>
+                <View style={styles.menu_background}>
                     <Text style={styles.menu_text_title}>
-                        กิจกรรม/ประชาสัมพันธ์
+                    {Language.t('a/pr.header')}
                     </Text>
                     <TouchableOpacity
-                     style={styles.menu_btn}
-                        onPress={() => navigation.navigate('ShowTemppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: route })}
+                        style={styles.menu_btn}
+                        onPress={() => navigation.navigate('ShowTemppage', { name: Language.t('a/pr.header'), route: route })}
                     >
                         <Text style={styles.menu_text_title}>
-                            ดูเพิ่มเติม {`>>`}
+                        {Language.t('a/pr.seeMore')}
                         </Text>
                     </TouchableOpacity>
 
@@ -48,7 +48,7 @@ export default FlatListPromotion = ({ route }) => {
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
-                    height={deviceHeight*0.4}
+                    height={deviceHeight * 0.4}
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -57,16 +57,18 @@ export default FlatListPromotion = ({ route }) => {
                         return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
-                                    <TouchableOpacity style={ {marginBottom: deviceHeight *0.2}}
+                                    <TouchableOpacity style={{ marginBottom: deviceHeight * 0.2 }}
                                         onPress={() => navigation.navigate('Temppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: item })}>
 
                                         <Image
-                                            style={ styles.menu_activity_image}
+                                            style={styles.menu_activity_image}
                                             source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                         />
                                         {/* <View style={{ padding: 10 }}>
                                             <Text>
-                                                {item.SHWPH_EXPLAIN}
+                                                {item.SHWPH_EXPLAIN.split('EN:').length > 1 ? Language.getLang() == 'th' ? item.SHWPH_EXPLAIN.split('EN:')[0]
+                                        : item.SHWPH_EXPLAIN.split('EN:')[1]
+                                        : item.SHWPH_EXPLAIN.split('EN:')[0]}
                                             </Text>
                                         </View> */}
                                     </TouchableOpacity>

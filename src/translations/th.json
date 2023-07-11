@@ -17,12 +17,17 @@
   },
   "register": {
     "header": "สมัครสมาชิก",
+    "header2": "ลงทะเบียนรับโปรดีๆ มากมาย",
     "idCard": "บัตรประชาชน",
     "mobileNo": "เบอร์โทรศัพท์ผู้ใช้",
     "password": "รหัสผ่าน",
+    "secretPassword": "รหัสผ่านลับ",
+    "forgotPassword": "ลืมรหัสผ่าน",
+    "verificationCode":"รหัสยืนยันการยืนยันตนสมาชิก",
     "day": "วันที่",
     "month": "เดือน",
     "year": "ปี",
+    "registration": "ลงทะเบียน",
     "confirmPassword": "ยืนยันรหัสผ่าน",
     "validationEmptyIdCard": "กรุณากรอกรหัสบัตรประชาชน",
     "validationIncorrectIdCard": "กรอกบัตรประชาชนไม่ถูกต้อง",
@@ -40,6 +45,7 @@
     "error614": "ข้อมูลสมาชิกไม่ถูกต้อง",
     "error615": "ไม่มีใบอนุญาตหรือใบอนุญาตหมดอายุ",
     "select": "โปรดระบุ",
+    "invalidCode": "รหัสไม่ถูกต้อง",
     "titleHeader": "กรุณากรอกข้อมูล",
     "alertNextInterestedTitle": "บอกเราสิว่าคุณสนใจด้านไหน?",
     "alertNextInterested": "ระบุอย่างน้อย 1 หมวด เพื่อให้เราหาโปรโมชั่นที่ดีที่สุดให้คุณ",
@@ -67,13 +73,39 @@
     "profile": "ข้อมูลส่วนตัว",
     "history": "ประวัติการซื้อ / แลกแต้ม",
     "changeLanguage": "เปลี่ยนภาษา",
-    "language": "ภาษาไทย",
+    "language": "ภาษา",
     "logout": "ออกจากระบบ",
     "alertLogoutMessage": "คุณต้องการออกจากระบบหรือไม่?",
-    "cancel": "ยกเลิก"
+    "cancel": "ยกเลิก",
+    "search": "ค้นหา",
+    "scan": "สแกน",
+    "notFound": "ไม่มีสินค้าในหมวดนี้",
+    "lang": "ไทย"
+  },
+  "promotion": {
+    "header": "โปรโมชั่นแนะนำ",
+    "seeMore": "ดูเพิ่มเติม"
+  },
+  "product": {
+    "newProduct": "สินค้าใหม่",
+    "category": "หมวดหมู่",
+    "seeMore": "ดูเพิ่มเติม",
+    "addToCart": "ใส่ตะกร้า",
+    "thb": "บาท",
+    "productDetails": "รายละเอียดสินค้า",
+    "myBasket": "ตะกร้าของฉัน",
+    "notLogin": "กรุณาเข้าสู่ระบบเพื่อเพิ่มรายการสินค้า",
+    "notFound": "ไม่พบรายการสินค้า",
+    "totalPrice": "ราคารวม",
+    "order": "สั่งซื้อ"
+  },
+  "a/pr": {
+    "header": "กิจกรรม/ประชาสัมพันธ์",
+    "seeMore": "ดูเพิ่มเติม"
   },
   "profile": {
     "header": "ข้อมูลส่วนตัว",
+    "editProfile": "แก้ไขข้อมูลส่วนตัว",
     "headerPersonalInformation": "ข้อมูลส่วนบุคคล",
     "code": "รหัสสมาชิก",
     "status": "สถานะการใช้งาน",
@@ -87,6 +119,7 @@
     "district": "อำเภอ/เขต",
     "province": "จังหวัด",
     "postCode": "รหัสไปรษณีย์",
+    "and": "และ",
     "edit": "แก้ไข",
     "firstName": "ชื่อ",
     "lastName": "นามสกุล",
@@ -100,16 +133,16 @@
     "header": "ประวัติการซื้อ / แลกแต้ม",
     "redeemHistoryTabTitle": "ประวัติการแลกแต้ม",
     "purchaseHistoryTabTitle": "ประวัติการซื้อ",
-    "nodata":"ไม่มีข้อมูล",
-    "Ref":"เลขอ้างอิง",
-    "purchaseDate":"วันที่ซื้อ",
-    "pointBalance":"ยอดแต้ม",
-    "time":"เวลา",
-    "billAmount":"ยอดบิล",
-    "pointsExchange":"แต้มในการแลก",
-    "points":"พอยท์",
-    "activeWhen":"ใช้งานเมื่อ"
-
+    "nodata": "ไม่มีข้อมูล",
+    "Ref": "เลขอ้างอิง",
+    "purchaseDate": "วันที่ซื้อ",
+    "pointBalance": "ยอดแต้ม",
+    "time": "เวลา",
+    "billAmount": "ยอดบิล",
+    "pointsExchange": "แต้มในการแลก",
+    "points": "พอยท์",
+    "activeWhen": "ใช้งานเมื่อ",
+    "orderList":"รายการสั่งซื้อ"
   },
   "changeLanguage": {
     "header": "เปลี่ยนภาษา",
@@ -137,7 +170,9 @@
     "rewardPoint": "แต้มสะสม",
     "dateOfExpiry": "วันหมดอายุบัตร",
     "rewardPointToday": "แต้มวันนี้ ( มีผลวันถัดไป )",
-    "detail": "รายละเอียด"
+    "detail": "รายละเอียด",
+    "myPurchase": "การซื้อของฉัน",
+    "viewOrderHistory": "ดูประวัติการสั่งซื้อ"
   },
   "privilageForMember": {
     "header": "เกี่ยวกับบัตร"
@@ -169,7 +204,8 @@
   },
   "notiAlert": {
     "header": "การแจ้งเตือน",
-    "connectBusiness":"กรุณาเชื่อมต่อกิจการ"
+    "connectBusiness": "กรุณาเชื่อมต่อกิจการ",
+    "orderSuccess": "สั่งซื้อสำเร็จ"
   },
   "alert": {
     "errorTitle": "พบข้อผิดพลาด",
@@ -182,9 +218,11 @@
     "cancel": "ยกเลิก",
     "confirm": "ยืนยัน",
     "errorDetail": "ไม่พบข้อมูลในระบบ",
-    "internetError": "กรุณาตรวจสอบสัญญาณอินเตอร์เน็ต"
+    "internetError": "กรุณาตรวจสอบสัญญาณอินเตอร์เน็ต",
+    "changeLanguage": "คุณต้องการเปลี่ยนภาษาหรือไม่",
+    "specifyInformation": "กรุณาระบุข้อมูลให้ถูกต้อง"
   },
-  "selectBase": {
+  "tool": {
     "header": "ตั้งค่าฐานข้อมูลร้านค้า",
     "editheader": "\nกด \"แก้ไข\" เพื่อแก้ไขข้อมูล",
     "lebel": "โปรดระบุ..",
@@ -209,7 +247,7 @@
     "no": "ไม่ใช่",
     "delete": "ลบ",
     "error": "ไม่มีฐานข้อมูล",
-    "SelectImg": "ตัวเลือกรูปภาพ",
+    "SelectImg": "เลือกรูปภาพ",
     "cannotDelete": "ไม่สามารถลบฐานข้อมูลที่กำลังใช้งานได้",
     "cannotEdit": "ไม่สามารถแก้ไขฐานข้อมูลที่กำลังใช้งานได้"
   },

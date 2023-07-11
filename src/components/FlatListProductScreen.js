@@ -21,6 +21,8 @@ import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
+import { Language, changeLanguage } from '../translations/I18n';
+import * as safe_Format from '../styles/safe_Format';
 import { styles } from '../styles/styles';
 
 const deviceWidth = Dimensions.get('window').width;
@@ -39,7 +41,7 @@ export default FlatListProductScreen = ({ route }) => {
             >
                 <View style={styles.obj_list}>
                     {route.map((item, index) => {
-                        return (index < 10 &&
+                        return (
                             <>
                                 <View style={{ padding: deviceWidth * 0.01, }}>
                                     <TouchableOpacity style={styles.product_bottom_shadow}
@@ -58,7 +60,7 @@ export default FlatListProductScreen = ({ route }) => {
                                         </View>
                                         <View style={{ padding: 10 }}>
                                             <Text style={styles.textLight_title} >
-                                                {item.SHWC_ALIAS}
+                                                {Language.getLang() == 'th' ? item.SHWC_ALIAS : item.SHWC_EALIAS}
                                             </Text>
                                             <View
                                                 style={{
@@ -66,19 +68,7 @@ export default FlatListProductScreen = ({ route }) => {
                                                     justifyContent: 'center',
                                                     alignItems: 'center'
                                                 }}>
-                                                <CurrencyInput
-                                                    editable={false}
-                                                    delimiter=","
-                                                    separator="."
-                                                    precision={2}
-                                                    color={'red'}
-                                                    fontFamily={"Kanit-Light"}
-                                                    fontSize={FontSize.medium}
-                                                    placeholderTextColor={Colors.fontColor}
-                                                    value={item.NORMARPLU_U_PRC == '' ? 0 : item.NORMARPLU_U_PRC}
-                                                    multiline={true}
-                                                    textAlign={'center'}
-                                                />
+                                                 
                                                 <Text
                                                     style={{
                                                         color: 'red',
@@ -86,7 +76,7 @@ export default FlatListProductScreen = ({ route }) => {
                                                         fontSize: FontSize.medium
                                                     }}
                                                 >
-                                                    {`. - `}
+                                                    {`${item.NORMARPLU_U_PRC == '' || item.NORMARPLU_U_PRC == '-'? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC)} .- `}
                                                 </Text>
                                                 <Text
                                                     style={styles.textLight_title}

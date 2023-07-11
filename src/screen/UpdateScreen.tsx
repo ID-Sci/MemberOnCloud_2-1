@@ -27,6 +27,7 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
+import { styles } from '../styles/styles';
 import NumberPad from '../components/NumberPad';
 import OtpInput from '../components/OtpInput';
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
@@ -34,6 +35,7 @@ import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import CalendarScreen from '@blacksakura013/th-datepicker';
+import { Language } from '../translations/I18n';
 import moment from 'moment';
 import * as Keychain from 'react-native-keychain';
 const deviceWidth = Dimensions.get('window').width;
@@ -73,8 +75,8 @@ const UpdateScreen = ({ route }: any) => {
         if (countdown === 1) {
             clearInterval(clockCall);
             Alert.alert(
-                'แจ้งเตือน',
-                'OTP หมดอายุ โปรดกด \"ตกลง\"\nเพื่อรับ OTP อีกครั้ง', [{ text: 'ตกลง', onPress: () => otpRequest() }]);
+                Language.t('notiAlert.header'),
+                Language.t('register.OTPexpired'), [{ text: Language.t('alert.ok'), onPress: () => otpRequest() }]);
         } else if (countdown === 0) {
 
         } else {
@@ -103,7 +105,7 @@ const UpdateScreen = ({ route }: any) => {
         ConfigList.UserList.MB_I_CARD && set_I_CARD(ConfigList.UserList.MB_I_CARD)
     }, [])
     const [newData, setNewData] = useState({
-        MB_INTL: ConfigList.UserList.MB_INTL,
+        MB_INTL: ConfigList.UserList.MB_INTL?ConfigList.UserList.MB_INTL:' ',
         MB_NAME: ConfigList.UserList.MB_NAME,
         MB_SURNME: ConfigList.UserList.MB_SURNME,
         MB_SEX: ConfigList.UserList.MB_SEX,
@@ -112,7 +114,6 @@ const UpdateScreen = ({ route }: any) => {
         MB_ADDR_2: ConfigList.UserList.MB_ADDR_2,
         MB_ADDR_3: ConfigList.UserList.MB_ADDR_3,
         MB_POST: ConfigList.UserList.MB_POST,
-        MB_I_CARD: ConfigList.UserList.MB_I_CARD,
         MB_EMAIL: ConfigList.UserList.MB_EMAIL,
         MB_CNTRY_CODE: ConfigList.UserList.MB_CNTRY_CODE,
         MB_REG_MOBILE: ConfigList.UserList.MB_REG_MOBILE,
@@ -130,10 +131,7 @@ const UpdateScreen = ({ route }: any) => {
             C = false
             console.log(`MB_SURNME`)
         }
-        if (!newData.MB_I_CARD) {
-            C = false
-            console.log(`MB_I_CARD`)
-        }
+     
         if (!newData.MB_REG_MOBILE) {
             C = false
             console.log(`MB_REG_MOBILE`)
@@ -171,7 +169,7 @@ const UpdateScreen = ({ route }: any) => {
             otpRequest()
         } else {
             Alert.alert(
-                'พบข้อผิดพลาด', 'กรุณาระบุข้อมูลให้ถูกต้อง', [{ text: 'ตกลง', onPress: () => console.log(C) }]);
+                Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => console.log(C) }]);
         }
     }
     const otpRequest = async () => {
@@ -191,7 +189,7 @@ const UpdateScreen = ({ route }: any) => {
             }),
             body: JSON.stringify({
                 NTFU_OTP_MESSAGE:
-                    'รหัสยืนยันการยืนยันตน Member' + 'OTP-Ref: ' + otpPassword,
+                    Language.t('register.verificationCode') + 'OTP-Ref: ' + otpPassword,
                 NTFU_CNTRY_CODE: '66',
                 NTFU_MOBILE: newData.MB_REG_MOBILE,
                 NTFU_DISPLAY: 'Display',
@@ -206,7 +204,7 @@ const UpdateScreen = ({ route }: any) => {
             .then((json) => {
                 if (json[0].NTFU_GUID) {
                     console.log(`otp Request Success => { ${otpPassword} }`);
-                    Alert.alert('', `ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ\nเบอร์มือถือ (+66) ${Phone}`, [{ text: 'ตกลง', onPress: () =>   setLoading(false)}]);
+                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }]);
                 }
             })
             .catch((error) => {
@@ -214,7 +212,7 @@ const UpdateScreen = ({ route }: any) => {
 
 
                 Alert.alert(
-                    'พบข้อผิดพลาด', error, [{ text: 'ตกลง', onPress: () => BackHandler.exitApp() }]);
+                    Language.t('alert.errorTitle'), error, [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }]);
                 console.log('checkIPAddress>>', error);
 
                 setLoading(false)
@@ -251,14 +249,14 @@ const UpdateScreen = ({ route }: any) => {
                     await UpdateMember(responseData.MB_LOGIN_GUID)
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
 
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
 
             });
@@ -290,16 +288,16 @@ const UpdateScreen = ({ route }: any) => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                     navigation.goBack()
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
-            setLoading(false)
+        setLoading(false)
     }
     const UpdateMember = async (NEW_GUID: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -361,13 +359,13 @@ const UpdateScreen = ({ route }: any) => {
                 if (json && json.ResponseCode == '200') {
 
                 } else {
-                    Alert.alert(`แจ้งเตือน`, `${json.ReasonString}`, [
-                        { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
-                Alert.alert(`แจ้งเตือน`, `${error}`, [
-                    { text: `ยืนยัน`, onPress: () => setLoading(false) }])
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -403,8 +401,8 @@ const UpdateScreen = ({ route }: any) => {
                 LoginByMobile()
             }
             else {
-                Alert.alert(`แจ้งเตือน`, `รหัสไม่ถูกต้อง`, [
-                    { text: `ยืนยัน`, onPress: () => setPinCode('') }])
+                Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.invalidCode'), [
+                    { text: Language.t('alert.confirm'), onPress: () => setPinCode('') }])
             }
         }
     }
@@ -421,7 +419,7 @@ const UpdateScreen = ({ route }: any) => {
                         transparent={true}
                         animationType={'none'}
                         visible={loading}
-                        onRequestClose={() => { }}>
+                        onRequestClose={() => { styles.header_text_title }}>
                         <View
                             style={{
                                 flex: 1,
@@ -450,24 +448,11 @@ const UpdateScreen = ({ route }: any) => {
                 {Regis ? (<>
                     <View style={{ flex: 0.6, }}>
                         <View style={{ flex: 1, marginTop: 60, justifyContent: 'center' }}>
-                            <Text
-
-                                style={{
-                                    fontSize: FontSize.large,
-                                    alignSelf: 'center',
-                                    color: Colors.textColor,
-                                }}>
-                                {`ยืนยันการลงทะเบียนเรียบร้อย`}
+                            <Text style={styles.textLight_title}>
+                                {Language.t('register.confirmRegistration')}
                             </Text>
-                            <Text
-
-                                style={{
-                                    textAlign: 'center',
-                                    fontSize: FontSize.medium,
-                                    alignSelf: 'center',
-                                    color: Colors.textColor,
-                                }}>
-                                {` ระบบจะแจ้ง OTP ผ่าน SMS ของหมายเลขโทรศัพท์มือถือ (+66) ${Phone}`}
+                            <Text style={styles.textLight_title}>
+                                {`${Language.t('register.informOtp')} (+66) ${Phone}`}
 
                             </Text>
                             <OtpInput digit={4} pinCode={code ? pinCode : pinCode} />
@@ -485,7 +470,7 @@ const UpdateScreen = ({ route }: any) => {
                                             },
 
                                         ]}>
-                                        {`ส่ง OTP ใหม่อีกครั้ง ${countdown}`}
+                                        {`${Language.t('register.resendOtp')} ${countdown}`}
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -595,31 +580,14 @@ const UpdateScreen = ({ route }: any) => {
                     </View></>) : (
                     <>
                         <View
-                            style={{
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                flexDirection: 'row',
-                                width: deviceWidth,
-                                padding: deviceHeight * 0.02,
-                                backgroundColor: Colors.backgroundLoginColorSecondary,
-                                borderBottomWidth: 1,
-                                borderColor: Colors.borderColor
-                            }}>
-                            <Text
-                                style={{
-                                    fontSize: FontSize.medium,
-                                    color: Colors.menuButton,
-                                    fontWeight: 'bold',
-                                }}>
+                            style={styles.header}>
+                            <Text style={styles.header_text_title}>
                                 {route.params.name}
                             </Text>
                             <TouchableOpacity
                                 onPress={() => navigation.goBack()}
                             >
-                                <Text style={{
-                                    fontSize: FontSize.large,
-                                }}
-                                >
+                                <Text style={styles.header_text_Xtitle}>
                                     x
                                 </Text>
                             </TouchableOpacity>
@@ -628,8 +596,8 @@ const UpdateScreen = ({ route }: any) => {
                         <KeyboardAvoidingView keyboardVerticalOffset={2} behavior={'height'}>
                             <ScrollView >
                                 <View style={{ padding: deviceWidth * 0.05 }}>
-                                    <Text style={styles.textTitle}>
-                                        คำนำหน้า
+                                    <Text style={styles.textLight}>
+                                        {Language.t('profile.title')}
                                     </Text>
                                     <View style={{
                                         backgroundColor: Colors.backgroundColorSecondary,
@@ -645,7 +613,7 @@ const UpdateScreen = ({ route }: any) => {
                                         <Picker
                                             style={{
                                                 backgroundColor: Colors.backgroundColorSecondary,
-
+                                                fontFamily: 'Kanit-Bold',
                                                 width: deviceWidth * 0.8,
                                             }}
                                             mode="dropdown"
@@ -675,8 +643,8 @@ const UpdateScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ชื่อ
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.firstName')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -697,16 +665,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_NAME: item,
                                                 })}
-                                                placeholder={`ชื่อ`}
+                                                placeholder={Language.t('profile.firstName')}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            นามสกุล
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.lastName')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -727,15 +695,15 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_SURNME: item,
                                                 })}
-                                                placeholder={`นามสกุล`}
+                                                placeholder={Language.t('profile.lastName')}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     {/* <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
+                                        <Text style={styles.textLight}>
                                             เลขประจำตัวประชาชน
                                         </Text>
                                         <View style={{
@@ -756,14 +724,14 @@ const UpdateScreen = ({ route }: any) => {
                                                 onChangeText={(item: any) => set_I_CARD(item)}
                                                 placeholder={`X XXX XXXXXX XX X`}
                                                 maxLength={17}
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View> */}
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            เบอร์โทร
+                                        <Text style={styles.textLight}>
+                                            {Language.t('register.mobileNo')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -784,14 +752,14 @@ const UpdateScreen = ({ route }: any) => {
                                                 keyboardType="number-pad"
                                                 placeholder={'0XX-XXX-XXXX'}
                                                 maxLength={12}
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            วันเกิด
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.birthday')}
                                         </Text>
                                         <View style={{
 
@@ -820,8 +788,8 @@ const UpdateScreen = ({ route }: any) => {
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ที่อยู่-ถนน
+                                        <Text style={styles.textLight}>
+                                            {`${Language.t('profile.address')}-${Language.t('profile.road')}`}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -842,16 +810,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_1: item,
                                                 })}
-                                                placeholder={`ที่อยู่-ถนน`}
+                                                placeholder={`${Language.t('profile.address')}-${Language.t('profile.road')}`}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ตำบล/แขวง และ อำเภอ/เขต
+                                        <Text style={styles.textLight}>
+                                            {`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -872,15 +840,15 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_2: item,
                                                 })}
-                                                placeholder={`ตำบล/แขวง และ อำเภอ/เขต`}
-                                                style={styles.textInput}></TextInput>
+                                                placeholder={`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            จังหวัด
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.province')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -901,16 +869,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_ADDR_3: item,
                                                 })}
-                                                placeholder={`จังหวัด`}
+                                                placeholder={Language.t('profile.province')}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            รหัสไปรษณีย์
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.postCode')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -932,16 +900,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_POST: item,
                                                 })}
-                                                placeholder={`รหัสไปรษณีย์`}
+                                                placeholder={Language.t('profile.postCode')}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            อีเมล์
+                                        <Text style={styles.textLight}>
+                                            {Language.t('profile.email')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -962,16 +930,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_EMAIL: item,
                                                 })}
-                                                placeholder={`อีเมล์`}
-                                                style={styles.textInput}></TextInput>
+                                                placeholder={Language.t('profile.email')}
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
 
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            รหัสผ่าน
+                                        <Text style={styles.textLight}>
+                                        {Language.t('register.password')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -995,16 +963,16 @@ const UpdateScreen = ({ route }: any) => {
                                                     MB_PW: item,
                                                 })}
 
-                                                placeholder={`รหัสผ่าน`}
+                                                placeholder={Language.t('register.password')}
 
-                                                style={styles.textInput}></TextInput>
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <View style={{
                                         marginTop: deviceWidth * 0.05
                                     }}>
-                                        <Text style={styles.textTitle}>
-                                            ยืนยันรหัสผ่าน
+                                        <Text style={styles.textLight}>
+                                        {Language.t('register.confirmPassword')}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -1027,8 +995,8 @@ const UpdateScreen = ({ route }: any) => {
                                                     ...newData,
                                                     MB_CPW: item,
                                                 })}
-                                                placeholder={`ยืนยันรหัสผ่าน`}
-                                                style={styles.textInput}></TextInput>
+                                                placeholder={Language.t('register.confirmPassword')}
+                                                style={styles.inputtextLight_title}></TextInput>
                                         </View>
                                     </View>
                                     <TouchableOpacity
@@ -1052,12 +1020,8 @@ const UpdateScreen = ({ route }: any) => {
                                                 borderRadius: deviceWidth * 0.1,
                                             }}
                                         >
-                                            <Text style={{
-                                                fontSize: FontSize.large,
-                                                color: Colors.buttonTextColor
-                                            }}
-                                            >
-                                                {`ลงทะเบียน`}
+                                            <Text style={styles.text_btn}>
+                                               {Language.t('register.registration')}
                                             </Text>
                                         </View>
                                     </TouchableOpacity>
@@ -1072,67 +1036,5 @@ const UpdateScreen = ({ route }: any) => {
     )
 }
 
-const styles = StyleSheet.create({
-    container1: {
-
-        paddingBottom: 0,
-        flex: 1,
-        flexDirection: 'column',
-
-    },
-    container2: {
-        width: deviceWidth,
-        height: '100%',
-        position: 'absolute',
-        backgroundColor: 'white',
-        flex: 1,
-    },
-    button: {
-        marginTop: 10,
-        padding: 5,
-        marginBottom: 20,
-        alignItems: 'center',
-        backgroundColor: Colors.buttonColorPrimary,
-        borderRadius: 10,
-    },
-    textTitle: {
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textTitle2: {
-        alignSelf: 'center',
-        fontSize: FontSize.medium,
-        color: Colors.fontColor,
-    },
-    textButton: {
-        color: Colors.fontColor2,
-        fontSize: FontSize.medium,
-        padding: 10,
-        fontWeight: 'bold',
-        alignSelf: 'center',
-    },
-    textInput: {
-        flex: 8,
-        color: Colors.fontColor,
-        fontSize: FontSize.medium,
-        height: 'auto',
-        borderBottomWidth: 0.7,
-    },
-    row: {
-        flexDirection: 'row',
-        flex: 0.25,
-        backgroundColor: 'white',
-    },
-    box: {
-        flex: 1 / 3,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // borderWidth: 0.3,
-        // borderColor: "#BDBDBD"
-    },
-    text: {
-        fontSize: FontSize.large,
-    }
-});
 
 export default UpdateScreen
