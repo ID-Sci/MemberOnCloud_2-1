@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
+
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
@@ -28,7 +29,8 @@ import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default FlatListProductScreen = ({ route }) => {
+export default FlatListProductScreen = ({ backPage, name, route }) => {
+    console.log(backPage)
     const navigation = useNavigation();
     return (route &&
         (
@@ -45,10 +47,12 @@ export default FlatListProductScreen = ({ route }) => {
                             <>
                                 <View style={{ padding: deviceWidth * 0.01, }}>
                                     <TouchableOpacity style={styles.product_bottom_shadow}
-                                        onPress={() => navigation.navigate('ProductOrder', { route: item })}>
+                                        onPress={() => navigation.navigate('ProductOrder', { backPage: backPage, name: name, backPageItem: route, route: item })}>
                                         <View
                                             style={{
-                                                height: deviceHeight * 0.2
+                                                height: deviceHeight * 0.2,
+                                                justifyContent:'center',
+                                                alignItems:'center'
                                             }}>
                                             {item.IMAGE64 == "" ? <Image
                                                 style={styles.obj_Noimage}
@@ -68,15 +72,15 @@ export default FlatListProductScreen = ({ route }) => {
                                                     justifyContent: 'center',
                                                     alignItems: 'center'
                                                 }}>
-                                                 
+
                                                 <Text
                                                     style={{
                                                         color: 'red',
-                                                        fontFamily:'Kanit-Light',
+                                                        fontFamily: 'Kanit-Light',
                                                         fontSize: FontSize.medium
                                                     }}
                                                 >
-                                                    {`${item.NORMARPLU_U_PRC == '' || item.NORMARPLU_U_PRC == '-'? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC)} .- `}
+                                                    {`${item.NORMARPLU_U_PRC == '' || item.NORMARPLU_U_PRC == '-' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC)} .- `}
                                                 </Text>
                                                 <Text
                                                     style={styles.textLight_title}
@@ -93,7 +97,8 @@ export default FlatListProductScreen = ({ route }) => {
 
 
                 </View>
-            </ScrollView>)
+            </ScrollView>
+            )
     )
 }
 

@@ -15,7 +15,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import { FontSize } from '../styles/FontSizeHelper';
 import UnFlatListBasket from '../components/UnFlatListBasket';
@@ -30,8 +29,7 @@ import { Language } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const BasketScreen = ({ route }: any) => {
-    const navigation = useNavigation();
+const BasketScreen = ({navigation, route }: any) => { 
     const basketProduct = useAppSelector(basketSelector)
     const ConfigList = useAppSelector(config)
     return (basketProduct &&
@@ -58,7 +56,7 @@ const BasketScreen = ({ route }: any) => {
                     </TouchableOpacity>
                 </View>
                 {ConfigList.MB_LOGIN_GUID ?
-                    <FlatListBasket items={basketProduct.basketProduct} itemsERP={basketProduct.basketProductERP} prepareDocument={basketProduct.prepareDocument} /> :
+                    <FlatListBasket backPage={'basket'} items={basketProduct.basketProduct} itemsERP={basketProduct.basketProductERP} prepareDocument={basketProduct.prepareDocument} /> :
                     <UnFlatListBasket route={{}} />}
             </View>)
     )

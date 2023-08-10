@@ -20,7 +20,7 @@ export default FlatSlider = ({ route }) => {
 
         <FlatListSlider
             data={route}
-            height={deviceHeight * 0.3}
+            height={(deviceWidth) / (5 / 3)}
             timer={5000}
             onPress={(item) => navigation.navigate('Temppage', { name: 'banner', route: route[item] })}
             contentContainerStyle={{ paddingHorizontal: 0 }}

@@ -17,6 +17,14 @@ const scanBarHeight = deviceWidth * 0.0025; //this is equivalent to 1 from a 393
 const scanBarColor = "#22ff00";
 
 const iconScanColor = "blue";
+
+const imageBtnHeight = (vel: number) => {
+  return (deviceWidth * vel) / (5 / 3)
+}
+const imageBtnWidth = (vel: number) => {
+  return (deviceWidth * vel)
+}
+
 export const styles = StyleSheet.create({
   center: {
     flex: 1,
@@ -63,6 +71,7 @@ export const styles = StyleSheet.create({
     height: deviceHeight * 0.2,
     width: deviceWidth * 0.3,
     resizeMode: 'contain',
+
   },
   header: {
     alignItems: 'center',
@@ -93,7 +102,7 @@ export const styles = StyleSheet.create({
   header_text_Xtitle: {
     color: Colors.lightPrimiryColor,
     fontFamily: 'Kanit-Bold',
-    fontSize:FontSize.xlarge,
+    fontSize: FontSize.xlarge,
     textAlign: 'center'
   },
   input_GOODS_CODE_Light_title: {
@@ -103,7 +112,7 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Light',
     fontSize: FontSize.medium,
   },
-  inputtextLight_title:  {
+  inputtextLight_title: {
     flex: 8,
     marginLeft: 10,
     borderBottomColor: Colors.borderColor,
@@ -120,7 +129,7 @@ export const styles = StyleSheet.create({
   },
   textBold_title: {
     color: Colors.fontColor,
-    fontSize:FontSize.large,
+    fontSize: FontSize.large,
     fontFamily: 'Kanit-Bold',
     textAlign: 'center'
   },
@@ -134,17 +143,30 @@ export const styles = StyleSheet.create({
     color: Colors.fontColor,
     fontFamily: 'Kanit-Light'
   },
+  textCanceled: {
+    color: Colors.alert,
+    fontFamily: 'Kanit-Light'
+  },
+  DI_REFLight: {
+    color: Colors.fontColor,
+    fontFamily: 'Kanit-Bold'
+  },
+  DI_REFCanceled: {
+    color: Colors.alert,
+    fontFamily: 'Kanit-Bold'
+  },
+
   textLightborder: {
     color: Colors.borderColor,
     fontFamily: 'Kanit-Light',
     textAlign: 'center'
   },
-  textLink:{
+  textLink: {
     color: '#0288D1',
     fontFamily: 'Kanit-Light',
     textDecorationLine: 'underline',
     fontSize: FontSize.medium,
-},
+  },
   textBold: {
     color: Colors.fontColor,
     fontFamily: 'Kanit-Bold'
@@ -153,11 +175,11 @@ export const styles = StyleSheet.create({
     color: 'red',
     fontFamily: 'Kanit-Light'
   },
-text_btn:{
-  fontFamily: 'Kanit-Bold',
-  fontSize: FontSize.large,
-  color: Colors.buttonTextColor
-},
+  text_btn: {
+    fontFamily: 'Kanit-Bold',
+    fontSize: FontSize.large,
+    color: Colors.buttonTextColor
+  },
   dropdownBtnStyle: {
     width: '80%',
     height: 50,
@@ -241,8 +263,8 @@ text_btn:{
   promotin_btn: {
     backgroundColor: '#fff', alignSelf: 'center',
     justifyContent: 'center', flexDirection: 'row',
-    height: deviceHeight * 0.2,
-    width: deviceWidth * 0.8,
+    height: imageBtnHeight(0.8),
+    width: imageBtnWidth(0.8),
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -288,7 +310,6 @@ text_btn:{
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-
     elevation: 5,
     borderRadius: deviceWidth * 0.05,
   },
@@ -297,7 +318,7 @@ text_btn:{
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    height: deviceWidth * 0.2,
+    height: deviceWidth * 0.3,
     width: deviceWidth * 0.3,
     resizeMode: 'contain',
   },
@@ -311,10 +332,12 @@ text_btn:{
     resizeMode: 'contain',
   },
   product_bottom_text: {
+    color: Colors.fontColor,
     fontFamily: 'Kanit-Bold',
     textAlign: 'center'
   },
   product_bottom_text_title: {
+    color: Colors.fontColor,
     fontFamily: 'Kanit-Light',
     textAlign: 'center'
   },
@@ -322,15 +345,15 @@ text_btn:{
     backgroundColor: '#fff', alignItems: 'center',
     justifyContent: 'center',
     borderRadius: deviceWidth * 0.05,
-    height: deviceHeight * 0.3,
-    width: deviceWidth * 0.8,
+    height: imageBtnHeight(0.9),
+    width: imageBtnWidth(0.9),
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84, 
+    shadowRadius: 3.84,
   },
   rectangleContainer: {
     flex: 1,
@@ -338,7 +361,6 @@ text_btn:{
     justifyContent: "center",
     backgroundColor: "transparent"
   },
-
   rectangle: {
     height: rectDimensions,
     width: rectDimensions,
@@ -388,7 +410,7 @@ text_btn:{
     padding: 32,
     color: '#777',
   },
- 
+
   buttonText: {
 
     fontFamily: 'Kanit-Bold',
@@ -485,14 +507,15 @@ text_btn:{
     elevation: 5,
     borderRadius: deviceWidth * 0.05,
   },
-  basket_img_view:{
-    width: deviceWidth*0.2,
+  basket_img_view: {
+    width: deviceWidth * 0.2,
     height: deviceHeight * 0.2,
     alignSelf: 'center',
-    alignItems: 'center', 
-    justifyContent:'center'
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  basket_obj_view:{  width: deviceWidth*0.7,
+  basket_obj_view: {
+    width: deviceWidth * 0.7,
     paddingVertical: 20,
     paddingHorizontal: 20,
     justifyContent: 'space-between',
@@ -504,19 +527,19 @@ text_btn:{
     height: 'auto',
     borderBottomWidth: 0.7,
     fontFamily: 'Kanit-Light',
-},
-row: {
+  },
+  row: {
     flexDirection: 'row',
     flex: 0.25,
     backgroundColor: 'white',
     fontFamily: 'Kanit-Light',
-},
-box: {
+  },
+  box: {
     flex: 1 / 3,
     justifyContent: 'center',
     alignItems: 'center',
     fontFamily: 'Kanit-Light',
     // borderWidth: 0.3,
     // borderColor: "#BDBDBD"
-},
+  },
 });

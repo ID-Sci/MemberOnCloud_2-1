@@ -26,6 +26,7 @@ import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListPromotion from '../components/FlatListPromotion';
 import { BorderlessButton } from 'react-native-gesture-handler';
+
 import { mycardSelector, } from '../store/slices/mycardReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { config, updateMB_LOGIN_GUID, updateUserList, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
@@ -78,10 +79,15 @@ const MyCardScreen = () => {
                     dispatch(updateMB_LOGIN_GUID(''))
                     const NewKey = { ...configToken, logined: 'false' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    setLoading(false)
+                   
+                    await RNRestart.restart();
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
@@ -89,6 +95,7 @@ const MyCardScreen = () => {
                     { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
+            await setLoading(false)
     }
     return (
 

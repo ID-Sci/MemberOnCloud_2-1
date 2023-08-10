@@ -154,13 +154,13 @@ const HomeScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    const NewKey = { ...configToken, logined: 'false' }
+                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 }
             })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+            .catch(async (error) => {
+                const NewKey = { ...configToken, logined: 'false' }
+                await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 console.log('ERROR ' + error);
             })
     }
@@ -190,8 +190,12 @@ const HomeScreen = ({ route }: any) => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -235,14 +239,24 @@ const HomeScreen = ({ route }: any) => {
                         }
                     } else {
                         CState = false
-                        Alert.alert(Language.t('notiAlert.header'), `ไม่พบโครงการ`, [
-                            { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+
+
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t('error_ser.projectnotfound'), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                     }
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -317,8 +331,12 @@ const HomeScreen = ({ route }: any) => {
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
@@ -334,6 +352,29 @@ const HomeScreen = ({ route }: any) => {
     const fetchLayoutData = async (LayoutKey: String, LayoutList: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        console.log(`fetchLayoutData ${LayoutKey}`)
+        let fullDay: any = ''
+        try {
+            const response = await fetch(configToken.WebService + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
+                method: 'GET'
+            });
+
+            const datetime = response.headers.get('date');
+
+
+            const x = new Date(datetime);
+            const year = x.getFullYear().toString();
+            const month = (x.getMonth() + 1).toString().padStart(2, '0');
+            const day = x.getDate().toString().padStart(2, '0');
+            fullDay = year + month + day;
+
+
+        } catch (error) {
+            console.log('ERROR at fetchContent 1>> ' + error);
+
+        }
+        console.log(`fullDay >> ${fullDay}`)
+
         console.log(`fetchLayoutData ${LayoutKey}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
@@ -369,16 +410,20 @@ const HomeScreen = ({ route }: any) => {
                     }
                     if (LayoutKey == 'Notication') {
                         await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
-                        await dispatch(updateNotificationPage(responseData.SHOWPAGE))
+                        await dispatch(updateNotificationPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                        })))
                     }
                     if (LayoutKey == 'Category') {
                         await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
                         let tempdata = await getProducrALLCategory(responseData.SHOWPAGE)
+
                         await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
                             return a.GOODS_CODE - b.GOODS_CODE;
                         })))
                         let tempCPTNC = await getPageProJ(responseData.SHOWPAGE)
                         await dispatch(updateCategoryPage(tempCPTNC))
+
                     }
                     if (LayoutKey == 'Docinfo') {
                         await dispatch(updateDocinfoList(responseData.SHOWLAYOUT))
@@ -386,7 +431,11 @@ const HomeScreen = ({ route }: any) => {
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
-                        await dispatch(updatePromotionPage(responseData.SHOWPAGE))
+
+                        await fetchPageiItem(LayoutKey, responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                        }), fullDay)
+
                     }
                     if (LayoutKey == 'Activity') {
                         await dispatch(updateActivityList(responseData.SHOWLAYOUT))
@@ -399,15 +448,19 @@ const HomeScreen = ({ route }: any) => {
                     if (LayoutKey == 'Newproduct') {
                         await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
                         await dispatch(updateNewproductPage(responseData.SHOWPAGE))
-                        await fetchPageData('Newproduct', responseData.SHOWPAGE[0])
+                        await fetchNewproductContent('Newproduct', responseData.SHOWPAGE[0])
                     }
 
                     //    console.log(responseData)
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -419,10 +472,11 @@ const HomeScreen = ({ route }: any) => {
             })
     }
 
-    const fetchPageData = async (PageKey: String, PageList: any) => {
+    const fetchNewproductContent = async (PageKey: String, PageList: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchPageData ${PageList}`)
+        console.log(`fetchNewproductContent ${PageList}`)
+
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -452,8 +506,12 @@ const HomeScreen = ({ route }: any) => {
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
@@ -466,7 +524,66 @@ const HomeScreen = ({ route }: any) => {
             })
     }
 
+    const fetchPageiItem = async (PageKey: String, PageList: any, fullDay: string) => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        console.log(`fetchPageiItem ${fullDay}`)
+        let SHOWPAGE: any[] = []
+        for (var i in PageList) {
+            console.log(`fetchPageiItem ${PageList[i].SHWPH_GUID} `)
 
+            await fetch(configToken.WebService + '/ECommerce', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                    'BPAPUS-FUNCTION': 'GetPage',
+                    'BPAPUS-PARAM':
+                        '{"SHWP_GUID": "' +
+                        PageList[i].SHWPH_GUID +
+                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                    'BPAPUS-FILTER': '',
+                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-OFFSET': '0',
+                    'BPAPUS-FETCH': '0',
+                }),
+            })
+                .then((response) => response.json())
+                .then(async (json) => {
+                    if (json.ResponseCode == 200) {
+                        let responseData = JSON.parse(json.ResponseData);
+                        if (responseData.SHOWPAGE) {
+                            console.log(`${fullDay} => ${responseData.SHOWPAGE.SHWPH_FROM_DATE} && ${responseData.SHOWPAGE.SHWPH_TO_DATE} <= ${fullDay}`)
+                            await SHOWPAGE.push(responseData.SHOWPAGE)
+                        }
+                    } else {
+                        CState = false
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
+
+                    }
+
+                })
+                .catch((error) => {
+                    console.error('GetLayout >> ' + error);
+                    CState = false
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+
+                })
+
+
+        }
+        if (PageKey == 'Promotion') {
+            await dispatch(updatePromotionPage(SHOWPAGE.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })))
+        } else if (PageKey == 'Category') {
+
+        }
+    }
     const getProducrALLCategory = async (categoryList: any,) => {
 
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -501,8 +618,12 @@ const HomeScreen = ({ route }: any) => {
                         }
                     } else if (json.ResponseCode == 610) RNRestart.restart()
                     else {
-                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
@@ -552,8 +673,12 @@ const HomeScreen = ({ route }: any) => {
 
                         }
                     } else {
-                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
@@ -617,7 +742,7 @@ const HomeScreen = ({ route }: any) => {
                     <>
                         <FlatListCategory route={categoryList.categoryPage} onPressCategory={(item: any) => getProducrCategory(item)} />
                         <FlatListPromotion route={promotionList.promotionPage} />
-                        <FlatListNewproduct route={newproductList.newproductContent} />
+                        <FlatListNewproduct backPage={'Home'} route={newproductList.newproductContent} />
                         <FlatListActivity route={activityList.activityPage} />
                     </>
 

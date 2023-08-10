@@ -57,7 +57,7 @@ export default FlatListPromotion = ({ route }) => {
                         return (index < 10 &&
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
-                                    <TouchableOpacity style={styles.promotin_btn}
+                                    <TouchableOpacity  
                                         onPress={() => navigation.navigate('Temppage', { name: Language.t('promotion.header'), route: item })}>
                                         <Image
                                             style={styles.promotin_btn}

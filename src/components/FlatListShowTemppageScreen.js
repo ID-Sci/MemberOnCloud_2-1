@@ -32,32 +32,33 @@ export default FlatListShowTemppageScreen = ({ route }) => {
             <ScrollView
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight  
+                    height: deviceHeight
                 }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
                 {route.map((item, index) => {
-                    return (index < 10 &&
+                    return (
                         <>
                             <View style={{ padding: deviceWidth * 0.01 }}>
                                 <TouchableOpacity style={{
-                                    backgroundColor: '#fff', alignSelf: 'center',
-                                    justifyContent: 'center', flexDirection: 'row',
-                                    height: deviceWidth * 0.5,
-                                    width: deviceWidth * 0.9,
-                                    borderRadius: deviceWidth * 0.05,
+                                    backgroundColor: '#fff',
+
+
                                 }}
-                                onPress={() => navigation.navigate('Temppage', { name: 'โปรโมชั่นแนะนำ', route: item })}>
+                                    onPress={() => navigation.navigate('Temppage', { name: 'โปรโมชั่นแนะนำ', route: item })}>
                                     <Image
                                         style={{
                                             shadowColor: '#000',
                                             shadowOffset: { width: 0, height: 2 },
                                             shadowOpacity: 0.8,
                                             shadowRadius: 2,
-                                            height: deviceWidth * 0.5,
-                                            width: deviceWidth * 0.9,
-                                            borderRadius: deviceWidth * 0.05, 
+                                            height: (deviceWidth * 0.9 / (5 / 3)),
+                                            width: (deviceWidth * 0.9),
+                                            borderRadius: deviceWidth * 0.05,
+                                            alignSelf: 'center',
+                                            justifyContent: 'center',
+                                            resizeMode: 'contain',
                                         }}
                                         source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
                                     />

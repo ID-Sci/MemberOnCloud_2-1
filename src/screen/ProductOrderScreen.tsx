@@ -32,7 +32,8 @@ import * as safe_Format from '../styles/safe_Format';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-const ProductOrderScreen = ({ route }: any) => {
+const ProductOrderScreen = ({ backPage, route }: any) => {
+    backPage ? backPage = backPage : backPage = route.params.backPage
     const item = route.params.route
     const navigation = useNavigation()
     const dispatch = useAppDispatch();
@@ -60,7 +61,10 @@ const ProductOrderScreen = ({ route }: any) => {
             let newBasket = newSortBasketList(addBasket)
 
             await dispatch(updateBasket(newBasket))
-            navigation.navigate("basket")
+            if (route.params.backPageItem)
+                navigation.navigate(backPage, { backPage: backPage, name: route.params.name, route: route.params.backPageItem })
+            else
+                navigation.navigate(backPage)
         }
 
     }
@@ -162,8 +166,8 @@ const ProductOrderScreen = ({ route }: any) => {
                                 </View>
                                 {item.SHWC_EDIT_FEATURE != '' && (
                                     <View
-                                        style={{ 
-                                            marginTop: deviceHeight * 0.01, 
+                                        style={{
+                                            marginTop: deviceHeight * 0.01,
                                         }}>
                                         <Text
                                             style={styles.textBold}>
@@ -217,7 +221,6 @@ const ProductOrderScreen = ({ route }: any) => {
                                         backgroundColor: Colors.buttonTextColor,
                                         borderRadius: deviceWidth * 0.1,
                                     }}
-
                                 >
                                     <Text style={{
                                         fontFamily: 'Kanit-Bold',
@@ -259,7 +262,6 @@ const ProductOrderScreen = ({ route }: any) => {
                                         backgroundColor: Colors.buttonTextColor,
                                         borderRadius: deviceWidth * 0.1,
                                     }}
-
                                 >
                                     <Text style={{
                                         fontFamily: 'Kanit-Bold',
@@ -281,10 +283,8 @@ const ProductOrderScreen = ({ route }: any) => {
                             >
                                 <View
                                     style={styles.order_view}
-
                                 >
                                     <Text style={styles.order_text}>
-
                                         {`${Language.t('product.addToCart')} ${item.NORMARPLU_U_PRC == '' ? safe_Format.currencyFormat(0) : safe_Format.currencyFormat(item.NORMARPLU_U_PRC * order)} ${Language.t('product.thb')}`}
                                     </Text>
                                 </View>

@@ -134,6 +134,8 @@
     "header": "Purchase / Redeem History",
     "redeemHistoryTabTitle": "Redeem History",
     "purchaseHistoryTabTitle": "Purchase History",
+    "active":"active",
+    "canceled":"canceled",
     "nodata":"no data",
     "Ref":"Ref.",
     "purchaseDate":"purchase date",
@@ -173,7 +175,7 @@
     "rewardPointToday": "Reward Point Today ( effective the next day. )",
     "detail": "Detail",
     "myPurchase":"My purchase",
-    "viewOrderHistory":"View order history"
+    "viewOrderHistory":"Order history"
   },
   "privilageForMember": {
     "header": "About card"
@@ -282,6 +284,9 @@
     "617": "No License Or License Expire",
     "628": "Function Parameter Required ",
     "629": "Function Parameter Required ",
-    "632": "Email already exists"
+    "632": "Email already exists",
+    "634": "Mobile No Already Exists",
+    "635": "Member not found",
+    "projectnotfound":"Project not found"
   }
 }

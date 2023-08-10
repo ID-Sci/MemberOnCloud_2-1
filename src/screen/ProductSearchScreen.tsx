@@ -27,6 +27,7 @@ import { Language, changeLanguage } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
 import { config } from '../store/slices/configReducer';
 import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
+import AbsoluteBasket from './AbsoluteBasket'
 import { categorySelector, } from '../store/slices/categoryReducer';
 import { useAppSelector } from '../store/store';
 const deviceWidth = Dimensions.get('window').width;
@@ -162,7 +163,7 @@ const ProductSearchScreen = ({ route }: any) => {
                 }}>
 
                     {product && product.length > 0 && productState ? (
-                        <FlatListProductScreen route={product.filter((filteritem: any) => { return filteritem.GOODS_CODE.includes(GOODS_CODE) ||  filteritem.SHWC_ALIAS.includes(GOODS_CODE) || filteritem.SHWC_EALIAS.includes(GOODS_CODE) })} />
+                        <FlatListProductScreen backPage={'ProductSearch'} name={''} route={product.filter((filteritem: any) => { return filteritem.GOODS_CODE.includes(GOODS_CODE) || filteritem.SHWC_ALIAS.includes(GOODS_CODE) || filteritem.SHWC_EALIAS.includes(GOODS_CODE) })} />
                     ) : !loading && productState && (
                         <View
                             style={{
@@ -183,11 +184,12 @@ const ProductSearchScreen = ({ route }: any) => {
                                 source={require('../img/empty-box-blue-icon.png')}
                             />
                             <Text style={styles.textLight_title}>
-                            {Language.t('menu.notFound')}
+                                {Language.t('menu.notFound')}
                             </Text>
                         </View>
                     )}
                 </View>
+                <AbsoluteBasket/>
             </View>
         )
 

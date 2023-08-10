@@ -80,12 +80,16 @@ const LoginScreen = () => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    getMemberInfo(responseData.MB_LOGIN_GUID)
+                    await getMemberInfo(responseData.MB_LOGIN_GUID)
                     // Alert.alert(`สำเร็จ`, `${json.ReasonString}`, [
                     //     { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -93,7 +97,7 @@ const LoginScreen = () => {
                     { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
-        setLoading(false)
+        await setLoading(false)
     }
     const getMemberInfo = async (MB_LOGIN_GUID: any) => {
         console.log(`getProJ [Ec000400]`)
@@ -116,14 +120,18 @@ const LoginScreen = () => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    setLoading(false)
+
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: PhoneParm, MB_PW: PasswordParm, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-
+                    await setLoading(false)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
@@ -315,7 +323,7 @@ const LoginScreen = () => {
                     <TouchableOpacity
                         style={{
                             flexDirection: 'row',
-                            alignItems:'baseline'
+                            alignItems: 'baseline'
                         }}
                         onPress={() => navigation.navigate('SelLanguage')}>
                         <Text style={styles.textLight}>

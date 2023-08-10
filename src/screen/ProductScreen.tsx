@@ -23,6 +23,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListProductScreen from '../components/FlatListProductScreen';
+import AbsoluteBasket from './AbsoluteBasket'
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
@@ -53,9 +54,10 @@ const ProductScreen = ({ route }: any) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <FlatListProductScreen backPage={'Newproduct'} route={route.params.route} />
+                <FlatListProductScreen backPage={route.params.backPage} name={route.params.name} route={route.params.route} />
+                <AbsoluteBasket/>
             </View>)
     )
 }
 
-export default ProductScreen 
+export default ProductScreen

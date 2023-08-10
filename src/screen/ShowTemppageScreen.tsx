@@ -38,7 +38,6 @@ const ShowTemppageScreen = ({ route }: any) => {
                 style={{
                     width: deviceWidth,
                     height: deviceHeight,
-
                     backgroundColor: Colors.backgroundLoginColorSecondary,
 
                 }}

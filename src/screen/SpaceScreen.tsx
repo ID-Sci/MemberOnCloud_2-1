@@ -160,7 +160,7 @@ const SpaceScreen = () => {
             "MB_PW": "",
             "logined": "false",
             "Language": Language.getLang(),
-            "upDateVsersion": "3.0.3"
+            "upDateVsersion": "3.0.4"
         }
         changeLanguage(configToken?.Language ? configToken.Language : Language.getLang())
         console.log(` JSON.stringify(superObj) ${JSON.stringify(superObj.Mac)}`)
@@ -232,10 +232,10 @@ const SpaceScreen = () => {
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', json)
-                    CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -274,19 +274,22 @@ const SpaceScreen = () => {
                 if (json && json.ResponseCode == '200') {
                     let responseData = JSON.parse(json.ResponseData)
                     console.log(responseData)
-                    await dispatch(updateLoginList(responseData))
-                    await getProJ(responseData)
                     console.log(`configToken.logined >> [${configToken.logined}]`)
                     if (configToken.logined == 'true') {
                         await getLoginMbUsers(responseData)
                     }
+                    await dispatch(updateLoginList(responseData))
+                    await getProJ(responseData)
+
+
                 } else {
                     console.log('Function Parameter Required');
+
                     let temp_error = 'error_ser.' + json.ResponseCode;
                     console.log('>> ', temp_error)
-                    CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -325,13 +328,13 @@ const SpaceScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(LoginList, responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    const NewKey = { ...configToken, logined: 'false' }
+                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 }
             })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+            .catch(async (error) => {
+                const NewKey = { ...configToken, logined: 'false' }
+                await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                 console.log('ERROR ' + error);
             })
     }
@@ -361,8 +364,12 @@ const SpaceScreen = () => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
 
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -397,12 +404,16 @@ const SpaceScreen = () => {
 
                     if (responseData.Ec000400.length > 0) {
                         console.log(responseData.Ec000400[0])
-                        await dispatch(updateProjList(responseData.Ec000400[0]))
+                        dispatch(updateProjList(responseData.Ec000400[0]))
                         await FetchDataProject(LoginList, responseData.Ec000400[0])
                     } else {
                         CState = false
-                        Alert.alert(Language.t('notiAlert.header'), `ไม่พบโครงการ`, [
-                            { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t('error_ser.projectnotfound'), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                     }
                 } else {
                     CState = false
@@ -422,7 +433,7 @@ const SpaceScreen = () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`FetchDataProject`)
-        
+
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -480,8 +491,12 @@ const SpaceScreen = () => {
                     Docinfo && await fetchLayoutData('Docinfo', LoginList, Docinfo)
                 } else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
@@ -500,7 +515,7 @@ const SpaceScreen = () => {
         console.log(`fetchLayoutData ${LayoutKey}`)
         let fullDay: any = ''
         try {
-            const response = await fetch(configToken.WebService  + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
+            const response = await fetch(configToken.WebService + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
                 method: 'GET'
             });
 
@@ -553,11 +568,14 @@ const SpaceScreen = () => {
                     }
                     if (LayoutKey == 'Notication') {
                         await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
-                        await dispatch(updateNotificationPage(responseData.SHOWPAGE))
+                        await dispatch(updateNotificationPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                        })))
                     }
                     if (LayoutKey == 'Category') {
                         await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
-                        let tempdata = await getProducrALLCategory(responseData.SHOWPAGE, LoginList)
+                        let tempdata = await getProducrALLCategory(responseData.SHOWPAGE, LoginList,fullDay)
+                   
                         await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
                             return a.GOODS_CODE - b.GOODS_CODE;
                         })))
@@ -571,9 +589,11 @@ const SpaceScreen = () => {
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
-                        await dispatch(updatePromotionPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
+                        await fetchNewproductContent('Newproduct', LoginList, responseData.SHOWPAGE[0])
+                        await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE.sort((a: any, b: any) => {
                             return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        })))
+                        }), fullDay)
+
                     }
                     if (LayoutKey == 'Activity') {
                         await dispatch(updateActivityList(responseData.SHOWLAYOUT))
@@ -586,14 +606,18 @@ const SpaceScreen = () => {
                     if (LayoutKey == 'Newproduct') {
                         await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
                         await dispatch(updateNewproductPage(responseData.SHOWPAGE))
-                        await fetchPageData('Newproduct', LoginList, responseData.SHOWPAGE[0])
+                        await fetchNewproductContent('Newproduct', LoginList, responseData.SHOWPAGE[0])
                     }
 
                     //    console.log(responseData)
                 } else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
             })
             .catch((error) => {
@@ -605,10 +629,10 @@ const SpaceScreen = () => {
             })
     }
 
-    const fetchPageData = async (PageKey: String, LoginList: object, PageList: object) => {
+    const fetchNewproductContent = async (PageKey: String, LoginList: object, PageList: object) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchPageData ${PageList}`)
+        console.log(`fetchNewproductContent ${PageList}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -631,14 +655,16 @@ const SpaceScreen = () => {
                     let responseData = JSON.parse(json.ResponseData);
                     if (PageKey == 'Newproduct') {
                         await dispatch(updateNewproductContent(responseData.SHOWCONTENT))
-                    } else if (PageKey == 'Category') {
-                        return responseData.SHOWCONTENT[0]
                     }
                     //console.log(responseData)
                 } else {
                     CState = false
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
                 }
 
             })
@@ -650,7 +676,66 @@ const SpaceScreen = () => {
 
             })
     }
+    const fetchPageiItem = async (PageKey: String, LoginList: object, PageList: any, fullDay: string) => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        console.log(`fetchPageiItem ${fullDay}`)
+        let SHOWPAGE: any[] = []
+        for (var i in PageList) {
+            console.log(`fetchPageiItem ${PageList[i].SHWPH_GUID} `)
 
+            await fetch(configToken.WebService + '/ECommerce', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                    'BPAPUS-FUNCTION': 'GetPage',
+                    'BPAPUS-PARAM':
+                        '{"SHWP_GUID": "' +
+                        PageList[i].SHWPH_GUID +
+                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                    'BPAPUS-FILTER': '',
+                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-OFFSET': '0',
+                    'BPAPUS-FETCH': '0',
+                }),
+            })
+                .then((response) => response.json())
+                .then(async (json) => {
+                    if (json.ResponseCode == 200) {
+                        let responseData = JSON.parse(json.ResponseData);
+                        if (responseData.SHOWPAGE) {
+                            console.log(`${fullDay} => ${responseData.SHOWPAGE.SHWPH_FROM_DATE} && ${responseData.SHOWPAGE.SHWPH_TO_DATE} <= ${fullDay}`)
+                            await SHOWPAGE.push(responseData.SHOWPAGE)
+                        }
+                    } else {
+                        CState = false
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
+
+                    }
+
+                })
+                .catch((error) => {
+                    console.error('GetLayout >> ' + error);
+                    CState = false
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+
+                })
+
+
+        }
+        if (PageKey == 'Promotion') {
+            await dispatch(updatePromotionPage(SHOWPAGE.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })))
+        }else  if (PageKey == 'Category') {
+
+        }
+    }
     const getPageProJ = async (categoryList: any, LoginList: object,) => {
 
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -684,8 +769,12 @@ const SpaceScreen = () => {
 
                         }
                     } else {
-                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
@@ -703,7 +792,7 @@ const SpaceScreen = () => {
         return tempProductList
     }
 
-    const getProducrALLCategory = async (categoryList: any, LoginList: object,) => {
+    const getProducrALLCategory = async (categoryList: any, LoginList: object,fullDay) => {
 
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -736,8 +825,12 @@ const SpaceScreen = () => {
                             })
                         }
                     } else {
-                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                     console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
 
@@ -752,7 +845,8 @@ const SpaceScreen = () => {
         }
 
         console.log(`end getProducrALLCategory`)
-        return tempProductList
+        return tempProductList.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })
+   
     }
 
     const setnotiItem = async () => {

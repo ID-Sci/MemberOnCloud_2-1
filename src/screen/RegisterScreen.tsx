@@ -35,6 +35,7 @@ import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
+import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
 import { styles } from '../styles/styles';
 import { Language } from '../translations/I18n';
@@ -99,7 +100,10 @@ const RegisterScreen = ({ route }: any) => {
         })
 
     }
-
+    const setLoadingstate = () => {
+        setLoading(false)
+        setRegis(false)
+    }
     const [newData, setNewData] = useState({
         MB_INTL: 'นาย',
         MB_NAME: '',
@@ -118,7 +122,8 @@ const RegisterScreen = ({ route }: any) => {
         MB_CPW: ''
     });
 
-    const CState = () => {
+    const CState = async () => {
+        await setLoading(true)
         let C = true
         if (!newData.MB_NAME) {
             C = false
@@ -162,15 +167,18 @@ const RegisterScreen = ({ route }: any) => {
             console.log(`MB_CPW`)
         }
         if (C) {
-            setRegis(true)
-            otpRequest()
+
+            await setRegis(true)
+            await otpRequest()
+        
         } else {
             Alert.alert(
-                Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => console.log(C) }]);
+                Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }]);
         }
+        
     }
     const otpRequest = async () => {
-        setCountdown(defaultCountDown)
+        await setLoading(true)
         let otpPassword: any = Math.floor(1000 + Math.random() * 9000)
         setOTPpassword(otpPassword);
 
@@ -201,7 +209,9 @@ const RegisterScreen = ({ route }: any) => {
             .then((json) => {
                 if (json[0].NTFU_GUID) {
                     console.log(`otp Request Success => { ${otpPassword} }`);
-                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }]);
+                    setCountdown(defaultCountDown)
+                    setLoading(false)
+                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false)}]);
                 }
             })
             .catch((error) => {
@@ -210,9 +220,7 @@ const RegisterScreen = ({ route }: any) => {
 
                 Alert.alert(
                     Language.t('alert.errorTitle'), error, [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }]);
-                console.log('checkIPAddress>>', error);
-
-                setLoading(false)
+                    setLoadingstate()
             });
 
     };
@@ -278,14 +286,18 @@ const RegisterScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     LoginByMobile()
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
                 }
             })
             .catch((error) => {
 
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
                 console.log('ERROR ' + error);
             });
     };
@@ -315,14 +327,18 @@ const RegisterScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
                 }
             })
             .catch((error) => {
 
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
                 console.log('ERROR ' + error);
 
             });
@@ -352,16 +368,20 @@ const RegisterScreen = ({ route }: any) => {
                     await updateMB_LOGIN_GUID(MB_LOGIN_GUID)
                     const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    navigation.goBack()
-                    setLoading(false)
+                    await RNRestart.restart()
+                    setLoadingstate()
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
                 }
             })
             .catch((error) => {
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
                 console.log('ERROR ' + error);
             });
     }
@@ -422,19 +442,23 @@ const RegisterScreen = ({ route }: any) => {
                 if (json && json.ResponseCode == '200') {
 
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
                 }
             })
             .catch((error) => {
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
                 console.log('ERROR ' + error);
             });
     }
 
     const _PressResend = () => {
-        setCountdown(defaultCountDown);
+
 
         clearInterval(clockCall);
         clockCall = setInterval(() => {
@@ -457,13 +481,14 @@ const RegisterScreen = ({ route }: any) => {
 
         if (tempcode.length == 4) {
             if (tempcode == OTPpassword) {
+                setLoading(true)
                 setCountdown(0)
                 setPinCode('')
                 setRegis(false)
                 getNewMemberMbUsers()
             }
             else {
-                Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.invalidCode'), [
+                Alert.alert(Language.t('notiAlert.header'), Language.t('register.invalidCode'), [
                     { text: Language.t('alert.confirm'), onPress: () => setPinCode('') }])
             }
         }
@@ -481,7 +506,7 @@ const RegisterScreen = ({ route }: any) => {
                         transparent={true}
                         animationType={'none'}
                         visible={loading}
-                        onRequestClose={() => { }}>
+                        onRequestClose={() => { styles.header_text_title }}>
                         <View
                             style={{
                                 flex: 1,
@@ -824,8 +849,8 @@ const RegisterScreen = ({ route }: any) => {
                                                 era={'be'}
                                                 format={'dd month yyyy'}
                                                 borderColor={'gray'}
-                                                linkTodateColor={Colors.itemColor}
-                                                calendarModel={{ backgroundColor: Colors.backgroundLoginColorSecondary, buttonSuccess: { backgroundColor: Colors.itemColor }, pickItem: { color: Colors.itemColor } }}
+                                                linkTodateColor={Colors.backgroundLoginColor}
+                                                calendarModel={{ backgroundColor: Colors.backgroundLoginColorSecondary, buttonSuccess: { backgroundColor: Colors.backgroundLoginColor }, pickItem: { color: Colors.backgroundLoginColor } }}
                                                 borderWidth={0.7}
                                                 icon={{ color: Colors.fontColorSecondary }}
                                                 fontSize={FontSize.medium}

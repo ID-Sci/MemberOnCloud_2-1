@@ -122,6 +122,7 @@ const UpdateScreen = ({ route }: any) => {
     });
 
     const CState = () => {
+        setLoading(true)
         let C = true
         if (!newData.MB_NAME) {
             C = false
@@ -171,9 +172,11 @@ const UpdateScreen = ({ route }: any) => {
             Alert.alert(
                 Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => console.log(C) }]);
         }
+        setLoading(false)
     }
     const otpRequest = async () => {
-        setCountdown(defaultCountDown)
+      
+      await  setLoading(true)
         let otpPassword: any = Math.floor(1000 + Math.random() * 9000)
         setOTPpassword(otpPassword);
 
@@ -203,6 +206,8 @@ const UpdateScreen = ({ route }: any) => {
             .then((response) => response.json())
             .then((json) => {
                 if (json[0].NTFU_GUID) {
+                    setCountdown(defaultCountDown)
+                    setLoading(false) 
                     console.log(`otp Request Success => { ${otpPassword} }`);
                     Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }]);
                 }
@@ -249,8 +254,12 @@ const UpdateScreen = ({ route }: any) => {
                     await UpdateMember(responseData.MB_LOGIN_GUID)
                     await getMemberInfo(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
@@ -288,8 +297,12 @@ const UpdateScreen = ({ route }: any) => {
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                     navigation.goBack()
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }])
                 }
             })
             .catch((error) => {
@@ -364,8 +377,12 @@ const UpdateScreen = ({ route }: any) => {
                 }
             })
             .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoading(false) }])
+                console.log('Function Parameter Required'); 
+                let temp_error = 'error_ser.' + json.ResponseCode;
+                console.log('>> ', temp_error)
+                Alert.alert(
+                  Language.t('alert.errorTitle'),
+                  Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }])
                 console.log('ERROR ' + error);
             });
     }
@@ -401,7 +418,7 @@ const UpdateScreen = ({ route }: any) => {
                 LoginByMobile()
             }
             else {
-                Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.invalidCode'), [
+                Alert.alert(Language.t('notiAlert.header'), Language.t('register.invalidCode'), [
                     { text: Language.t('alert.confirm'), onPress: () => setPinCode('') }])
             }
         }
@@ -482,21 +499,21 @@ const UpdateScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('1')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         1
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('2')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         2
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={{ ...styles.box }}
                                     onPress={() => handlePinCode('3')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         3
                                     </Text>
                                 </TouchableOpacity>
@@ -505,21 +522,21 @@ const UpdateScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('4')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         4
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('5')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         5
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('6')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         6
                                     </Text>
                                 </TouchableOpacity>
@@ -528,21 +545,21 @@ const UpdateScreen = ({ route }: any) => {
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('7')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         7
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('8')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         8
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('9')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         9
                                     </Text>
                                 </TouchableOpacity>
@@ -552,14 +569,14 @@ const UpdateScreen = ({ route }: any) => {
 
                                     style={styles.box}
                                 >
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
 
                                     </Text>
                                 </View>
                                 <TouchableOpacity
                                     style={styles.box}
                                     onPress={() => handlePinCode('0')}>
-                                    <Text allowFontScaling={false} style={styles.text}>
+                                    <Text allowFontScaling={false} style={styles.textBold_title}>
                                         0
                                     </Text>
                                 </TouchableOpacity>
@@ -770,8 +787,8 @@ const UpdateScreen = ({ route }: any) => {
                                                 era={'be'}
                                                 format={'dd month yyyy'}
                                                 borderColor={'gray'}
-                                                linkTodateColor={Colors.itemColor}
-                                                calendarModel={{ backgroundColor: Colors.backgroundLoginColorSecondary, buttonSuccess: { backgroundColor: Colors.itemColor }, pickItem: { color: Colors.itemColor } }}
+                                                linkTodateColor={Colors.backgroundLoginColor}
+                                                calendarModel={{ backgroundColor: Colors.backgroundLoginColorSecondary, buttonSuccess: { backgroundColor: Colors.backgroundLoginColor }, pickItem: { color: Colors.backgroundLoginColor } }}
                                                 borderWidth={0.7}
                                                 icon={{ color: Colors.fontColorSecondary }}
                                                 fontSize={FontSize.medium}

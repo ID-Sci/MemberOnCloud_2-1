@@ -37,14 +37,14 @@ const PurchaseHistoryScreen = () => {
     const ConfigList = useAppSelector(config)
     const navigation = useNavigation()
     const dispatch = useAppDispatch();
-    const [Oe, setOe] = useState(ConfigList.Oe);
+    const [Oe, setOe] = useState([]);
     const [Purchase, setPurchase] = useState([]);
     const [Loading, setLoading] = useState(true);
     const [PurchaseLoading, setPurchaseLoading] = useState(true);
     const [product, setProduct] = useState(newproductList.allproductList)
-
+    const [HistoryTab, setHistoryTab] = useState(true);
     const fetchData = async () => {
-        setLoading(true)
+        await setLoading(true)
         console.log(`FETCH /LookupErp /Ar000130 => ${ConfigList.UserList.MB_CODE}`);
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -63,19 +63,23 @@ const PurchaseHistoryScreen = () => {
             }),
         })
             .then((response) => response.json())
-            .then((json) => {
+            .then(async (json) => {
                 if (json.ResponseCode == '200') {
                     let responseRedeem = JSON.parse(json.ResponseData).Ar000130.filter((filterItem: any) => { return filterItem.AR_MBCODE == ConfigList.UserList.MB_CODE })
                     // 
                     console.log(responseRedeem.length)
                     if (responseRedeem.length > 0)
-                        fetchOE(responseRedeem[0].AR_CODE)
+                        await fetchOE(responseRedeem[0].AR_CODE)
                     else
                         Alert.alert(Language.t('notiAlert.header'), `ไม่พบข้อมูล`, [
                             { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
 
             })
@@ -87,7 +91,7 @@ const PurchaseHistoryScreen = () => {
 
     }
     const fetchOE = async (AR_CODE: String) => {
-        console.log(`FETCH /LookupErp /Oe002304 => ${AR_CODE}`);
+
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         let Oe002304: any[] = [{
@@ -95,6 +99,8 @@ const PurchaseHistoryScreen = () => {
             Oe002304Info: {}
         }]
         let Oe000304: string | any[] = []
+
+        console.log(`FETCH /LookupErp /Oe002304 => ${AR_CODE}`);
         await fetch(configToken.WebService + '/LookupErp', {
             method: 'POST',
             body: JSON.stringify({
@@ -116,8 +122,12 @@ const PurchaseHistoryScreen = () => {
                     if (responseRedeem.length > 0)
                         Oe002304 = responseRedeem
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
 
             })
@@ -126,7 +136,9 @@ const PurchaseHistoryScreen = () => {
                     { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
+        console.log(`Oe002304 >> ${Oe002304.length}`)
         console.log(`FETCH /LookupErp /Oe000304 => ${AR_CODE}`);
+
         await fetch(configToken.WebService + '/LookupErp', {
             method: 'POST',
             body: JSON.stringify({
@@ -148,8 +160,12 @@ const PurchaseHistoryScreen = () => {
                     if (responseRedeem.length > 0)
                         Oe000304 = responseRedeem
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -157,24 +173,29 @@ const PurchaseHistoryScreen = () => {
                     { text: Language.t('alert.confirm'), onPress: () => console.log() }])
                 console.log('ERROR ' + error);
             });
-        let tempObj: any[] = []
-        console.log(`Oe002304 >> ${Oe002304.length}`)
         console.log(`Oe000304 >> ${Oe000304.length}`)
+        let tempObj: any[] = []
+
+
         const combinedArray: any[] = Oe002304.concat(Oe000304);
         // const combinedArray: any[] = Oe002304;
-        console.log(`combinedArray >> ${combinedArray.length}`)
+        console.log(`combinedArray >>  ${combinedArray.length}`)
         await combinedArray.sort((a, b) => {
-            return b.DI_DATE - a.DI_DATE;
+            return b.DI_KEY - a.DI_KEY;
         })
+
         for (var i in combinedArray) {
+            console.log(`load ${i}/{${combinedArray.length}}`)
             tempObj.push(await GetInvoiceDocinfo(combinedArray[i]))
+            if (tempObj.length >= Oe.length)
+                setOe(tempObj)
         }
 
+        await setLoading(false)
 
-        await setOe(tempObj)
         await dispatch(updateUserOe(tempObj))
 
-        await setLoading(false)
+
     }
     const GetInvoiceDocinfo = async (OeKEY: any) => {
 
@@ -197,7 +218,7 @@ const PurchaseHistoryScreen = () => {
             .then((response) => response.json())
             .then(async (json) => {
                 responseData = JSON.parse(json.ResponseData);
-
+                responseData.DOCINFO.DI_REF = OeKEY.DI_REF
             })
             .catch((error) => {
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
@@ -207,7 +228,7 @@ const PurchaseHistoryScreen = () => {
         return responseData
     }
     const onRefresh = async () => {
-
+        await setOe([])
         await fetchData()
         console.log(`reloade completed`)
 
@@ -232,7 +253,7 @@ const PurchaseHistoryScreen = () => {
             <View style={styles.header}>
                 <Text
                     style={styles.header_text_title}>
-                    {Language.t('history.purchaseHistoryTabTitle')}
+                    {Language.t('profileCard.viewOrderHistory')}
                 </Text>
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
@@ -244,190 +265,264 @@ const PurchaseHistoryScreen = () => {
                 </TouchableOpacity>
             </View>
             < >
-                <ScrollView
-                    style={{
-                        width: deviceWidth,
-                    }}
+                <View style={{ padding: 10 }} >
+                    <View
+                        style={{
+                            height: 35,
+                            width: deviceWidth - 20,
+                            borderBottomColor: '#000000',
+                            borderBottomWidth: 0.2,
+                            flexDirection: 'row',
+                            alignSelf: 'center',
+                            alignItems: 'stretch',
+                            justifyContent: 'space-between',
+                        }}>
+                        <TouchableOpacity
+                            onPress={() => setHistoryTab(true)}
+                        >
+                            <Text
+                                style={{
+                                    fontFamily: 'Kanit-Bold',
+                                    color: HistoryTab == true ? '#0288D1' : 'black',
+                                    paddingLeft: 20,
+                                    fontSize: FontSize.medium,
+                                }}>
+                                {Language.t('history.active')}
+                            </Text>
+                        </TouchableOpacity>
+                        <Text style={{}}>
+                            /
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => setHistoryTab(false)}>
+                            <Text
+                                style={{
+                                    fontFamily: 'Kanit-Bold',
+                                    color: HistoryTab == true ? 'black' : 'red',
+                                    paddingRight: 20,
+                                    fontSize: FontSize.medium,
+                                }}>
+                                {Language.t('history.canceled')}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                {HistoryTab ? (
+                    <ScrollView
+                        style={{
+                            width: deviceWidth,
+                        }}
 
-                    refreshControl={<RefreshControl Loading={false} onRefresh={onRefresh} />}
-                    bounces={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View style={styles.obj_list}>
-
-                        {Oe.map((item, index) => {
-                            return (
-                                <>
-                                    <View style={{
-                                        padding: 10,
-                                        width: deviceWidth - 40,
-                                        alignItems: 'center',
-                                        borderColor: Colors.borderColor,
-                                        borderBottomWidth: 1
-                                    }}>
-                                        <TouchableOpacity style={{
+                        refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+                        bounces={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View style={styles.obj_list}>
+                            {Oe.filter((filterItem: any) => { return filterItem.DOCINFO.DI_ACTIVE == '0' }).map((item: { DOCINFO: { DI_REF: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; DI_DATE: any; }; TRANSTKD: { map: (arg0: { (obj: any): number; (obj: any): number; (obj: any): number; (obj: any): number; }) => any[]; TRD_K_U_PRC: string; }; }, index: any) => {
+                                return (
+                                    <>
+                                        <View style={{
+                                            padding: 10,
                                             width: deviceWidth - 40,
-                                            backgroundColor: '#fff', alignItems: 'center',
-                                            justifyContent: 'center',
-                                        }} onPress={() => navigation.navigate('PurchaseHistoryInfo', { route: item })}>
-                                            <View style={{
+                                            alignItems: 'center',
+                                            borderColor: Colors.borderColor,
+                                            borderBottomWidth: 1
+                                        }}>
+                                            <TouchableOpacity style={{
                                                 width: deviceWidth - 40,
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                flexDirection: 'row',
-                                            }}>
-                                                <Text style={styles.textLight} >{item.DOCINFO.DI_REF}</Text>
-                                                <Text style={styles.textLight}>{safe_Format.dateFormat(item.DOCINFO.DI_DATE)}</Text>
-                                            </View>
-                                            <View
-                                                style={{
-                                                    width: deviceWidth * 0.8,
+                                                backgroundColor: '#fff', alignItems: 'center',
+                                                justifyContent: 'center',
+                                            }} onPress={() => navigation.navigate('PurchaseHistoryInfo', { route: item })}>
+                                                <View style={{
+                                                    width: deviceWidth - 40,
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between',
                                                     flexDirection: 'row',
                                                 }}>
-                                                <View style={{
-                                                    alignItems: 'flex-start',
-                                                    justifyContent: 'center',
-                                                    width: deviceWidth * 0.2,
-                                                    height: deviceWidth * 0.2,
-                                                }}>
-                                                    {product && !product.find(obj => obj.GOODS_CODE == item.TRANSTKD[0].GOODS_CODE) || product.find(obj => obj.GOODS_CODE == item.TRANSTKD[0].GOODS_CODE).IMAGE64 == "" ? <Image
-                                                        style={{
-                                                            resizeMode: 'contain',
-                                                            height: deviceWidth * 0.15,
-                                                            width: deviceWidth * 0.15,
-                                                        }}
-                                                        source={require('../img/newproduct.png')}
-                                                    /> : <Image
-                                                        style={{
-                                                            resizeMode: 'contain',
-                                                            height: deviceWidth * 0.15,
-                                                            width: deviceWidth * 0.15,
-                                                        }}
-                                                        source={{ uri: `data:image/png;base64,${product.find(obj => obj.GOODS_CODE == item.TRANSTKD[0].GOODS_CODE).IMAGE64}` }}
-                                                    />}
+                                                    <Text style={styles.DI_REFLight} >{item.DOCINFO.DI_REF}</Text>
+                                                    <Text style={styles.textLight}>{safe_Format.dateFormat(item.DOCINFO.DI_DATE)}</Text>
                                                 </View>
                                                 <View style={{
-                                                    width: deviceWidth * 0.6,
+                                                    width: deviceWidth - 40,
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between',
                                                     flexDirection: 'row',
                                                 }}>
-                                                    <View>
-                                                        <View style={{
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center',
-                                                            width: deviceWidth * 0.6,
-                                                            flexDirection: 'row',
-                                                        }}>
-                                                            <Text style={styles.textLight}>
-                                                                {Language.getLang() == 'th' ? product.find(obj => obj.GOODS_CODE == item.TRANSTKD[0].GOODS_CODE)?.SHWC_ALIAS :product.find(obj => obj.GOODS_CODE == item.TRANSTKD[0].GOODS_CODE)?.SHWC_EALIAS}
-                                                            </Text>
-                                                        </View>
-                                                        <View style={{
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center',
-                                                            width: deviceWidth * 0.6,
-                                                            height: FontSize.large * 2,
-                                                            flexDirection: 'row',
-                                                        }}>
-                                                            <Text style={styles.textLight}>
-                                                                X  {item.TRANSTKD[0].TRD_QTY}
-                                                            </Text>
-                                                            <Text style={styles.textLight}>
-                                                                {safe_Format.currencyFormat(item.TRANSTKD[0].TRD_K_U_PRC == '' ? 0 : item.TRANSTKD[0].TRD_K_U_PRC * item.TRANSTKD[0].TRD_QTY)}
-                                                            </Text>
-                                                            
+                                                    <Text style={styles.textLight} >
+                                                        X {item.TRANSTKD.map((obj: any) => Number(obj.TRD_QTY))
+                                                            .reduce((accumulator: any, currentValue: any) => accumulator + currentValue, 0)} ชิ้น
 
-                                                        </View>
-
+                                                    </Text>
+                                                    <View
+                                                        style={{
+                                                            width: deviceWidth * 0.4,
+                                                            justifyContent: 'flex-end',
+                                                            alignItems: 'center',
+                                                            flexDirection: 'row',
+                                                        }}
+                                                    >
+                                                        <Text style={styles.textLight} >
+                                                            {Language.t('history.orderList')}: ฿
+                                                        </Text>
+                                                        <Text style={styles.textLight}>
+                                                            {safe_Format.formatCurrency(item.TRANSTKD.TRD_K_U_PRC == '' ? 0 : item.TRANSTKD.map((obj: { TRD_K_U_PRC: number; TRD_QTY: number; }) => Number(obj.TRD_K_U_PRC * obj.TRD_QTY))
+                                                                .reduce((accumulator: any, currentValue: any) => accumulator + currentValue, 0))}
+                                                        </Text>
                                                     </View>
                                                 </View>
-                                            </View>
-                                            <View
-                                                style={{
 
-                                                    width: deviceWidth * 0.8,
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
+                                )
+                            })}
+
+
+                        </View>
+                        {Loading && (
+                            <View
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    width: deviceWidth,
+                                    borderRadius: deviceWidth * 0.05,
+                                    padding: 50,
+                                }}>
+                                <View style={{
+                                    backgroundColor: Colors.borderColor,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    position: 'absolute',
+                                    height: FontSize.large * 2,
+                                    width: FontSize.large * 2,
+                                    borderRadius: FontSize.large,
+                                    opacity: 0.5,
+
+                                }}>
+                                    <ActivityIndicator animating={Loading} size={FontSize.large} color="#0288D1" />
+                                </View>
+
+                            </View>
+                        )}
+
+                    </ScrollView>
+                ) : (
+                    <ScrollView
+                        style={{
+                            width: deviceWidth,
+                        }}
+
+                        refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+                        bounces={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View style={styles.obj_list}>
+                            {Oe.filter((filterItem: any) => { return filterItem.DOCINFO.DI_ACTIVE == '1' }).map((item: { DOCINFO: { DI_REF: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; DI_DATE: any; }; TRANSTKD: { map: (arg0: { (obj: any): number; (obj: any): number; (obj: any): number; (obj: any): number; }) => any[]; TRD_K_U_PRC: string; }; }, index: any) => {
+                                return (
+                                    <>
+                                        <View style={{
+                                            padding: 10,
+                                            width: deviceWidth - 40,
+                                            alignItems: 'center',
+                                            borderColor: Colors.borderColor,
+                                            borderBottomWidth: 1
+                                        }}>
+                                            <TouchableOpacity style={{
+                                                width: deviceWidth - 40,
+                                                backgroundColor: '#fff', alignItems: 'center',
+                                                justifyContent: 'center',
+                                            }} onPress={() => navigation.navigate('PurchaseHistoryInfo', { route: item })}>
+                                                <View style={{
+                                                    width: deviceWidth - 40,
                                                     alignItems: 'center',
-
+                                                    justifyContent: 'space-between',
                                                     flexDirection: 'row',
                                                 }}>
-                                                <View
-                                                    style={{
-                                                        width: deviceWidth * 0.4,
-                                                        justifyContent: 'flex-start',
-                                                        height: deviceHeight * 0.1,
-                                                        alignItems: 'center',
-                                                        flexDirection: 'row',
-                                                    }}
-                                                >
-                                                    <Text style={styles.textLight} >
-                                                        X {item.TRANSTKD.map(obj => Number(obj.TRD_QTY))
-                                                            .reduce((accumulator, currentValue) => accumulator + currentValue, 0)} ชิ้น
-                                                    </Text>
+                                                    <Text style={styles.DI_REFCanceled} >{item.DOCINFO.DI_REF}</Text>
+
+
+                                                    <Text style={styles.textLight}>{safe_Format.dateFormat(item.DOCINFO.DI_DATE)}</Text>
                                                 </View>
-                                                <View
-                                                    style={{
-                                                        width: deviceWidth * 0.4,
-                                                        height: deviceHeight * 0.1,
-                                                        justifyContent: 'flex-end',
-                                                        alignItems: 'center',
-                                                        flexDirection: 'row',
-                                                    }}
-                                                >
+                                                <View style={{
+                                                    width: deviceWidth - 40,
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    flexDirection: 'row',
+                                                }}>
                                                     <Text style={styles.textLight} >
-                                                        {Language.t('history.orderList')}: ฿
-                                                    </Text>
+                                                        X {item.TRANSTKD.map((obj: any) => Number(obj.TRD_QTY))
+                                                            .reduce((accumulator: any, currentValue: any) => accumulator + currentValue, 0)} ชิ้น
 
-                                                    <Text style={styles.textLight}>
-                                                        {safe_Format.formatCurrency(item.TRANSTKD.TRD_K_U_PRC == '' ? 0 : item.TRANSTKD.map(obj => Number(obj.TRD_K_U_PRC * obj.TRD_QTY))
-                                                            .reduce((accumulator, currentValue) => accumulator + currentValue, 0))}
                                                     </Text>
+                                                    <View
+                                                        style={{
+                                                            width: deviceWidth * 0.4,
+                                                            justifyContent: 'flex-end',
+                                                            alignItems: 'center',
+                                                            flexDirection: 'row',
+                                                        }}
+                                                    >
+                                                        <Text style={styles.textLight} >
+                                                            {Language.t('history.orderList')}: ฿
+                                                        </Text>
+                                                        <Text style={styles.textLight}>
+                                                            {safe_Format.formatCurrency(item.TRANSTKD.TRD_K_U_PRC == '' ? 0 : item.TRANSTKD.map((obj: { TRD_K_U_PRC: number; TRD_QTY: number; }) => Number(obj.TRD_K_U_PRC * obj.TRD_QTY))
+                                                                .reduce((accumulator: any, currentValue: any) => accumulator + currentValue, 0))}
+                                                        </Text>
+                                                    </View>
                                                 </View>
 
-                                            </View>
-                                        </TouchableOpacity>
-                                    </View>
-                                </>
-                            )
-                        })}
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
+                                )
+                            })}
 
 
-                    </View>
-                </ScrollView>
+                        </View>
+                        {Loading && (
+                            <View
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    width: deviceWidth,
+                                    borderRadius: deviceWidth * 0.05,
+                                    padding: 50,
+                                }}>
+                                <View style={{
+                                    backgroundColor: Colors.borderColor,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    position: 'absolute',
+                                    height: FontSize.large * 2,
+                                    width: FontSize.large * 2,
+                                    borderRadius: FontSize.large,
+                                    opacity: 0.5,
 
-                {Loading && (<View
-                    style={{
+                                }}>
+                                    <ActivityIndicator animating={Loading} size={FontSize.large} color="#0288D1" />
+                                </View>
 
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        position: 'absolute',
-                        height: deviceHeight * 0.3,
-                        width: deviceWidth,
-                        borderRadius: deviceWidth * 0.05
-                    }}>
-                    <View style={{
-                        backgroundColor: Colors.borderColor,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        position: 'absolute',
-                        height: FontSize.large * 2,
-                        width: FontSize.large * 2,
-                        borderRadius: FontSize.large,
-                        opacity: 0.5,
+                            </View>
+                        )}
 
-                    }}>
-                        <ActivityIndicator animating={Loading} size={FontSize.large} color="#0288D1" />
-                    </View>
+                    </ScrollView>
+                )}
 
-                </View>)}
+
+
             </ >
+
         </View>
     )
 

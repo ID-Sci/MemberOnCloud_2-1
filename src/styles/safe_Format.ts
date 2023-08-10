@@ -30,7 +30,7 @@ export const dateFormat = (date: any) => {
     var x = new Date()
     var year = x.getFullYear()
     var inputyear = Number(date.substring(0, 4))
-    if (inputyear <= Number(x.getFullYear())) Language.getLang() == 'th' ? inputyear += 543 : inputyear
+    Language.getLang() == 'th' ? inputyear += 543 : inputyear
     return date.substring(6, 8) + ' ' + (Language.getLang() == 'th' ? months_th_mini[Number(date.substring(4, 6)) - 1] : months_en_mini[Number(date.substring(4, 6)) - 1]) + ' ' + inputyear
 }
 export const checkDate = (temp_date: any) => {

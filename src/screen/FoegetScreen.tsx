@@ -31,7 +31,6 @@ import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLogin
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
-import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
 import { Language } from '../translations/I18n';
 import RNRestart from 'react-native-restart';
@@ -85,21 +84,24 @@ const FoegetScreen = ({ route }: any) => {
             .then(async (json) => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
-
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => setGetNewpassword(true) }])
+                    setGetNewpassword(true)
+                    setloading(false)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setloading(false) }])
                 }
             })
             .catch((error) => {
 
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
                 console.log('ERROR ' + error);
             });
-        await setloading(false)
+
     }
     const LoginByMobile = async () => {
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -138,8 +140,12 @@ const FoegetScreen = ({ route }: any) => {
                     let responseData = JSON.parse(json.ResponseData);
                     SetPassword(responseData.MB_LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -184,17 +190,21 @@ const FoegetScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     getMemberInfo(LOGIN_GUID)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setloading(false) }])
                 }
             })
             .catch((error) => {
 
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
                 console.log('ERROR ' + error);
             });
-        await setloading(false)
+
     }
 
     const getMemberInfo = async (MB_LOGIN_GUID: any) => {
@@ -218,21 +228,25 @@ const FoegetScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID)) }])
-                    const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PASSWORD, logined: 'true' }
+                    await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
+                    const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
                     await RNRestart.restart()
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setloading(false) }])
                 }
             })
             .catch((error) => {
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
                 console.log('ERROR ' + error);
             });
+        await setloading(false)
     }
 
     const checkScreen = () => {
@@ -315,7 +329,7 @@ const FoegetScreen = ({ route }: any) => {
         return (
 
             <ScrollView>
-            
+
                 <View style={{ padding: deviceWidth * 0.05 }}>
 
                     <KeyboardAvoidingView behavior={'height'}>
@@ -324,7 +338,7 @@ const FoegetScreen = ({ route }: any) => {
                                 marginTop: deviceWidth * 0.05
                             }}>
                                 <Text style={styles.textLight}>
-                                    {Language.t('register.forgotPassword')}
+                                    {Language.t('register.secretPassword')}
                                 </Text>
                                 <View style={{
                                     backgroundColor: Colors.backgroundColorSecondary,
@@ -463,7 +477,7 @@ const FoegetScreen = ({ route }: any) => {
                         </ScrollView>
                     </KeyboardAvoidingView>
                 </View>
-                
+
             </ScrollView>
         )
     }

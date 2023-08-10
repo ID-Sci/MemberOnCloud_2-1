@@ -40,27 +40,23 @@ const TemppageScreen = ({ route }: any) => {
                 <View style={{
                     width: deviceWidth,
                     height: deviceHeight,
+                    backgroundColor: '#fff',
                 }}>
+                    <Image
+                        style={{
+                            height: deviceWidth / (5 / 3),
+                            width: (deviceWidth),
+
+                        }}
+                        source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
+                    />
                     <ScrollView
                         style={{
                             width: deviceWidth,
-                            height: deviceHeight,
-                            backgroundColor: '#fff',
                         }}>
                         < >
 
-                            <View
-                            >
-                                <Image
-                                    style={{
-                                        shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 2 },
-                                        shadowRadius: 2,
-                                        height: deviceHeight * 0.3,
-                                    }}
-                                    source={{ uri: `data:image/png;base64,${item.IMAGE64}` }}
-                                />
-                            </View>
+
                             <View
                                 style={{
                                     padding: deviceWidth * 0.1

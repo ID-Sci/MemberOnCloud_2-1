@@ -23,13 +23,15 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import { FontSize } from '../styles/FontSizeHelper';
 import FlatListProductScreen from '../components/FlatListProductScreen';
-
+import AbsoluteBasket from './AbsoluteBasket';
 import * as Keychain from 'react-native-keychain';
 import { config } from '../store/slices/configReducer';
 import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
 import { categorySelector, } from '../store/slices/categoryReducer';
 import { useAppSelector } from '../store/store';
 import { newproductSelector, } from '../store/slices/newproductReducer';
+import { basketSelector } from '../store/slices/basketReducer';
+
 import { styles } from '../styles/styles';
 import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
@@ -39,6 +41,7 @@ const ProductCategoryScreen = ({ route }: any) => {
     const navigation = useNavigation();
     const categoryList = useAppSelector(categorySelector)
     const newproductList = useAppSelector(newproductSelector)
+    const basketProduct = useAppSelector(basketSelector)
     const ConfigList = useAppSelector(config)
     const [product, setProduct] = useState([[]])
     const [category, setCategory] = useState(route.params.route)
@@ -81,8 +84,12 @@ const ProductCategoryScreen = ({ route }: any) => {
                         let responseData = JSON.parse(json.ResponseData);
                         setProduct(responseData.SHOWCONTENT)
                     } else {
-                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                            { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required'); 
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                      Language.t('alert.errorTitle'),
+                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                 })
                 .catch((error) => {
@@ -132,7 +139,7 @@ const ProductCategoryScreen = ({ route }: any) => {
                 </View>
 
 
-                {loading &&
+                {loading ?
                     <Modal
                         transparent={true}
                         animationType={'none'}
@@ -153,35 +160,37 @@ const ProductCategoryScreen = ({ route }: any) => {
                                     color={Colors.lightPrimiryColor} />
                             </View>
                         </View>
-                    </Modal>
-                }
-                <View style={{
-                    marginTop: FontSize.large * 2,
-                    height: deviceHeight - FontSize.large * 4,
-                }}>
+                    </Modal> :
+                    <View style={{
+                        marginTop: FontSize.large * 2,
+                        height: deviceHeight - FontSize.large * 4,
+                    }}>
 
-                    {product && product.length > 0 ? (
-                        <FlatListProductScreen route={product} />
-                    ) : !loading && (
-                        <View
-                            style={{
-                                height: deviceHeight - FontSize.large * 4,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}>
-                            <Image
-                                style={styles.iconmainObj}
-                                source={require('../img/empty-box-blue-icon.png')}
-                            />
-                            <Text style={styles.textLight_title}>
-                               {Language.t('menu.notFound')}
-                            </Text>
-                        </View>
-                    )}
-                </View>
+                        {product && product.length > 0 ? (
+                            <FlatListProductScreen backPage={'ProductCategory'} route={product} />
+                        ) : !loading && (
+                            <View
+                                style={{
+                                    height: deviceHeight - FontSize.large * 4,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}>
+                                <Image
+                                    style={styles.iconmainObj}
+                                    source={require('../img/empty-box-blue-icon.png')}
+                                />
+                                <Text style={styles.textLight_title}>
+                                    {Language.t('menu.notFound')}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                }
+
 
 
                 <FlatListCategoryDropdown route={{ CategoryItem: categoryList.categoryPage, ExtarItem: category }} onPressCategory={(item: any) => setCategory(item)} />
+                <AbsoluteBasket />
             </View>
         )
 

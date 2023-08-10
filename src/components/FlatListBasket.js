@@ -25,7 +25,7 @@ import { styles } from '../styles/styles';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
+export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument }) => {
     const navigation = useNavigation();
     const dispatch = useAppDispatch();
     const [amount, setAmount] = useState(0)
@@ -37,14 +37,15 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
     const [prepareDoc, setPrepareDoc] = useState(prepareDocument)
     const ConfigList = useAppSelector(config)
     const docinfoType = useAppSelector(docinfoSelector).docinfoPage[0].SHWPH_TTL_ECPTN
-
+    const PromotionType = useAppSelector(docinfoSelector).docinfoPage[1].SHWPH_TTL_CPTN
+    console.log(JSON.stringify(useAppSelector(docinfoSelector).docinfoPage))
     useEffect(() => {
         setData(items)
         setDataItem(itemsERP)
         setPrepareDoc(prepareDocument)
     }, [items]);
 
-
+    console.log(`PromotionType >> ${PromotionType}`)
     useEffect(() => {
         if (ConfigList.MB_LOGIN_GUID) {
 
@@ -141,8 +142,12 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     await dispatch(updateARcode(responseData.AR_CODE))
                     await calBasket(responseData.AR_CODE)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -188,6 +193,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                         VAT_DATE: DI_DATE,
                         AR_CODE: AR_CODE,
                         ARD_TDSC_KEYIN: '',
+                        PRMT_CODE: PromotionType,
                         DI_REMARK: 'MEMBER APP',
                     },
                     ImpTrhDetail: dataItem
@@ -218,8 +224,12 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.AROE.AROE_B_AMT)
                     await setAmount(responseData.AROE.AROE_B_AMT)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -255,8 +265,12 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
                         { text: Language.t('alert.confirm'), onPress: () => navigation.goBack() }])
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -283,6 +297,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                         VAT_DATE: DI_DATE,
                         AR_CODE: AR_CODE,
                         ARD_TDSC_KEYIN: '',
+                        PRMT_CODE: PromotionType,
                         DI_REMARK: 'MEMBER APP',
                     },
                     ImpTrhDetail: dataItem
@@ -313,8 +328,12 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.ARDETAIL.ARD_B_AMT)
                     await setAmount(responseData.ARDETAIL.ARD_B_AMT)
                 } else {
-                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
             })
             .catch((error) => {
@@ -345,7 +364,6 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             .then(async (json) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-
                     dispatch(updateBasket([]))
                     fetchData()
                     Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
@@ -539,7 +557,8 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
             return b.DI_DATE - a.DI_DATE;
         });
         for (var i in combinedArray) {
-            tempObj.push(await GetInvoiceDocinfo(combinedArray[i]))
+            if (OeKEY.DI_KEY)
+                tempObj.push(await GetInvoiceDocinfo(combinedArray[i]))
         }
 
 
@@ -576,6 +595,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                 console.log('ERROR ' + error);
             });
         return responseData
+
     }
     return (data &&
         (
@@ -637,7 +657,7 @@ export default FlatListBasket = ({ items, itemsERP, prepareDocument }) => {
                                             <>
                                                 <View style={{ padding: deviceWidth * 0.01 }}>
                                                     <TouchableOpacity style={styles.basket_bg_btn}
-                                                        onPress={() => navigation.navigate('ProductOrder', { route: item })}>
+                                                        onPress={() => navigation.navigate('ProductOrder', { backPage: backPage, backPageItem: data, route: item })}>
                                                         <View
                                                             style={styles.basket_img_view}>
                                                             {item.IMAGE64 == "" ? <Image

@@ -48,16 +48,16 @@ export default FlatListPromotion = ({ route }) => {
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
-                    height={deviceHeight * 0.4}
+               
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
                 >
                     {route.map((item, index) => {
-                        return (index < 10 &&
+                        return (
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
-                                    <TouchableOpacity style={{ marginBottom: deviceHeight * 0.2 }}
+                                    <TouchableOpacity style={{ marginBottom: deviceHeight * 0.05 }}
                                         onPress={() => navigation.navigate('Temppage', { name: 'กิจกรรม/ประชาสัมพันธ์', route: item })}>
 
                                         <Image

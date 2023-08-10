@@ -27,7 +27,7 @@ import { Language, changeLanguage } from '../translations/I18n';
 const deviceWidth = Dimensions.get('window').width;
 const deviceHeight = Dimensions.get('window').height;
 
-export default FlatListNewproduct = ({ route }) => {
+export default FlatListNewproduct = ({backPage, route }) => { 
     const navigation = useNavigation();
     return (route &&
         (
@@ -39,7 +39,7 @@ export default FlatListNewproduct = ({ route }) => {
                     </Text>
                     <TouchableOpacity
                         style={styles.menu_btn}
-                        onPress={() => navigation.navigate('Newproduct', { name: Language.t('product.newProduct'), route: route })}
+                        onPress={() => navigation.navigate('Newproduct', { backPage:'Newproduct', name: Language.t('product.newProduct'), route: route })}
                     >
                         <Text style={styles.menu_text_title}>
                             {Language.t('product.seeMore')}
@@ -49,7 +49,7 @@ export default FlatListNewproduct = ({ route }) => {
                 <ScrollView
                     paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
-                    height={deviceHeight * 0.4}
+           
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
@@ -60,7 +60,7 @@ export default FlatListNewproduct = ({ route }) => {
                             <>
                                 <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
                                     <TouchableOpacity style={styles.newproduct_bottom_shadow}
-                                        onPress={() => navigation.navigate('ProductOrder', { route: item })}>
+                                        onPress={() => navigation.navigate('ProductOrder', {  backPage: backPage, route: item })}>
 
                                         {item.IMAGE64 == "" ? <Image
                                             style={styles.product_Noimage}
@@ -106,6 +106,7 @@ export default FlatListNewproduct = ({ route }) => {
                     })}
 
                 </ScrollView>
+          
             </View>)
     )
 }
