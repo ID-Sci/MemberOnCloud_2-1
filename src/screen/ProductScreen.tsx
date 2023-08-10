@@ -53,7 +53,7 @@ const ProductScreen = ({ route }: any) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <FlatListProductScreen route={route.params.route} />
+                <FlatListProductScreen backPage={'Newproduct'} route={route.params.route} />
             </View>)
     )
 }
