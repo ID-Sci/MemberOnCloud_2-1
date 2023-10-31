@@ -24,11 +24,9 @@ import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import { Language, changeLanguage } from '../translations/I18n';
 import * as safe_Format from '../styles/safe_Format';
-import { styles } from '../styles/styles';
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-
+ 
 export default FlatListProductScreen = ({ backPage, name, route }) => {
     console.log(backPage)
     const navigation = useNavigation();

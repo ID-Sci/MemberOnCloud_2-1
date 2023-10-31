@@ -1,11 +1,30 @@
 import {
   StyleSheet,
   Dimensions,
+  StatusBar, Platform
 } from 'react-native'
 import Colors from './colors';
 import { FontSize } from './FontSizeHelper';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+
+
+const getStatusBarHeight = () => {
+  if (Platform.OS === 'android') {
+    // สำหรับ Android
+    return StatusBar.currentHeight;
+  } else if (Platform.OS === 'ios') {
+    // สำหรับ iOS
+    return 20; // ความสูงของ StatusBar ใน iOS (อาจต้องปรับแต่งตามรุ่นของอุปกรณ์)
+  } else {
+    // สำหรับระบบปฏิบัติการอื่น ๆ หรือแพลตฟอร์มอื่น ๆ
+    return 0; // ความสูงเริ่มต้นหากไม่รู้ขนาดของ StatusBar
+  }
+};
+
+// ใช้ฟังก์ชัน getStatusBarHeight() เพื่อรับความสูงของ StatusBar
+export const statusBarHeight = getStatusBarHeight();
+console.log('StatusBar Height:', statusBarHeight);
+export const deviceWidth = Dimensions.get('window').width;
+export const deviceHeight = Dimensions.get('window').height;
 const overlayColor = "rgba(0,0,0,0.5)"; // this gives us a black color with a 50% transparency
 
 const rectDimensions = deviceWidth * 0.65; // this is equivalent to 255 from a 393 device width
@@ -78,9 +97,9 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     width: deviceWidth,
+    paddingTop: statusBarHeight,
     paddingLeft: FontSize.large,
     paddingRight: FontSize.large,
-    height: FontSize.large * 2,
     backgroundColor: Colors.backgroundheader,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor
@@ -95,12 +114,12 @@ export const styles = StyleSheet.create({
     borderRadius: deviceWidth * 0.05
   },
   header_text_title: {
-    color: Colors.lightPrimiryColor,
+    color: Colors.buttonTextColor,
     fontFamily: 'Kanit-Bold',
     textAlign: 'center'
   },
   header_text_Xtitle: {
-    color: Colors.lightPrimiryColor,
+    color: Colors.buttonTextColor,
     fontFamily: 'Kanit-Bold',
     fontSize: FontSize.xlarge,
     textAlign: 'center'
@@ -152,8 +171,16 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Bold'
   },
   DI_REFCanceled: {
-    color: Colors.alert,
+    color: Colors.borderColor,
     fontFamily: 'Kanit-Bold'
+  },
+  Docinfo_Light: {
+    color: Colors.fontColor,
+    fontFamily: 'Kanit-Light'
+  },
+  Docinfo_Canceled: {
+    color: Colors.borderColor,
+    fontFamily: 'Kanit-Light'
   },
 
   textLightborder: {
@@ -218,6 +245,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center'
   },
   category_bottom_text_title: {
+    color: Colors.fontColor,
     fontFamily: 'Kanit-Light',
     textAlign: 'center'
   },
@@ -271,10 +299,10 @@ export const styles = StyleSheet.create({
       height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 3.84, 
     borderRadius: deviceWidth * 0.05,
     resizeMode: 'contain',
+    
   },
   androidButtonText: {
 
@@ -434,7 +462,8 @@ export const styles = StyleSheet.create({
     //padding: 16,
   },
   back_btn: {
-    padding: deviceWidth * 0.025,
+    paddingTop:statusBarHeight,
+    paddingRight: deviceWidth * 0.025,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',

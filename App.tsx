@@ -185,7 +185,7 @@ const App = (): JSX.Element => {
 
   return (
     <Provider store={store}>
-      <StatusBar hidden={true} />
+      <StatusBar translucent backgroundColor="transparent"  hidden={false} />
       <Navigator />
     </Provider>
 

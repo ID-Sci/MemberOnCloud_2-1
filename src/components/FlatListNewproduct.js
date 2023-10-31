@@ -18,15 +18,13 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
-import { styles } from '../styles/styles';
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import * as safe_Format from '../styles/safe_Format';
 import { Language, changeLanguage } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-
+ 
 export default FlatListNewproduct = ({backPage, route }) => { 
     const navigation = useNavigation();
     return (route &&
@@ -47,21 +45,19 @@ export default FlatListNewproduct = ({backPage, route }) => {
                     </TouchableOpacity>
                 </View>
                 <ScrollView
-                    paddingBottom={deviceWidth * 0.05}
                     horizontal={true}
-           
                     contentContainerStyle={{ paddingHorizontal: 20 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
+                 
                 >
                     {route.map((item, index) => {
 
                         return (index < 10 &&
                             <>
-                                <View style={{ paddingLeft: deviceWidth * 0.01, paddingRight: deviceWidth * 0.01 }}>
+                                <View style={{paddingRight: 10,paddingBottom:10 }}>
                                     <TouchableOpacity style={styles.newproduct_bottom_shadow}
                                         onPress={() => navigation.navigate('ProductOrder', {  backPage: backPage, route: item })}>
-
                                         {item.IMAGE64 == "" ? <Image
                                             style={styles.product_Noimage}
                                             source={require('../img/newproduct.png')}
@@ -97,8 +93,6 @@ export default FlatListNewproduct = ({backPage, route }) => {
                                                 </Text>
                                             </View>
                                         </View>
-
-
                                     </TouchableOpacity>
                                 </View>
                             </>

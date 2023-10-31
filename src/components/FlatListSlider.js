@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import {
     View,
     Text,
@@ -10,16 +10,19 @@ import {
 } from 'react-native';
 import { FlatListSlider } from 'react-native-flatlist-slider';
 import { useNavigation } from '@react-navigation/native';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 const images = []
 
 export default FlatSlider = ({ route }) => {
+    const [routeItem,setRouteItem] = useState(route)
+    useEffect(()=>{
+        setRouteItem(route)
+    },[route])
     const navigation = useNavigation();
     return (route ?
 
         <FlatListSlider
-            data={route}
+            data={routeItem}
             height={(deviceWidth) / (5 / 3)}
             timer={5000}
             onPress={(item) => navigation.navigate('Temppage', { name: 'banner', route: route[item] })}

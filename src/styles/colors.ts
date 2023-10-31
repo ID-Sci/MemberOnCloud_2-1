@@ -10,7 +10,7 @@ export default {
   backgroundLoginColor,
   backgroundLoginColorSecondary,
   primaryColor: "#03A9F4",
-  backgroundheader:"#EFFAFA",
+  backgroundheader:"#0077c2",
   lightPrimiryColor: "#80d6ff",
   darkPrimiryColor: "#0077c2",
   fontColor: "#292F39",

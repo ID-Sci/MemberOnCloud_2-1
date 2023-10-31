@@ -26,10 +26,8 @@ import FlatListPromotion from '../components/FlatListPromotion';
 import { Language, changeLanguage } from '../translations/I18n';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import RNRestart from 'react-native-restart';
-import * as Keychain from 'react-native-keychain';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import * as Keychain from 'react-native-keychain'; 
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const TemppageScreen = () => {
     const navigation = useNavigation()

@@ -25,11 +25,8 @@ import * as safe_Format from '../styles/safe_Format';
 import { newproductSelector } from '../store/slices/newproductReducer';
 import * as Keychain from 'react-native-keychain';
 import { Language, changeLanguage } from '../translations/I18n';
-import { styles } from '../styles/styles';
-import CurrencyInput from 'react-native-currency-input';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
+import CurrencyInput from 'react-native-currency-input'; 
 const PurchaseHistoryScreenInfo = ({ route }: any) => {
     const newproductList = useAppSelector(newproductSelector)
     const ConfigList = useAppSelector(config)
@@ -51,7 +48,7 @@ const PurchaseHistoryScreenInfo = ({ route }: any) => {
             style={{
                 backgroundColor: '#fff',
                 width: deviceWidth,
-                height: deviceHeight
+                height: deviceHeight+statusBarHeight
             }}
         >
             <View style={styles.header}>

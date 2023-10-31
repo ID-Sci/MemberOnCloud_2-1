@@ -30,10 +30,9 @@ import FlatListCategoryDropdown from '../components/FlatListCategoryDropdown';
 import AbsoluteBasket from './AbsoluteBasket'
 import { categorySelector, } from '../store/slices/categoryReducer';
 import { useAppSelector } from '../store/store';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
 import { newproductSelector, } from '../store/slices/newproductReducer';
-import { styles } from '../styles/styles';
+
 
 const ProductSearchScreen = ({ route }: any) => {
     const navigation = useNavigation();
@@ -41,22 +40,28 @@ const ProductSearchScreen = ({ route }: any) => {
     const categoryList = useAppSelector(categorySelector)
     const ConfigList = useAppSelector(config)
     const [GOODS_CODE, setGOODS_CODE] = useState('');
+ 
+ 
     const [product, setProduct] = useState(newproductList.allproductList)
     const [productState, setProductState] = useState(false)
     const [loading, setLoading] = useState(false)
     useEffect(() => {
         if (route.params?.post) {
             setGOODS_CODE(route.params.post)
-            setProductState(true)
+            
         }
+        setProductState(true)
     }, [route.params?.data]);
+    useEffect(() => {
+        setProduct(newproductList.allproductList) 
+    }, [newproductList.allproductList]);
 
     return (
         product && (
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight + statusBarHeight
                 }}>
                 <View
                     style={{
@@ -127,11 +132,11 @@ const ProductSearchScreen = ({ route }: any) => {
                 </View>
 
 
-                {loading &&
+                {loading || product.length == 0 &&
                     <Modal
                         transparent={true}
                         animationType={'none'}
-                        visible={loading}
+                        visible={true}
                         onRequestClose={() => { }}>
                         <View
                             style={{
@@ -151,7 +156,7 @@ const ProductSearchScreen = ({ route }: any) => {
                                     borderRadius: deviceWidth * 0.05
                                 }}>
                                 <ActivityIndicator
-                                    animating={loading}
+                                    animating={true}
                                     size="large"
                                     color={Colors.lightPrimiryColor} />
                             </View>
@@ -162,9 +167,9 @@ const ProductSearchScreen = ({ route }: any) => {
                     height: deviceHeight - FontSize.large * 3,
                 }}>
 
-                    {product && product.length > 0 && productState ? (
-                        <FlatListProductScreen backPage={'ProductSearch'} name={''} route={product.filter((filteritem: any) => { return filteritem.GOODS_CODE.includes(GOODS_CODE) || filteritem.SHWC_ALIAS.includes(GOODS_CODE) || filteritem.SHWC_EALIAS.includes(GOODS_CODE) })} />
-                    ) : !loading && productState && (
+                    {product &&  productState ? (
+                        <FlatListProductScreen backPage={'ProductSearch'} name={''} route={product.filter((filteritem: any) => { return filteritem.SHWC_CODE.includes(GOODS_CODE) || filteritem.SHWC_ALIAS.includes(GOODS_CODE) || filteritem.SHWC_EALIAS.includes(GOODS_CODE) })} />
+                    ) : !loading &&  productState && (
                         <View
                             style={{
                                 height: deviceHeight - FontSize.large * 4,
@@ -189,7 +194,7 @@ const ProductSearchScreen = ({ route }: any) => {
                         </View>
                     )}
                 </View>
-                <AbsoluteBasket/>
+                <AbsoluteBasket />
             </View>
         )
 

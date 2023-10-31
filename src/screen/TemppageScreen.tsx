@@ -23,11 +23,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 import FlatListPromotion from '../components/FlatListPromotion';
-import { BorderlessButton } from 'react-native-gesture-handler';
-import { styles } from '../styles/styles';
+import { BorderlessButton } from 'react-native-gesture-handler'; 
 import { Language } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const TemppageScreen = ({ route }: any) => {
     const navigation = useNavigation()
@@ -39,7 +37,7 @@ const TemppageScreen = ({ route }: any) => {
             <View style={{ alignItems: 'flex-end' }}>
                 <View style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                     backgroundColor: '#fff',
                 }}>
                     <Image

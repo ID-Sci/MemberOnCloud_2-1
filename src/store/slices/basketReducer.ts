@@ -3,15 +3,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 type authState = {
-   basketProduct:Array<[]>
-   basketProductERP:Array<[]>
-   item:Array<[]>
+   basketProduct: Array<[]>
+   basketProductERP: Array<[]>
+   item: Array<[]>
    prepareDocument: Object
 }
 
 const initialState: authState = {
-   basketProduct:[],
-   basketProductERP:[],
+   basketProduct: [],
+   basketProductERP: [],
    item: [],
    prepareDocument: {},
 }
@@ -28,15 +28,16 @@ export const basketSlice = createSlice({
       },
       updateBasket: (state: authState, action: PayloadAction<any>) => {
          state.basketProduct = action.payload;
-         const newData = action.payload.map((object : any) => {
+         const newData = action.payload.map((object: any) => {
             return {
                KEY: object.KEY,
                TRD_KEYIN: object.GOODS_CODE,
                TRD_QTY: object.QTY,
+               TRD_NX_QTY: object.QTY,
                TRD_K_U_PRC: object.SPCLARPLU_U_PRC,
                TRD_Q_FREE: '',
-               TRD_DSC_KEYIN:''
-           }
+               TRD_DSC_KEYIN: ''
+            }
          })
          state.basketProductERP = newData
       },

@@ -26,8 +26,7 @@ import { FontSize } from '../styles/FontSizeHelper';
 import * as Keychain from 'react-native-keychain';
 import { useAppSelector } from '../store/store';
 import { basketSelector } from '../store/slices/basketReducer';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const IconBasketTab = (focused: any) => {
     const basketProduct = useAppSelector(basketSelector)

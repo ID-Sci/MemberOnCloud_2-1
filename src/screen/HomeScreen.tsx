@@ -22,7 +22,6 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 import { FontSize } from '../styles/FontSizeHelper';
 import FlatSlider from '../components/FlatListSlider';
 import FlatListCategory from '../components/FlatListCategory';
@@ -35,7 +34,7 @@ import * as Keychain from 'react-native-keychain';
 
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
+import { config, updateARcode, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import { newproductSelector } from '../store/slices/newproductReducer';
 import { docinfoSelector, updateDocinfoList, clearDocinfoList, updateDocinfoPage, clearDocinfoPage } from '../store/slices/docinfoReducer';
 import { projSelector, updateProjList, clearProjList } from '../store/slices/projReducer';
@@ -48,14 +47,14 @@ import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, cl
 import { newproductSlice, updateNewproductList, updateAllproductList, clearAllproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { Language, changeLanguage } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-let images: Array<[]> = []
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
+import RNFetchBlob from 'rn-fetch-blob';
+
 let CState = true
 const HomeScreen = ({ route }: any) => {
-    const [product, setProduct] = useState([])
     const navigation = useNavigation();
 
+    const projList = useAppSelector(projSelector)
     const categoryList = useAppSelector(categorySelector)
     const promotionList = useAppSelector(promotionSelector)
     const bannerList = useAppSelector(bannerSelector)
@@ -64,11 +63,21 @@ const HomeScreen = ({ route }: any) => {
     const notificationList = useAppSelector(notificationSelector)
     const ConfigList = useAppSelector(config)
     const [OnScrollIndex, setOnScrollIndex] = useState(0)
+    const [bannerData, setBannerData] = useState(bannerList.bannerPage)
+    const [categoryData, setCategoryData] = useState(categoryList.categoryPage)
+    const [promotionData, setPromotionData] = useState(promotionList.promotionPage)
+    const [newproductData, setNewproductData] = useState(newproductList.newproductContent)
+    const [activityData, setActivityData] = useState(activityList.activityPage)
+    const [notificationData, setNotificationData] = useState(notificationList.notificationPage)
+
     const [notivalue, setNotivalue] = useState(AsyncStorage.getItem('noti') == null ? '0' : AsyncStorage.getItem('noti'))
     const [headerShown, setHeaderShown] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [timeLeft, setTimeLeft] = useState(60);
+    const [product, setProduct] = useState(newproductList.allproductList)
+    let ProducrALL: any[] = []
     const scrolling = useRef(new Animated.Value(0)).current;
+    let CState = true
     const translation = scrolling.interpolate({
         inputRange: [0, 80],
         outputRange: [-100, 0],
@@ -79,7 +88,10 @@ const HomeScreen = ({ route }: any) => {
     useEffect(() => {
         getNotiData()
     }, [])
-
+    useEffect(() => {
+        FetchDataProject()
+        getItemImage()
+    }, [])
     useEffect(() => {
 
         const intervalId = setInterval(() => {
@@ -89,11 +101,184 @@ const HomeScreen = ({ route }: any) => {
             clearInterval(intervalId);
         }
     })
+    const getItemImage = async () => {
+        await Promise.allSettled([
+            // setBannerImage(),
+            setCategoryImage(),
+            setPromotionImage(),
+            setActivityImage(),
+            setNewproductImage(),
+            setNotificationImage(),
+            setProductImage()
+        ])
+    }
+    // const setBannerImage = async () => {
+    //     let tempBannerData = [];
+    //     for (var i in bannerData) {
+    //         const updatedBanner = { ...bannerData[i], IMAGE64: await getImagefile('ShowPage', bannerData[i]) };
+    //         tempBannerData.push(updatedBanner);
+    //     }
+    //     setBannerData(tempBannerData);
+    // }
+    const setCategoryImage = async () => {
+        let tempCategoryData: any[] = [];
+        const settledPromises = await Promise.allSettled(categoryData.map(async (categoryItem) => {
+            try {
+                const IMAGE64 = await getImagefile('ShowPage', categoryItem);
+                return { ...categoryItem, IMAGE64 };
+            } catch (error) {
+                return { ...categoryItem, IMAGE64: null, error: error.message };
+            }
+        }));
+        
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempCategoryData.push(result.value);
+            } else {
+                console.error(`Error fetching IMAGE64 for categoryData ${index}:`, result.reason);
+            }
+        });
+        
+        setCategoryData(tempCategoryData);
+        
+    }
+    const setPromotionImage = async () => {
+        let tempPromotionData: any[] = [];
+        const settledPromises = await Promise.allSettled(promotionData.map(async (promotionItem) => {
+            try {
+                const IMAGE64 = await getImagefile('ShowPage', promotionItem);
+                return { ...promotionItem, IMAGE64 };
+            } catch (error) {
+                return { ...promotionItem, IMAGE64: null, error: error.message };
+            }
+        }));
+        
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempPromotionData.push(result.value);
+            } else {
+                console.error(`Error fetching IMAGE64 for promotionData ${index}:`, result.reason);
+            }
+        });
+        
+        setPromotionData(tempPromotionData);
+        dispatch(updatePromotionPage(tempPromotionData));
+        
+    }
+    const setActivityImage = async () => {
+        let tempActivityData: any[] = [];
+        const settledPromises = await Promise.allSettled(activityData.map(async (activityItem) => {
+            const IMAGE64 = await getImagefile('ShowPage', activityItem);
+            return { ...activityItem, IMAGE64 };
+        }));
+        
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempActivityData.push(result.value);
+            } else {
+                console.error(`Error fetching IMAGE64 for activityData ${index}:`, result.reason);
+            }
+        });
+        
+        setActivityData(tempActivityData);
+        
+    }
+    const setNewproductImage = async () => {
+        let tempNewproductData: any[] = [];
+        const settledPromises = await Promise.allSettled(newproductData.map(async (newproductItem) => {
+            const IMAGE64 = await getImagefile('ShowContent', newproductItem);
+            return { ...newproductItem, IMAGE64 };
+        }));
+        
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempNewproductData.push(result.value);
+            } else {
+                console.error(`Error fetching IMAGE64 for newproductData ${index}:`, result.reason);
+            }
+        });
+        
+        setNewproductData(tempNewproductData);
+        
+    }
+    const setNotificationImage = async () => {
+        let tempNotificationData: any[] = [];
+        const settledPromises = await Promise.allSettled(notificationData.map(async (notificationItem) => {
+            const IMAGE64 = await getImagefile('ShowPage', notificationItem);
+            return { ...notificationItem, IMAGE64 };
+        }));
+        
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempNotificationData.push(result.value);
+            } else {
+                console.error(`Error fetching IMAGE64 for notificationData ${index}:`, result.reason);
+            }
+        });
+        
+        setNotificationData(tempNotificationData);
+    }
+    const setProductImage = async () => {
+        let tempProduct: any = [];
+        const settledPromises = await Promise.allSettled(product.map(async (productItem) => {
+            const IMAGE64 = await getImagefile('ShowContent', productItem);
+            return { ...productItem, IMAGE64 };
+        }));
+
+
+        settledPromises.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+                tempProduct.push(result.value);
+            } else {
+
+                console.error(`Error fetching IMAGE64 for product ${index}:`, result.reason);
+            }
+        });
+        await dispatch(updateAllproductList(tempProduct));
+    }
+
+    const getImagefile = async (FilePath: string, item: any) => {
+        try {
+            const checkLoginToken = await Keychain.getGenericPassword();
+            const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null;
+            if (!configToken) {
+                throw new Error("Config token not found.");
+            }
+            let temp_res = ""
+            let Parameter = {}
+            if (FilePath == 'ShowPage') {
+                Parameter = {
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                    FilePath: 'ShowPage',
+                    FileName: item.SHWPH_GUID,
+                }
+            } else if (FilePath == 'ShowContent') {
+                Parameter = {
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                    FilePath: 'ShowContent',
+                    FileName: item.SHWC_GUID,
+                }
+            }
+
+            await RNFetchBlob.fetch('GET', configToken.WebService + '/DownloadFile', Parameter).then((res) => {
+                temp_res = res.data;
+            });
+
+
+            return temp_res
+        } catch (error) {
+            console.error("Error while fetching image:", error);
+            return null; // Handle the error gracefully in your application
+        }
+    }
 
     const decrementClock = async () => {
-        if (timeLeft === 0) {
+        if (timeLeft === 0 && !refreshing) {
             await setTimeLeft(60);
-            await getProJ()
+            if (CState)
+                await FetchDataProject()
         } else {
             await setTimeLeft(timeLeft - 1);
         }
@@ -112,10 +297,10 @@ const HomeScreen = ({ route }: any) => {
 
     }
     const setNotiData = async () => {
-        console.log(notificationList.notificationPage.length.toString())
-        await AsyncStorage.setItem('noti', notificationList.notificationPage.length.toString())
-        await setNotivalue(notificationList.notificationPage.length.toString())
-        await navigation.navigate('ShowTemppage' as never, { name: Language.t('notiAlert.header'), route: notificationList.notificationPage } as never)
+        console.log(notificationData.length.toString())
+        await AsyncStorage.setItem('noti', notificationData.length.toString())
+        await setNotivalue(notificationData.length.toString())
+        await navigation.navigate('ShowTemppage' as never, { name: Language.t('notiAlert.header'), route: notificationData } as never)
     }
     const getProducrCategory = async (item: any) => {
         navigation.navigate('ProductCategory' as never, { name: Language.t('product.category'), route: item } as never)
@@ -123,236 +308,20 @@ const HomeScreen = ({ route }: any) => {
 
     const onRefresh = async () => {
         await setRefreshing(true);
-        await getProJ()
+        await setTimeLeft(60);
+        if (CState)
+            await FetchDataProject()
+
+        await setRefreshing(false);
         await getNotiData()
         console.log(`reloade completed`)
 
-        await setRefreshing(false);
     };
 
-    const getLoginMbUsers = async () => {
-        console.log(`LoginByMobile`)
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        await fetch(configToken.WebService + '/MbUsers', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'LoginByMobile',
-                'BPAPUS-PARAM': '{"MB_CNTRY_CODE": "66", "MB_REG_MOBILE": "' +
-                    configToken.Phone +
-                    '","MB_PW": "' +
-                    configToken.MB_PW +
-                    '"}',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json)
-                if (json.ResponseCode == 200) {
-                    let responseData = JSON.parse(json.ResponseData);
-                    await getMemberInfo(responseData.MB_LOGIN_GUID)
-                } else {
-                    const NewKey = { ...configToken, logined: 'false' }
-                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                }
-            })
-            .catch(async (error) => {
-                const NewKey = { ...configToken, logined: 'false' }
-                await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                console.log('ERROR ' + error);
-            })
-    }
-
-    const getMemberInfo = async (MB_LOGIN_GUID: any) => {
-        console.log(`getProJ [Ec000400]`)
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        await fetch(configToken.WebService + '/Member', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'ShowMemberInfo',
-                'BPAPUS-PARAM':
-                    '{ "MB_LOGIN_GUID": "' + MB_LOGIN_GUID + '"}',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json)
-                if (json.ResponseCode == 200) {
-                    let responseData = JSON.parse(json.ResponseData);
-                    await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
-                    const NewKey = { ...configToken, Phone: configToken.Phone, MB_PW: configToken.MB_PW, logined: 'true' }
-                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                } else if (json.ResponseCode == 610) RNRestart.restart()
-                else {
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
-                }
-            })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-                console.log('ERROR ' + error);
-            })
-
-    }
-
-    const getProJ = async () => {
-        console.log(`getProJ [Ec000400]`)
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        await setTimeLeft(60);
-        await fetch(configToken.WebService + '/ECommerce', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'Ec000400',
-                'BPAPUS-PARAM': '',
-                'BPAPUS-FILTER': "AND SHWJH_CODE='MEMBER ON CLOUD' ",
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0'
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json.ReasonString)
-                if (json.ResponseCode == 200) {
-                    let responseData = JSON.parse(json.ResponseData);
-
-                    if (responseData.Ec000400.length > 0) {
-                        console.log(responseData.Ec000400[0])
-                        await dispatch(updateProjList(responseData.Ec000400[0]))
-                        await FetchDataProject(responseData.Ec000400[0])
-                        if (configToken.logined == 'true') {
-                            await getLoginMbUsers()
-                        }
-                    } else {
-                        CState = false
-
-
-                        console.log('Function Parameter Required');
-                        let temp_error = 'error_ser.' + json.ResponseCode;
-                        console.log('>> ', temp_error)
-                        Alert.alert(
-                            Language.t('alert.errorTitle'),
-                            Language.t('error_ser.projectnotfound'), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
-                    }
-                } else if (json.ResponseCode == 610) RNRestart.restart()
-                else {
-                    CState = false
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
-                }
-            })
-            .catch((error) => {
-                CState = false
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
-                console.log('ERROR ' + error);
-            })
-        await setnotiItem()
-
-    }
-
-    const FetchDataProject = async (ProjList: any) => {
+    const FetchDataProject = async () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`FetchDataProject`)
-        await fetch(configToken.WebService + '/ECommerce', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'GetProject',
-                'BPAPUS-PARAM':
-                    '{"SHWJ_GUID": "' +
-                    ProjList.SHWJH_GUID +
-                    '","SHWJ_IMAGE": "Y", "SHWL_IMAGE": "Y"}',
-                'BPAPUS-FILTER': '',
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json.ReasonString)
-                if (json.ResponseCode == 200) {
-                    let tempArray = [];
-                    let responseData = JSON.parse(json.ResponseData);
-                    console.log(`\n\rresponseData.SHOWLAYOUT [${responseData.SHOWLAYOUT.length}]`)
-
-                    let Banner = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('BANNER') })[0]
-                    console.log(`\nBanner [${Banner ? true : false}]\n +> `)
-                    Banner && await fetchLayoutData('Banner', Banner)
-
-                    let Notication = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NOTI') })[0]
-                    console.log(`\nNotication [${Notication ? true : false}]\n +> `)
-                    Notication && await fetchLayoutData('Notication', Notication)
-
-                    let Category = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('CATEGORY') })[0]
-                    console.log(`\nCategory [${Category ? true : false}]\n +>`)
-                    Category && await fetchLayoutData('Category', Category)
-
-                    let Promotion = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('PROMOTION') })[0]
-                    console.log(`\nPromotion [${Promotion ? true : false}]\n +> `)
-                    Promotion && await fetchLayoutData('Promotion', Promotion)
-
-                    let Newproduct = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NEWPRODUCT') })[0]
-                    console.log(`\nPromotion [${Newproduct ? true : false}]\n +> `)
-                    Newproduct && await fetchLayoutData('Newproduct', Newproduct)
-
-                    let Activity = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('ACTIVITY') })[0]
-                    console.log(`\nActivity [${Activity ? true : false}]\n +> `)
-                    Activity && await fetchLayoutData('Activity', Activity)
-
-                    let Mycard = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('MYCARD') })[0]
-                    console.log(`\nMycard [${Mycard ? true : false}]\n +> `)
-                    Mycard && await fetchLayoutData('Mycard', Mycard)
-
-                    let Docinfo = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('DOCINFO') })[0]
-                    console.log(`\nDocinfo [${Docinfo ? true : false}]\n +> `)
-                    Docinfo && await fetchLayoutData('Docinfo', Docinfo)
-                } else if (json.ResponseCode == 610) RNRestart.restart()
-                else {
-                    CState = false
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
-                }
-
-            })
-            .catch((error) => {
-                console.error('FetchDataProject >> ' + error);
-                CState = false
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
-
-            })
-    }
-
-    const fetchLayoutData = async (LayoutKey: String, LayoutList: any) => {
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchLayoutData ${LayoutKey}`)
         let fullDay: any = ''
         try {
             const response = await fetch(configToken.WebService + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
@@ -374,8 +343,99 @@ const HomeScreen = ({ route }: any) => {
 
         }
         console.log(`fullDay >> ${fullDay}`)
+        await fetch(configToken.WebService + '/ECommerce', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'GetProject',
+                'BPAPUS-PARAM':
+                    '{"SHWJ_GUID": "' +
+                    projList.projList.SHWJH_GUID +
+                    '","SHWJ_IMAGE": "Y", "SHWL_IMAGE": "Y"}',
+                'BPAPUS-FILTER': '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json.ReasonString)
+                if (json.ResponseCode == 200) {
+                    let tempArray = [];
+                    let responseData = JSON.parse(json.ResponseData);
+                    console.log(`\n\rresponseData.SHOWLAYOUT [${responseData.SHOWLAYOUT.length}]`)
+                    let temp_data = {
+                        BANNER: null,
+                        NOTI: null,
+                        CATEGORY: null,
+                        PROMOTION: null,
+                        NEWPRODUCT: null,
+                        ACTIVITY: null,
+                        MYCARD: null,
+                        DOCINFO: null,
 
+                    }
+                    for (const iterator of responseData.SHOWLAYOUT) {
+                        let SHWLH_CODE = iterator.SHWLH_CODE
+                        if (SHWLH_CODE.includes('BANNER')) {
+                            temp_data.BANNER = iterator
+                        } else if (SHWLH_CODE.includes('NOTI')) {
+                            temp_data.NOTI = iterator
+                        } else if (SHWLH_CODE.includes('CATEGORY')) {
+                            temp_data.CATEGORY = iterator
+                        } else if (SHWLH_CODE.includes('PROMOTION')) {
+                            temp_data.PROMOTION = iterator
+                        } else if (SHWLH_CODE.includes('NEWPRODUCT')) {
+                            temp_data.NEWPRODUCT = iterator
+                        } else if (SHWLH_CODE.includes('ACTIVITY')) {
+                            temp_data.ACTIVITY = iterator
+                        } else if (SHWLH_CODE.includes('MYCARD')) {
+                            temp_data.MYCARD = iterator
+                        } else if (SHWLH_CODE.includes('DOCINFO')) {
+                            temp_data.DOCINFO = iterator
+                        }
+                    }
+                    await Promise.allSettled([
+                        // fetchLayoutData('Banner',  temp_data.BANNER, fullDay),
+                        fetchLayoutData('Notication', temp_data.NOTI, fullDay),
+                        fetchLayoutData('Category', temp_data.CATEGORY, fullDay),
+                        fetchLayoutData('Promotion', temp_data.PROMOTION, fullDay),
+                        fetchLayoutData('Newproduct', temp_data.NEWPRODUCT, fullDay),
+                        fetchLayoutData('Activity', temp_data.ACTIVITY, fullDay),
+                        fetchLayoutData('Mycard', temp_data.MYCARD, fullDay),
+                        fetchLayoutData('Docinfo', temp_data.DOCINFO, fullDay),
+                    ])
+
+                } else if (json.ResponseCode == 610) RNRestart.restart()
+                else {
+                    CState = false
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }])
+                }
+
+            })
+            .catch((error) => {
+                console.error('FetchDataProject >> ' + error);
+                CState = false
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+
+            })
+    }
+
+    const fetchLayoutData = async (LayoutKey: String, LayoutList: any, fullDay: any) => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`fetchLayoutData ${LayoutKey}`)
+
+
+
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -397,37 +457,36 @@ const HomeScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     if (LayoutKey == 'Banner') {
-                        await responseData.SHOWPAGE.sort((a: any, b: any) => {
+                        dispatch(updateBannerList(responseData.SHOWLAYOUT))
+                        await fetchPageiItem(LayoutKey, responseData.SHOWPAGE.sort((a: any, b: any) => {
                             return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        }).map((Banneritem: any) => {
-                            let objImage: any = {
-                                image: `data:image/png;base64,${Banneritem.IMAGE64}`
-                            }
-                            images.push(objImage)
-                        })
-                        await dispatch(updateBannerList(responseData.SHOWLAYOUT))
-                        await dispatch(updateBannerPage(responseData.SHOWPAGE))
+                        }), fullDay)
                     }
-                    if (LayoutKey == 'Notication') {
-                        await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
-                        await dispatch(updateNotificationPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        })))
-                    }
-                    if (LayoutKey == 'Category') {
-                        await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
-                        let tempdata = await getProducrALLCategory(responseData.SHOWPAGE)
 
-                        await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
-                            return a.GOODS_CODE - b.GOODS_CODE;
-                        })))
+                    if (LayoutKey == 'Category') {
+
+                        await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
+                        ProducrALL = await getProducrALLCategory(responseData.SHOWPAGE)
                         let tempCPTNC = await getPageProJ(responseData.SHOWPAGE)
+                        await setCategoryData(tempCPTNC)
                         await dispatch(updateCategoryPage(tempCPTNC))
 
                     }
+                    if (LayoutKey == 'Activity') {
+                        await dispatch(updateActivityList(responseData.SHOWLAYOUT))
+                        await setActivityData(responseData.SHOWPAGE)
+                        await dispatch(updateActivityPage(responseData.SHOWPAGE))
+                    }
+
+                    if (LayoutKey == 'Newproduct') {
+                        await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
+                        await dispatch(updateNewproductPage(responseData.SHOWPAGE))
+                        await fetchNewproductContent('Newproduct', responseData.SHOWPAGE[0])
+                    }
+
                     if (LayoutKey == 'Docinfo') {
                         await dispatch(updateDocinfoList(responseData.SHOWLAYOUT))
-                        await dispatch(updateDocinfoPage(responseData.SHOWPAGE))
+                        await dispatch(updateDocinfoPage(await fetchDocType(responseData.SHOWPAGE)))
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
@@ -437,20 +496,17 @@ const HomeScreen = ({ route }: any) => {
                         }), fullDay)
 
                     }
-                    if (LayoutKey == 'Activity') {
-                        await dispatch(updateActivityList(responseData.SHOWLAYOUT))
-                        await dispatch(updateActivityPage(responseData.SHOWPAGE))
+
+                    if (LayoutKey == 'Notication') {
+                        await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
+                        await fetchPageiItem(LayoutKey, responseData.SHOWPAGE.sort((a: any, b: any) => {
+                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                        }), fullDay)
                     }
                     if (LayoutKey == 'Mycard') {
                         await dispatch(updateMycardList(responseData.SHOWLAYOUT))
                         await dispatch(updateMycardPage(responseData.SHOWPAGE))
                     }
-                    if (LayoutKey == 'Newproduct') {
-                        await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
-                        await dispatch(updateNewproductPage(responseData.SHOWPAGE))
-                        await fetchNewproductContent('Newproduct', responseData.SHOWPAGE[0])
-                    }
-
                     //    console.log(responseData)
                 } else if (json.ResponseCode == 610) RNRestart.restart()
                 else {
@@ -471,7 +527,47 @@ const HomeScreen = ({ route }: any) => {
 
             })
     }
+    const fetchDocType = async (SHOWLAYOUT: any) => {
+        console.log(`fetchDocType SHOWLAYOUT >.${JSON.stringify(SHOWLAYOUT)}`)
+        let LAYOUTDATA = SHOWLAYOUT
+        let DT_DOCCODE = SHOWLAYOUT[0].SHWPH_TTL_ECPTN
 
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+
+        await fetch(configToken.WebService + '/LookupErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'Dc000110',
+                'BPAPUS-PARAM': '',
+                'BPAPUS-FILTER': `AND(DT_DOCCODE = '${DT_DOCCODE}')`,
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json.ReasonString)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    responseData.Dc000110[0].SHWPH_TTL_CPTN = LAYOUTDATA[0].SHWPH_TTL_CPTN
+                    LAYOUTDATA[0] = responseData.Dc000110[0]
+
+                } else {
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                console.log('ERROR ' + error);
+            })
+        return LAYOUTDATA
+    }
     const fetchNewproductContent = async (PageKey: String, PageList: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -498,6 +594,15 @@ const HomeScreen = ({ route }: any) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     if (PageKey == 'Newproduct') {
+                        await setNewproductData(responseData.SHOWCONTENT)
+                        ProducrALL = [...ProducrALL, ...responseData.SHOWCONTENT]
+                        await dispatch(updateAllproductList(ProducrALL.reduce((uniqueArray, item) => {
+                            const isUnique = !uniqueArray.some((existingItem: any) => existingItem.SHWC_ALIAS === item.SHWC_ALIAS);
+                            if (isUnique) {
+                                uniqueArray.push(item);
+                            }
+                            return uniqueArray;
+                        }, [])))
                         await dispatch(updateNewproductContent(responseData.SHOWCONTENT))
                     } else if (PageKey == 'Category') {
                         return responseData.SHOWCONTENT[0]
@@ -552,10 +657,10 @@ const HomeScreen = ({ route }: any) => {
                 .then(async (json) => {
                     if (json.ResponseCode == 200) {
                         let responseData = JSON.parse(json.ResponseData);
-                        if (responseData.SHOWPAGE) {
-                            console.log(`${fullDay} => ${responseData.SHOWPAGE.SHWPH_FROM_DATE} && ${responseData.SHOWPAGE.SHWPH_TO_DATE} <= ${fullDay}`)
+
+                        if (responseData.SHOWPAGE.SHWPH_FROM_DATE <= fullDay && fullDay <= responseData.SHOWPAGE.SHWPH_TO_DATE)
                             await SHOWPAGE.push(responseData.SHOWPAGE)
-                        }
+
                     } else {
                         CState = false
                         console.log('Function Parameter Required');
@@ -578,10 +683,15 @@ const HomeScreen = ({ route }: any) => {
 
 
         }
-        if (PageKey == 'Promotion') {
-            await dispatch(updatePromotionPage(SHOWPAGE.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })))
-        } else if (PageKey == 'Category') {
-
+        if (PageKey == 'Promotion' && SHOWPAGE != null) {
+            await setPromotionData(SHOWPAGE)
+            await dispatch(updatePromotionPage(SHOWPAGE))
+        } else if (PageKey == 'Banner' && SHOWPAGE != null) {
+            await setBannerData(SHOWPAGE)
+            await dispatch(updateBannerPage(SHOWPAGE))
+        } else if (PageKey == 'Notication' && SHOWPAGE != null) {
+            await setNotificationData(SHOWPAGE)
+            await dispatch(updateNotificationPage(SHOWPAGE))
         }
     }
     const getProducrALLCategory = async (categoryList: any,) => {
@@ -602,7 +712,7 @@ const HomeScreen = ({ route }: any) => {
                         categoryList[r].SHWPH_GUID +
                         '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
                     'BPAPUS-FILTER': '',
-                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-ORDERBY': 'ORDER BY SHWPH_KEY DESC',
                     'BPAPUS-OFFSET': '0',
                     'BPAPUS-FETCH': '0',
                 }),
@@ -668,7 +778,6 @@ const HomeScreen = ({ route }: any) => {
                     if (json.ResponseCode == 200) {
                         let responseData = JSON.parse(json.ResponseData);
                         if (responseData.SHOWPAGE) {
-                            console.log(`responseData > ${responseData.SHOWPAGE}`)
                             tempProductList.push(responseData.SHOWPAGE)
 
                         }
@@ -722,7 +831,7 @@ const HomeScreen = ({ route }: any) => {
                     bounces={false}
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}
-                    style={{ height: deviceHeight }}
+                    style={{ height: deviceHeight + statusBarHeight }}
 
                     onScroll={Animated.event(
                         [{
@@ -737,17 +846,17 @@ const HomeScreen = ({ route }: any) => {
                         { useNativeDriver: true }
                     )} >
                     <View >
-                        <FlatSlider route={bannerList.bannerPage} />
+                        <FlatSlider route={bannerData} />
                     </View>
                     <>
-                        <FlatListCategory route={categoryList.categoryPage} onPressCategory={(item: any) => getProducrCategory(item)} />
-                        <FlatListPromotion route={promotionList.promotionPage} />
-                        <FlatListNewproduct backPage={'Home'} route={newproductList.newproductContent} />
-                        <FlatListActivity route={activityList.activityPage} />
+                        <FlatListCategory route={categoryData} onPressCategory={(item: any) => getProducrCategory(item)} />
+                        <FlatListPromotion route={promotionData} />
+                        <FlatListNewproduct backPage={'Home'} route={newproductData} />
+                        <FlatListActivity route={activityData} />
                     </>
 
                 </Animated.ScrollView>
-                {refreshing && (<View
+                {/* {refreshing && (<View
                     style={{
 
                         display: 'flex',
@@ -775,7 +884,7 @@ const HomeScreen = ({ route }: any) => {
                         <ActivityIndicator animating={refreshing} size={FontSize.large} color="#0288D1" />
                     </View>
 
-                </View>)}
+                </View>)} */}
             </View>
             <Animated.View
                 style={{
@@ -783,8 +892,7 @@ const HomeScreen = ({ route }: any) => {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: 70,
-
+                    height: statusBarHeight * 2.2 + FontSize.large,
                     backgroundColor: Colors.buttonTextColor,
                     opacity: scrolling,
                     transform: [
@@ -796,8 +904,8 @@ const HomeScreen = ({ route }: any) => {
             <View style={{
                 width: deviceWidth,
 
-                paddingTop: deviceWidth * 0.03,
-                paddingBottom: deviceWidth * 0.03,
+                paddingTop: statusBarHeight,
+                paddingBottom: deviceWidth * 0.1,
                 paddingLeft: deviceWidth * 0.03,
                 paddingRight: deviceWidth * 0.03,
                 alignItems: 'center',
@@ -820,7 +928,7 @@ const HomeScreen = ({ route }: any) => {
 
                     elevation: 5,
                 }}
-                    onPress={() => navigation.navigate('ProductSearch' as never, { name: Language.t('menu.search') } as never)}
+                    onPress={() => navigation.navigate('ProductSearch' as never, { route: 'ProductSearch' } as never)}
                 >
                     <View style={{ padding: 10 }}  >
                         <Image
@@ -855,13 +963,11 @@ const HomeScreen = ({ route }: any) => {
                                 }}
                             />
                         </View>
-
                     </View>
                 </TouchableOpacity>
                 <View style={{
                     width: deviceWidth * 0.1
                 }}>
-
                     <TouchableOpacity style={{
                         shadowColor: "#000",
                         shadowOffset: {
@@ -883,7 +989,7 @@ const HomeScreen = ({ route }: any) => {
                                 resizeMode: 'contain',
                             }}
                         />
-                        {(notificationList.notificationPage.length - Number(notivalue)) > 0 && (
+                        {(notificationData.length - Number(notivalue)) > 0 && (
                             <View style={{
                                 width: FontSize.large,
                                 height: FontSize.large,
@@ -900,7 +1006,7 @@ const HomeScreen = ({ route }: any) => {
                                     fontFamily: 'Kanit',
                                     fontWeight: 'bold'
                                 }}>
-                                    {notificationList.notificationPage.length - Number(notivalue)}
+                                    {notificationData.length - Number(notivalue)}
                                 </Text>
                             </View>
                         )}
@@ -913,115 +1019,5 @@ const HomeScreen = ({ route }: any) => {
 
 
 
-
-const styles = StyleSheet.create({
-    container1: {
-        flex: 1,
-    },
-    body: {
-        marginTop: 10,
-        marginLeft: 10,
-        marginRight: 10,
-        width: deviceWidth * 2,
-        borderRadius: 15,
-        backgroundColor: Colors.backgroundColorSecondary
-    },
-    body1e: {
-        marginTop: 20,
-        flexDirection: "row",
-        justifyContent: 'flex-end'
-    },
-    body1: {
-        marginTop: 20,
-        flexDirection: "row",
-    },
-    tabbar: {
-
-    },
-    footer: {
-        position: 'absolute',
-        justifyContent: 'center',
-        flexDirection: "row",
-        left: 0,
-        top: deviceHeight - deviceHeight * 0.1,
-        width: deviceWidth,
-    },
-    table: {
-
-    },
-    tableView: {
-        paddingLeft: 10,
-        paddingRight: 10,
-        flexDirection: "row",
-    },
-    tableHeader: {
-        borderTopLeftRadius: 15,
-        borderTopEndRadius: 15,
-        flexDirection: "row",
-        backgroundColor: Colors.buttonColorPrimary,
-    },
-    dorpdown: {
-        justifyContent: 'center',
-        fontSize: FontSize.medium,
-    },
-    dorpdownTop: {
-        justifyContent: 'flex-end',
-        fontSize: FontSize.medium,
-    },
-    textTitle: {
-        paddingRight: deviceWidth * 0.07,
-        fontSize: FontSize.medium,
-        fontWeight: 'bold',
-        color: '#ffff',
-    },
-    image: {
-        flex: 1,
-        paddingTop: deviceHeight * 0.2,
-        resizeMode: 'contain',
-
-    },
-    topImage: {
-        height: deviceHeight / 3,
-        width: deviceWidth,
-        resizeMode: 'contain',
-    },
-    imageIcon: {
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        resizeMode: 'contain',
-    },
-
-    button: {
-        marginTop: 10,
-        marginBottom: 25,
-        padding: 5,
-        alignItems: 'center',
-        backgroundColor: Colors.buttonColorPrimary,
-        borderRadius: 10,
-    },
-    textButton: {
-        fontSize: FontSize.large,
-        color: Colors.fontColor2,
-    },
-    buttonContainer: {
-        marginTop: 10,
-    },
-    checkboxContainer: {
-        flexDirection: "row",
-        marginLeft: 10,
-        marginBottom: 20,
-    },
-    checkbox: {
-        alignSelf: "center",
-        borderBottomColor: '#ffff',
-        color: '#f fff',
-    },
-    label: {
-        margin: 8,
-        color: '#ffff',
-    },
-});
 
 export default HomeScreen;

@@ -22,8 +22,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import CurrencyInput from 'react-native-currency-input';
 
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 export default FlatListShowTemppageScreen = ({ route }) => {
     const navigation = useNavigation();
@@ -32,7 +31,7 @@ export default FlatListShowTemppageScreen = ({ route }) => {
             <ScrollView
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight+statusBarHeight
                 }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}

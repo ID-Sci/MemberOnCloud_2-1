@@ -25,10 +25,7 @@ import CurrencyInput from 'react-native-currency-input';
 import FlatListShowTemppageScreen from '../components/FlatListShowTemppageScreen';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 const ShowTemppageScreen = ({ route }: any) => {
     const navigation = useNavigation();
 
@@ -37,7 +34,7 @@ const ShowTemppageScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                     backgroundColor: Colors.backgroundLoginColorSecondary,
 
                 }}

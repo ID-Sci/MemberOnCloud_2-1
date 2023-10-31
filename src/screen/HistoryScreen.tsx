@@ -23,9 +23,7 @@ import { useAppDispatch, useAppSelector } from '../store/store';
 import * as safe_Format from '../styles/safe_Format';
 import { Language, changeLanguage } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 const HistoryScreen = () => {
     const ConfigList = useAppSelector(config)
     const navigation = useNavigation()
@@ -126,8 +124,8 @@ const HistoryScreen = () => {
                     let temp_error = 'error_ser.' + json.ResponseCode;
                     console.log('>> ', temp_error)
                     Alert.alert(
-                      Language.t('alert.errorTitle'),
-                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
 
             })
@@ -170,8 +168,8 @@ const HistoryScreen = () => {
                     let temp_error = 'error_ser.' + json.ResponseCode;
                     console.log('>> ', temp_error)
                     Alert.alert(
-                      Language.t('alert.errorTitle'),
-                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                 }
 
             })
@@ -193,7 +191,7 @@ const HistoryScreen = () => {
         <View
             style={{
                 width: deviceWidth,
-                height: deviceHeight
+                height: deviceHeight+statusBarHeight
             }}
         >
             <View
@@ -236,7 +234,7 @@ const HistoryScreen = () => {
                         >
                             <Text
                                 style={{
-                                    fontFamily:'Kanit-Bold',
+                                    fontFamily: 'Kanit-Bold',
                                     color: HistoryTab == true ? '#0288D1' : 'black',
                                     paddingLeft: 20,
                                     fontSize: FontSize.medium,
@@ -252,12 +250,12 @@ const HistoryScreen = () => {
                             <Text
 
                                 style={{
-                                    fontFamily:'Kanit-Bold',
+                                    fontFamily: 'Kanit-Bold',
                                     color: HistoryTab == true ? 'black' : '#0288D1',
                                     paddingRight: 20,
                                     fontSize: FontSize.medium,
                                 }}>
-                              {Language.t('history.redeemHistoryTabTitle')}
+                                {Language.t('history.redeemHistoryTabTitle')}
                             </Text>
                         </TouchableOpacity>
 
@@ -282,7 +280,7 @@ const HistoryScreen = () => {
                                             }}
                                         >
                                             <Text style={styles.textLight}>
-                                            {Language.t('history.Ref')} # {items.MBP_REF}
+                                                {Language.t('history.Ref')} # {items.MBP_REF}
                                             </Text>
                                             <View >
                                                 <View
@@ -291,7 +289,7 @@ const HistoryScreen = () => {
                                                     }} >
                                                     <View style={{ width: (deviceWidth * 0.6) - 20 }}>
                                                         <Text style={styles.textLight}>
-                                                        {Language.t('history.purchaseDate')}
+                                                            {Language.t('history.purchaseDate')}
                                                         </Text>
                                                     </View>
                                                     <View
@@ -302,7 +300,7 @@ const HistoryScreen = () => {
                                                             justifyContent: 'space-between'
                                                         }}>
                                                         <Text style={styles.textLight}>
-                                                        {Language.t('history.pointBalance')}
+                                                            {Language.t('history.pointBalance')}
                                                         </Text>
                                                         <Text style={styles.textLight}>
                                                             {safe_Format.pointFormat(items.MBP_POINT)}
@@ -327,7 +325,7 @@ const HistoryScreen = () => {
                                                             justifyContent: 'space-between'
                                                         }}>
                                                         <Text style={styles.textLight}>
-                                                        {Language.t('history.billAmount')}
+                                                            {Language.t('history.billAmount')}
                                                         </Text>
                                                         <Text style={styles.textLight}>
                                                             {safe_Format.currencyFormat(items.MBP_RDM)}
@@ -344,13 +342,13 @@ const HistoryScreen = () => {
                                         borderBottomWidth: 0.2,
                                         marginBottom: 1,
                                         width: deviceWidth,
-                                        marginTop:deviceHeight*0.4,
+                                        marginTop: deviceHeight * 0.4,
                                         alignItems: 'center',
                                     }}
                                 >
 
                                     <Text style={styles.textLight}>
-                                    {Language.t('history.nodata')}
+                                        {Language.t('history.nodata')}
                                     </Text>
 
                                 </View>
@@ -377,7 +375,7 @@ const HistoryScreen = () => {
                                                 }}
                                             >
                                                 <Text style={styles.textLight}>
-                                                {Language.t('history.Ref')} # {items.MBP_REF}
+                                                    {Language.t('history.Ref')} # {items.MBP_REF}
                                                 </Text>
                                                 <View >
                                                     <View
@@ -386,7 +384,7 @@ const HistoryScreen = () => {
                                                         }} >
                                                         <View style={{ width: (deviceWidth * 0.4) - 20 }}>
                                                             <Text style={styles.textLight}>
-                                                            {Language.t('history.pointsExchange')}
+                                                                {Language.t('history.pointsExchange')}
                                                             </Text>
                                                         </View>
                                                         <View
@@ -409,7 +407,7 @@ const HistoryScreen = () => {
                                                         }} >
                                                         <View style={{ width: (deviceWidth * 0.4) - 20 }}>
                                                             <Text style={styles.textLight}>
-                                                            {Language.t('history.activeWhen')}
+                                                                {Language.t('history.activeWhen')}
                                                             </Text>
                                                         </View>
                                                         <View
@@ -436,7 +434,7 @@ const HistoryScreen = () => {
                                             borderBottomWidth: 0.2,
                                             marginBottom: 1,
                                             width: deviceWidth,
-                                            marginTop:deviceHeight*0.4,
+                                            marginTop: deviceHeight * 0.4,
                                             alignItems: 'center',
                                         }}
                                     >

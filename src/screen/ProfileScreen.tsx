@@ -28,8 +28,7 @@ import { config, } from '../store/slices/configReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import LoginScreen from './LoginScreen'
 import MyCardScreen from './MyCardScreen'
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const ProfileScreen = ( ) => {
     const navigation = useNavigation()

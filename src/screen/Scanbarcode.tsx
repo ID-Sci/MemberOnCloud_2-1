@@ -12,18 +12,14 @@ import * as  ImagePicker from 'react-native-image-picker';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import { FontSize } from '../styles/FontSizeHelper';
-import { styles } from '../styles/styles';
+import { FontSize } from '../styles/FontSizeHelper'; 
 import * as Animatable from 'react-native-animatable';
 import { QRreader } from 'react-native-qr-decode-image-camera';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { Language } from '../translations/I18n';
 
-
-
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 export interface ScanBarcodeParams {
   route: keyof RootStackParamList,
   data: any

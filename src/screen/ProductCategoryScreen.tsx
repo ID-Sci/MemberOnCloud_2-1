@@ -32,10 +32,8 @@ import { useAppSelector } from '../store/store';
 import { newproductSelector, } from '../store/slices/newproductReducer';
 import { basketSelector } from '../store/slices/basketReducer';
 
-import { styles } from '../styles/styles';
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
 import { Language, changeLanguage } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
 
 const ProductCategoryScreen = ({ route }: any) => {
     const navigation = useNavigation();
@@ -43,6 +41,7 @@ const ProductCategoryScreen = ({ route }: any) => {
     const newproductList = useAppSelector(newproductSelector)
     const basketProduct = useAppSelector(basketSelector)
     const ConfigList = useAppSelector(config)
+    const [allproductList, setallproductList] = useState(newproductList.allproductList)
     const [product, setProduct] = useState([[]])
     const [category, setCategory] = useState(route.params.route)
     const [loading, setLoading] = useState(false)
@@ -51,7 +50,9 @@ const ProductCategoryScreen = ({ route }: any) => {
     useEffect(() => {
         getProducrCategory();
     }, [category]);
-
+    useEffect(() => {
+       
+    }, [])
     const getProducrCategory = async () => {
         await setLoading(true)
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -84,12 +85,12 @@ const ProductCategoryScreen = ({ route }: any) => {
                         let responseData = JSON.parse(json.ResponseData);
                         setProduct(responseData.SHOWCONTENT)
                     } else {
-                        console.log('Function Parameter Required'); 
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                      Language.t('alert.errorTitle'),
-                      Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
+                        console.log('Function Parameter Required');
+                        let temp_error = 'error_ser.' + json.ResponseCode;
+                        console.log('>> ', temp_error)
+                        Alert.alert(
+                            Language.t('alert.errorTitle'),
+                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
                     }
                 })
                 .catch((error) => {
@@ -106,7 +107,7 @@ const ProductCategoryScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight + statusBarHeight
                 }}>
                 <View
                     style={styles.header}>
@@ -184,6 +185,7 @@ const ProductCategoryScreen = ({ route }: any) => {
                                 </Text>
                             </View>
                         )}
+                        
                     </View>
                 }
 

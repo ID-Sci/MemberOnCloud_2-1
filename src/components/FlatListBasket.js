@@ -21,9 +21,8 @@ import * as Keychain from 'react-native-keychain';
 import { Language, changeLanguage } from '../translations/I18n';
 import { config, updateARcode, updateUserOe } from '../store/slices/configReducer';
 import * as safe_Format from '../styles/safe_Format';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
+
 
 export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument }) => {
     const navigation = useNavigation();
@@ -31,176 +30,106 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
     const [amount, setAmount] = useState(0)
     const [data, setData] = useState(items)
     const [dataItem, setDataItem] = useState(itemsERP)
-    const [loading, setloading] = useState(false)
+    const [loading, setloading] = useState(true)
     const [createAR, setCreateAR] = useState(false)
 
     const [prepareDoc, setPrepareDoc] = useState(prepareDocument)
     const ConfigList = useAppSelector(config)
-    const docinfoType = useAppSelector(docinfoSelector).docinfoPage[0].SHWPH_TTL_ECPTN
+    const docinfoType = useAppSelector(docinfoSelector).docinfoPage[0]
     const PromotionType = useAppSelector(docinfoSelector).docinfoPage[1].SHWPH_TTL_CPTN
     console.log(JSON.stringify(useAppSelector(docinfoSelector).docinfoPage))
+
+
+    console.log(`PromotionType >> ${docinfoType}`)
+
     useEffect(() => {
         setData(items)
         setDataItem(itemsERP)
         setPrepareDoc(prepareDocument)
+
     }, [items]);
 
-    console.log(`PromotionType >> ${PromotionType}`)
     useEffect(() => {
-        if (ConfigList.MB_LOGIN_GUID) {
-
-            if (items.length > 0) {
-
-                const ARCheck = async () => {
-
-                    const { MB_CODE } = ConfigList.UserList
-                    const checkLoginToken = await Keychain.getGenericPassword();
-                    const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-                    await fetch(configToken.WebService + '/LookupErp', {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                            'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                            'BPAPUS-FUNCTION': 'Ar000130',
-                            'BPAPUS-PARAM': '',
-                            'BPAPUS-FILTER': `AND(AR_MBCODE = '${MB_CODE}')`,
-                            'BPAPUS-ORDERBY': '',
-                            'BPAPUS-OFFSET': '0',
-                            'BPAPUS-FETCH': '0',
-                        }),
-                    })
-                        .then((response) => response.json())
-                        .then(async (json) => {
-                            if (json.ResponseCode == 200) {
-                                let responseData = JSON.parse(json.ResponseData);
-                                if (responseData.Ar000130.length > 0) {
-                                    await dispatch(updateARcode(responseData.Ar000130[0].AR_CODE))
-
-                                    await calBasket(responseData.Ar000130[0].AR_CODE)
-
-                                } else createARfile()
-
-                            } else {
-                                Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
-                                    { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
-                            }
-                        })
-                        .catch((error) => {
-                            Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                                { text: Language.t('alert.confirm'), onPress: () => setloading(false) }])
-                            console.log('ERROR ' + error);
-                        })
-
-                }
-                ARCheck();
-
-            }
-        } else {
-            Alert.alert(Language.t('notiAlert.header'), `Login member`, [
-                { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-        }
+        console.log(`JSON.stringify(dataItem) >> ${JSON.stringify(dataItem)}`)
+        let sum = 0
+        for (var i in dataItem)
+            sum += dataItem[i].TRD_QTY * dataItem[i].TRD_K_U_PRC
+        items.length > 0 && setAmount(sum)
+        setloading(false)
 
     }, [dataItem]);
 
 
-    const createARfile = async () => {
-        const { MB_CODE, MB_PHONE, MB_EMAIL, MB_INTL, MB_NAME, MB_SURNME } = await ConfigList.UserList
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let param = {
-            AR_CODE: "/MB",
-            AR_NAME: MB_NAME,
-            AR_MBCODE: MB_CODE,
-            AR_ENABLE: 'Y',
-            ADDB_COMPANY: "ลูกหนี้ member",
-            ADDB_PHONE: MB_PHONE,
-            ADDB_EMAIL: MB_EMAIL,
-            CT_INTL: MB_INTL,
-            CT_NAME: MB_NAME,
-            CT_SURNME: MB_SURNME,
-            DFAR_TYPE: "1"
-        }
-        console.log(" ######## createARfile  #######", param)
-        await fetch(configToken.WebService + '/CreateUpdateMaster', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'NEWARFILE',
-                'BPAPUS-PARAM': JSON.stringify(param),
-                'BPAPUS-FILTER': '',
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                if (json.ResponseCode == 200) {
-                    let responseData = JSON.parse(json.ResponseData);
-                    console.log(" responseData createARfile  >>>", responseData)
-                    await dispatch(updateARcode(responseData.AR_CODE))
-                    await calBasket(responseData.AR_CODE)
-                } else {
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
-                }
-            })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-                console.log('ERROR ' + error);
-            })
-
-    }
-
-    const calBasket = async (AR_CODE) => {
+    const calBasket = async () => {
         await setloading(true)
-        docinfoType == 'BK' && await calBasketSellOrder(AR_CODE)
-        docinfoType == 'CS' && await calBasketInvoice(AR_CODE)
-        docinfoType == 'DS' && await calBasketInvoice(AR_CODE)
-        await setloading(false)
+
+        if (docinfoType.SHWPH_TTL_CPTN.includes('BOOKING')) await calBasketSellOrder()
+
+        if (docinfoType.SHWPH_TTL_CPTN.includes('SELL'))
+            await calBasketInvoice()
+
+
+        // await saveBasket()
+
 
     }
     const saveBasket = async () => {
-        await setloading(true)
 
-        docinfoType == 'BK' && await saveBasketSellOrder()
-        docinfoType == 'CS' && await saveBasketInvoice()
-        docinfoType == 'DS' && await saveBasketInvoice()
+
+        if (docinfoType.SHWPH_TTL_CPTN.includes('BOOKING'))
+            await saveBasketSellOrder()
+
+        if (docinfoType.SHWPH_TTL_CPTN.includes('SELL'))
+            await saveBasketInvoice()
+
+
         await setloading(false)
 
     }
-    const calBasketSellOrder = async (AR_CODE) => {
-        let newDate = new Date()
-        var d = newDate.getDate()
-        var m = newDate.getMonth() + 1
-        var y = newDate.getFullYear()
-        let DI_DATE = y + (m <= 9 ? '0' + m : m) + d
+    const calBasketSellOrder = async () => {
+        let newDate = new Date();
+
+        var d = newDate.getDate();
+        var m = newDate.getMonth() + 1;
+        var y = newDate.getFullYear();
+        let DI_DATE = `${y}${(m <= 9 ? '0' + m : m)}${(d <= 9 ? '0' + d : d)}`;
+
+        newDate.setDate(newDate.getDate() + 30);
+        var e_d = newDate.getDate();
+        var e_m = newDate.getMonth() + 1;
+        var e_y = newDate.getFullYear();
+        let e_DI_DATE = `${e_y}${(e_m <= 9 ? '0' + e_m : e_m)}${(e_d <= 9 ? '0' + e_d : e_d)}`;
+
+        console.log(`DI_DATE >> ${DI_DATE}`);
+        console.log(`e_DI_DATE >> ${e_DI_DATE}`);
         const param = {
             ErpUpdFunc: [
                 {
+
                     ImpTrhHeader: {
                         DI_DATE: DI_DATE,
                         DI_REF: '<เลขถัดไป>',
-                        DT_DOCCODE: docinfoType,
-                        DT_PROPERTIES: '307',
+                        DT_DOCCODE: docinfoType.DT_DOCCODE,
+                        DT_PROPERTIES: docinfoType.DT_PROPERTIES,
                         VAT_REF: '<เลขเดียวกัน>',
                         VAT_DATE: DI_DATE,
-                        AR_CODE: AR_CODE,
+                        VAT_RATE: '7',
+                        VAT_RFR_REF: '<เลขเดียวกัน>',
+                        AR_CODE: ConfigList.UserList.AR_CODE,
                         ARD_TDSC_KEYIN: '',
+                        TRH_SHIP_DATE: DI_DATE + '0000',
+                        TRH_SHIP_ADDB: ConfigList.UserList.ADDB_KEY,
+                        TRH_CANCEL_DATE: e_DI_DATE + '0000',
                         PRMT_CODE: PromotionType,
+                        AROE_TDSC_KEYIN: '0',
+                        AROE_DUE_DA: DI_DATE + '0000',
                         DI_REMARK: 'MEMBER APP',
                     },
                     ImpTrhDetail: dataItem
                 },
             ],
         }
-        console.log(" ######## calBasketSellOrder  #######", param)
+        console.log(" ######## calBasketSellOrder  #######", JSON.stringify(param))
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/UpdateErp', {
@@ -223,6 +152,7 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                     await dispatch(updatePrepareDocumentt(param))
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.AROE.AROE_B_AMT)
                     await setAmount(responseData.AROE.AROE_B_AMT)
+                    await   saveBasketSellOrder(param)
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -239,8 +169,9 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
             })
     }
 
-    const saveBasketSellOrder = async () => {
-        console.log("######## saveBasketSellOrder prepareDocument >>>", prepareDocument)
+    const saveBasketSellOrder = async (param) => {
+
+        console.log("######## saveBasketSellOrder prepareDocument >>>", JSON.stringify(param))
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/UpdateErp', {
@@ -249,7 +180,7 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                 'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
                 'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
                 'BPAPUS-FUNCTION': 'SaveSellOrderDocinfo',
-                'BPAPUS-PARAM': JSON.stringify(prepareDocument),
+                'BPAPUS-PARAM': JSON.stringify(param),
                 'BPAPUS-FILTER': '',
                 'BPAPUS-ORDERBY': '',
                 'BPAPUS-OFFSET': '0',
@@ -260,7 +191,17 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
             .then(async (json) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-
+                    console.log(`responseData.DI_KEY >> ${responseData.DI_KEY}`)
+                    console.log(JSON.stringify({
+                        'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                        'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                        'BPAPUS-FUNCTION': 'SaveSellOrderDocinfo',
+                        'BPAPUS-PARAM': JSON.stringify(param),
+                        'BPAPUS-FILTER': '',
+                        'BPAPUS-ORDERBY': '',
+                        'BPAPUS-OFFSET': '0',
+                        'BPAPUS-FETCH': '0',
+                    }))
                     dispatch(updateBasket([]))
                     Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
                         { text: Language.t('alert.confirm'), onPress: () => navigation.goBack() }])
@@ -279,25 +220,44 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                 console.log('ERROR ' + error);
             })
     }
-    const calBasketInvoice = async (AR_CODE) => {
-        let newDate = new Date()
-        var d = newDate.getDate()
-        var m = newDate.getMonth() + 1
-        var y = newDate.getFullYear()
-        let DI_DATE = y + (m <= 9 ? '0' + m : m) + d
+    const calBasketInvoice = async () => {
+        let newDate = new Date();
+
+        var d = newDate.getDate();
+        var m = newDate.getMonth() + 1;
+        var y = newDate.getFullYear();
+        let DI_DATE = `${y}${(m <= 9 ? '0' + m : m)}${(d <= 9 ? '0' + d : d)}`;
+
+        newDate.setDate(newDate.getDate() + 30);
+        var e_d = newDate.getDate();
+        var e_m = newDate.getMonth() + 1;
+        var e_y = newDate.getFullYear();
+        let e_DI_DATE = `${e_y}${(e_m <= 9 ? '0' + e_m : e_m)}${(e_d <= 9 ? '0' + e_d : e_d)}`;
+
+        console.log(`DI_DATE >> ${DI_DATE}`);
+        console.log(`e_DI_DATE >> ${e_DI_DATE}`);
+
         const param = {
             ErpUpdFunc: [
                 {
+
                     ImpTrhHeader: {
                         DI_DATE: DI_DATE,
                         DI_REF: '<เลขถัดไป>',
-                        DT_DOCCODE: docinfoType,
-                        DT_PROPERTIES: '307',
+                        DT_DOCCODE: docinfoType.DT_DOCCODE,
+                        DT_PROPERTIES: docinfoType.DT_PROPERTIES,
                         VAT_REF: '<เลขเดียวกัน>',
                         VAT_DATE: DI_DATE,
-                        AR_CODE: AR_CODE,
+                        VAT_RATE: '7',
+                        VAT_RFR_REF: '<เลขเดียวกัน>',
+                        AR_CODE: ConfigList.UserList.AR_CODE,
                         ARD_TDSC_KEYIN: '',
+                        TRH_SHIP_DATE: DI_DATE + '0000',
+                        TRH_SHIP_ADDB: ConfigList.UserList.ADDB_KEY,
+                        TRH_CANCEL_DATE: e_DI_DATE + '0000',
                         PRMT_CODE: PromotionType,
+                        AROE_TDSC_KEYIN: '0',
+                        AROE_DUE_DA: DI_DATE + '0000',
                         DI_REMARK: 'MEMBER APP',
                     },
                     ImpTrhDetail: dataItem
@@ -325,8 +285,10 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     await dispatch(updatePrepareDocumentt(param))
+
                     console.log(" ==== responseData.ARDETAIL.ARD_B_AMT ===== ", responseData.ARDETAIL.ARD_B_AMT)
                     await setAmount(responseData.ARDETAIL.ARD_B_AMT)
+                    await saveBasketInvoice(param)
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -343,8 +305,8 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
             })
     }
 
-    const saveBasketInvoice = async () => {
-        console.log("######## saveBasketInvoice prepareDocument >>>", prepareDocument)
+    const saveBasketInvoice = async (param) => {
+        console.log("######## saveBasketInvoice prepareDocument >>>", param)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/UpdateErp', {
@@ -353,7 +315,7 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                 'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
                 'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
                 'BPAPUS-FUNCTION': 'SaveInvoiceDocinfo',
-                'BPAPUS-PARAM': JSON.stringify(prepareDocument),
+                'BPAPUS-PARAM': JSON.stringify(param),
                 'BPAPUS-FILTER': '',
                 'BPAPUS-ORDERBY': '',
                 'BPAPUS-OFFSET': '0',
@@ -365,7 +327,19 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     dispatch(updateBasket([]))
-                    fetchData()
+                    console.log()
+                    console.log(JSON.stringify({
+                        'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                        'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                        'BPAPUS-FUNCTION': 'SaveInvoiceDocinfo',
+                        'BPAPUS-PARAM': JSON.stringify(param),
+                        'BPAPUS-FILTER': '',
+                        'BPAPUS-ORDERBY': '',
+                        'BPAPUS-OFFSET': '0',
+                        'BPAPUS-FETCH': '0',
+                    }))
+                    console.log(JSON.stringify(responseData))
+                    console.log()
                     Alert.alert(Language.t('notiAlert.header'), Language.t('notiAlert.orderSuccess'), [
                         { text: Language.t('alert.confirm'), onPress: () => navigation.goBack() }])
                 } else {
@@ -414,14 +388,13 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
         newItem[index] = { ...newItem[index], TRD_QTY: newItem[index].TRD_QTY - 1 }
         setDataItem(newItem)
     }
-    console.log(data.length)
 
     const loadingScreen = () => {
         return (
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                     opacity: 1,
                     alignSelf: 'center',
                     justifyContent: 'center',
@@ -436,167 +409,9 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
             </View>
         )
     }
-    const fetchData = async () => {
-
-        console.log(`FETCH /LookupErp /Ar000130 => ${ConfigList.UserList.MB_CODE}`);
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-
-        await fetch(configToken.WebService + '/LookupErp', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'Ar000130',
-                'BPAPUS-PARAM': '',
-                "BPAPUS-FILTER": '',
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then((json) => {
-                console.log(json.ResponseCode)
-                if (json.ResponseCode == '200') {
-                    let responseRedeem = JSON.parse(json.ResponseData).Ar000130.filter((filterItem) => { return filterItem.AR_MBCODE == ConfigList.UserList.MB_CODE })
-                    // 
-                    console.log(responseRedeem.length)
-                    if (responseRedeem.length > 0)
-                        fetchOE(responseRedeem[0].AR_CODE)
-
-                } else {
-
-                }
-
-            })
-            .catch((error) => {
-
-                console.log('ERROR ' + error);
-            });
-
-    }
-    const fetchOE = async (AR_CODE) => {
-        console.log(`FETCH /LookupErp /Oe002304 => ${AR_CODE}`);
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let Oe002304 = [{
-            Oe002304: {},
-            Oe002304Info: {}
-        }]
-        let Oe000304 = []
-        await fetch(configToken.WebService + '/LookupErp', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'Oe002304',
-                'BPAPUS-PARAM': '',
-                "BPAPUS-FILTER": '',
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json.ResponseCode)
-                if (json.ResponseCode == '200') {
-                    let responseRedeem = JSON.parse(json.ResponseData).Oe002304.filter((filterItem) => { return filterItem.AR_CODE == AR_CODE })
-                    console.log(responseRedeem.length)
-                    if (responseRedeem.length > 0)
-                        Oe002304 = responseRedeem
-                } else {
-
-                }
-
-            })
-            .catch((error) => {
-
-                console.log('ERROR ' + error);
-            });
-        console.log(`FETCH /LookupErp /Oe000304 => ${AR_CODE}`);
-        await fetch(configToken.WebService + '/LookupErp', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'Oe000304',
-                'BPAPUS-PARAM': '',
-                "BPAPUS-FILTER": '',
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then((json) => {
-                console.log(json.ResponseCode)
-                if (json.ResponseCode == '200') {
-                    let responseRedeem = JSON.parse(json.ResponseData).Oe000304.filter((filterItem) => { return filterItem.AR_CODE == AR_CODE })
-                    console.log(responseRedeem.length)
-
-                    if (responseRedeem.length > 0)
-                        Oe000304 = responseRedeem
-                } else {
-
-                }
-
-            })
-            .catch((error) => {
-
-                console.log('ERROR ' + error);
-            });
-        let tempObj = []
-        console.log(`Oe002304 >> ${Oe002304.length}`)
-        console.log(`Oe000304 >> ${Oe000304.length}`)
-        const combinedArray = Oe002304.concat(Oe000304);
-
-        console.log(`combinedArray >> ${combinedArray.length}`)
-        await combinedArray.sort((a, b) => {
-            return b.DI_DATE - a.DI_DATE;
-        });
-        for (var i in combinedArray) {
-            if (OeKEY.DI_KEY)
-                tempObj.push(await GetInvoiceDocinfo(combinedArray[i]))
-        }
 
 
-        await dispatch(updateUserOe(tempObj))
 
-
-    }
-    const GetInvoiceDocinfo = async (OeKEY) => {
-
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let responseData = []
-        await fetch(configToken.WebService + '/UpdateErp', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'GetInvoiceDocinfo',
-                'BPAPUS-PARAM': '{\"DI_KEY\":\"' + OeKEY.DI_KEY + '\"}',
-                'BPAPUS-FILTER': "",
-                'BPAPUS-ORDERBY': '',
-                'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                responseData = JSON.parse(json.ResponseData);
-
-            })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-                console.log('ERROR ' + error);
-            });
-        return responseData
-
-    }
     return (data &&
         (
             <View style={{ alignItems: 'flex-end' }}>
@@ -618,7 +433,6 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                                         width: deviceWidth * 0.8,
                                         resizeMode: 'contain',
                                     }}
-                                    resizeMode={'contain'}
                                     source={require('../img/empty-box-blue-icon.png')}
                                 />
 
@@ -630,7 +444,7 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
                         <View style={{
                             justifyContent: 'center',
                             width: deviceWidth,
-                            height: deviceHeight,
+                            height: deviceHeight + statusBarHeight,
                             alignContent: 'center',
                             position: 'absolute',
                         }}>
@@ -866,7 +680,8 @@ export default FlatListBasket = ({ backPage, items, itemsERP, prepareDocument })
 
                             </View>
                             <TouchableOpacity
-                                onPress={() => saveBasket()}
+                                onPress={() => calBasket()}
+                                disabled={loading}
                                 style={{
                                     alignItems: 'center',
                                     justifyContent: 'center',

@@ -22,9 +22,7 @@ import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import { Language, changeLanguage } from '../translations/I18n';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
     const [CategoryItem, setCategoryItem] = useState(route.ExtarItem);
@@ -40,7 +38,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                 style={styles.category_dropdownlist}
                 onPress={() => setThisState(item)}>
                 <View style={{
-                    width: deviceWidth * 0.5,
+                    width: deviceWidth * 0.1,
                     alignItems: 'flex-end'
                 }}>
                     <Image
@@ -50,11 +48,11 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                 </View>
                 <View
                     style={{
-                        width: deviceWidth * 0.5,
+                        width: deviceWidth * 0.9,
                         alignItems: 'flex-start'
                     }}>
                     <Text style={styles.category_bottom_text}>
-                    {Language.getLang() == 'th'?`${item.SHWPH_TTL_CPTN}`:`${item.SHWPH_TTL_ECPTN}`}
+                        {Language.getLang() == 'th' ? `${item.SHWPH_TTL_CPTN}` : `${item.SHWPH_TTL_ECPTN}`}
                     </Text>
                 </View>
             </TouchableOpacity>
@@ -62,7 +60,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
     );
     return (route &&
         (
-            <SafeAreaView style={{ marginTop: FontSize.large * 2, position: 'absolute', }} >
+            <SafeAreaView style={{ marginTop: (FontSize.large * 2) + statusBarHeight, position: 'absolute', }} >
                 {CategoryModel ? (
                     <View >
                         <FlatList
@@ -71,21 +69,21 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                             keyExtractor={item => item.SHWPH_GUID}
                             extraData={CategoryItem}
                         />
-                        
-                            <TouchableOpacity
-                                style={styles.category_dropdownlist}
-                                onPress={() => setThisState('ALL')}>
-                                <View width={deviceWidth * 0.1}>
 
-                                </View>
-                                <Text style={styles.category_bottom_text}>
-                                    - ALL -
-                                </Text>
-                                <View width={deviceWidth * 0.1}>
+                        <TouchableOpacity
+                            style={styles.category_dropdownlist}
+                            onPress={() => setThisState('ALL')}>
+                            <View width={deviceWidth * 0.1}>
 
-                                </View>
-                            </TouchableOpacity>
-                         
+                            </View>
+                            <Text style={styles.category_bottom_text}>
+                                - ALL -
+                            </Text>
+                            <View width={deviceWidth * 0.9}>
+
+                            </View>
+                        </TouchableOpacity>
+
                     </View>
 
                 ) : (
@@ -98,11 +96,12 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                 <View width={deviceWidth * 0.1}>
 
                                 </View>
-
                                 <Text style={styles.category_bottom_text}>
                                     - ALL -
                                 </Text>
-                                <View width={deviceWidth * 0.1}>
+                              
+
+                                <View width={deviceWidth * 0.9}>
 
                                 </View>
                             </TouchableOpacity>
@@ -114,7 +113,7 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                 style={styles.category_dropdownlist}
                                 onPress={() => setCategoryModel(!CategoryModel)}>
                                 <View style={{
-                                    width: deviceWidth * 0.5,
+                                    width: deviceWidth * 0.1,
                                     alignItems: 'flex-end'
                                 }}>
                                     <Image
@@ -124,11 +123,11 @@ export default FlatListCategoryDropdown = ({ route, onPressCategory }) => {
                                 </View>
                                 <View
                                     style={{
-                                        width: deviceWidth * 0.5,
+                                        width: deviceWidth * 0.9,
                                         alignItems: 'flex-start'
                                     }}>
                                     <Text style={styles.category_bottom_text}>
-                                    {Language.getLang() == 'th'?`${CategoryItem.SHWPH_TTL_CPTN}`:`${CategoryItem.SHWPH_TTL_ECPTN}`}
+                                        {Language.getLang() == 'th' ? `${CategoryItem.SHWPH_TTL_CPTN}` : `${CategoryItem.SHWPH_TTL_ECPTN}`}
                                     </Text>
                                 </View>
                             </TouchableOpacity>

@@ -26,12 +26,9 @@ import { updateBasket, basketSelector } from '../store/slices/basketReducer';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { Language, changeLanguage } from '../translations/I18n';
 import { useAppDispatch, useAppSelector } from '../store/store'
-import { config, updateARcode } from '../store/slices/configReducer';
-import { styles } from '../styles/styles';
+import { config, updateARcode } from '../store/slices/configReducer'; 
 import * as safe_Format from '../styles/safe_Format';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
-
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 const ProductOrderScreen = ({ backPage, route }: any) => {
     backPage ? backPage = backPage : backPage = route.params.backPage
     const item = route.params.route
@@ -85,7 +82,7 @@ const ProductOrderScreen = ({ backPage, route }: any) => {
             <View style={{ alignItems: 'flex-end' }}>
                 <View style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                 }}>
                     <ScrollView
                         style={{

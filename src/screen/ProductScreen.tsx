@@ -25,9 +25,7 @@ import CurrencyInput from 'react-native-currency-input';
 import FlatListProductScreen from '../components/FlatListProductScreen';
 import AbsoluteBasket from './AbsoluteBasket'
 import { BorderlessButton } from 'react-native-gesture-handler';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const ProductScreen = ({ route }: any) => {
     const navigation = useNavigation();
@@ -36,7 +34,7 @@ const ProductScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight+statusBarHeight
                 }}
             >
 

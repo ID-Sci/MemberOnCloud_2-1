@@ -24,11 +24,10 @@ import { useAppSelector } from '../store/store';
 import { basketSelector } from '../store/slices/basketReducer';
 import * as safe_Format from '../styles/safe_Format';
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
-import { styles } from '../styles/styles';
+ 
 import { Language } from '../translations/I18n';
 
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const AbsoluteBasket = ({ route }: any) => {
     const navigation = useNavigation();

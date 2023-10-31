@@ -29,7 +29,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
 import NumberPad from '../components/NumberPad';
 import OtpInput from '../components/OtpInput';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
+import { config, updateARcode, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
@@ -37,10 +37,8 @@ import CalendarScreen from '@blacksakura013/th-datepicker';
 import moment from 'moment';
 import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
-import { styles } from '../styles/styles';
 import { Language } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
 const defaultCountDown = 60;
 
 const RegisterScreen = ({ route }: any) => {
@@ -109,11 +107,12 @@ const RegisterScreen = ({ route }: any) => {
         MB_NAME: '',
         MB_SURNME: '',
         MB_SEX: '',
-        MB_BIRTH: new Date(),
-        MB_ADDR_1: '',
-        MB_ADDR_2: '',
-        MB_ADDR_3: '',
-        MB_POST: '',
+        MB_BIRTH: '',
+        ADDB_ADDB_1: '',
+        ADDB_SUB_DISTRICT: '',
+        ADDB_DISTRICT: '',
+        ADDB_PROVINCE: '',
+        ADDB_POST: '',
         MB_I_CARD: '.',
         MB_EMAIL: '',
         MB_CNTRY_CODE: '66',
@@ -142,21 +141,26 @@ const RegisterScreen = ({ route }: any) => {
             C = false
             console.log(`MB_EMAIL`)
         }
-        if (!newData.MB_POST) {
+        if (!newData.ADDB_POST) {
             C = false
-            console.log(`MB_POST`)
+            console.log(`ADDB_POST`)
         }
-        if (!newData.MB_ADDR_1) {
+        if (!newData.ADDB_ADDB_1) {
             C = false
-            console.log(`MB_ADDR_1`)
+            console.log(`ADDB_ADDB_1`)
         }
-        if (!newData.MB_ADDR_2) {
+        if (!newData.ADDB_SUB_DISTRICT) {
             C = false
-            console.log(`MB_ADDR_2`)
+            console.log(`ADDB_SUB_DISTRICT`)
         }
-        if (!newData.MB_ADDR_3) {
+
+        if (!newData.ADDB_DISTRICT) {
             C = false
-            console.log(`MB_ADDR_3`)
+            console.log(`ADDB_DISTRICT`)
+        }
+        if (!newData.ADDB_PROVINCE) {
+            C = false
+            console.log(`ADDB_PROVINCE`)
         }
         if (!newData.MB_PW) {
             C = false
@@ -170,12 +174,12 @@ const RegisterScreen = ({ route }: any) => {
 
             await setRegis(true)
             await otpRequest()
-        
+
         } else {
             Alert.alert(
                 Language.t('alert.errorTitle'), Language.t('alert.specifyInformation'), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }]);
         }
-        
+
     }
     const otpRequest = async () => {
         await setLoading(true)
@@ -211,7 +215,7 @@ const RegisterScreen = ({ route }: any) => {
                     console.log(`otp Request Success => { ${otpPassword} }`);
                     setCountdown(defaultCountDown)
                     setLoading(false)
-                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false)}]);
+                    Alert.alert('', `${Language.t('register.informOtp')} (+66) ${Phone}`, [{ text: Language.t('alert.ok'), onPress: () => setLoading(false) }]);
                 }
             })
             .catch((error) => {
@@ -220,7 +224,7 @@ const RegisterScreen = ({ route }: any) => {
 
                 Alert.alert(
                     Language.t('alert.errorTitle'), error, [{ text: Language.t('alert.ok'), onPress: () => BackHandler.exitApp() }]);
-                    setLoadingstate()
+                setLoadingstate()
             });
 
     };
@@ -243,6 +247,23 @@ const RegisterScreen = ({ route }: any) => {
         birthDate = year + '' + month + '' + day
 
         newData.MB_INTL == 'นาย' || newData.MB_INTL == 'คุณ' || newData.MB_INTL == 'ด.ช.' || newData.MB_INTL == 'MR.' ? sex = 'M' : sex = 'F'
+        let Parameter = {
+            MB_CODE:newData.MB_REG_MOBILE,
+            MB_CARD:newData.MB_REG_MOBILE,
+            MB_INTL: newData.MB_INTL,
+            MB_NAME: newData.MB_NAME,
+            MB_SURNME: newData.MB_SURNME,
+            MB_SEX: sex,
+            MB_BIRTH: birthDate,
+            MB_ADDR_1: ' ',
+            MB_ADDR_2: ' ',
+            MB_ADDR_3: ' ',
+            MB_POST: ' ',
+            MB_EMAIL: newData.MB_EMAIL,
+            MB_CNTRY_CODE: newData.MB_CNTRY_CODE,
+            MB_REG_MOBILE: newData.MB_REG_MOBILE,
+            MB_PW: newData.MB_PW
+        }
 
         await fetch(configToken.WebService + '/MbUsers', {
             method: 'POST',
@@ -250,41 +271,15 @@ const RegisterScreen = ({ route }: any) => {
                 'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
                 'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
                 'BPAPUS-FUNCTION': 'NewMember',
-                'BPAPUS-PARAM':
-                    '{"MB_INTL":  "' +
-                    newData.MB_INTL +
-                    '","MB_NAME":"' +
-                    newData.MB_NAME +
-                    '","MB_SURNME":"' +
-                    newData.MB_SURNME +
-                    '","MB_SEX": "' +
-                    sex +
-                    '","MB_BIRTH": "' +
-                    birthDate +
-                    '","MB_ADDR_1": "' +
-                    newData.MB_ADDR_1 +
-                    '","MB_ADDR_2": "' +
-                    newData.MB_ADDR_2 +
-                    '","MB_ADDR_3": "' +
-                    newData.MB_ADDR_3 +
-                    '","MB_POST": "' +
-                    newData.MB_POST +
-
-                    '","MB_EMAIL": "' +
-                    newData.MB_EMAIL +
-                    '","MB_CNTRY_CODE":"' +
-                    newData.MB_CNTRY_CODE +
-                    '","MB_REG_MOBILE":"' +
-                    newData.MB_REG_MOBILE +
-                    '","MB_PW": "' +
-                    newData.MB_PW + '"}',
+                'BPAPUS-PARAM': JSON.stringify(Parameter)
             }),
         })
             .then((response) => response.json())
             .then(async (json) => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
-                    LoginByMobile()
+                    await getLoginMbUsers()
+
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -301,6 +296,141 @@ const RegisterScreen = ({ route }: any) => {
                 console.log('ERROR ' + error);
             });
     };
+    const getLoginMbUsers = async () => {
+        console.log(`LoginByMobile`)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/MbUsers', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'LoginByMobile',
+                'BPAPUS-PARAM': '{"MB_CNTRY_CODE": "66", "MB_REG_MOBILE": "' +
+                    newData.MB_REG_MOBILE +
+                    '","MB_PW": "' +
+                    newData.MB_PW +
+                    '"}',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    await getMemberInfo(responseData.MB_LOGIN_GUID)
+
+
+                } else {
+                    const NewKey = { ...configToken, logined: 'false' }
+                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                }
+            })
+            .catch(async (error) => {
+                const NewKey = { ...configToken, logined: 'false' }
+                await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                console.log('ERROR ' + error);
+            })
+    }
+    const getMemberInfo = async (MB_LOGIN_GUID: any) => {
+        console.log(`getMemberInfo`)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        await fetch(configToken.WebService + '/Member', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'ShowMemberInfo',
+                'BPAPUS-PARAM':
+                    '{ "MB_LOGIN_GUID": "' + MB_LOGIN_GUID + '"}',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    await createARfile(responseData.ShowMemberInfo[0])
+
+
+
+                } else {
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+    }
+    const createARfile = async (MemberInfo: any) => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        let Parameter = {
+            AR_CODE: "/MB",
+            AR_NAME: `${newData.MB_NAME} ${newData.MB_SURNME}`,
+            AR_MBCODE: MemberInfo.MB_CODE,
+            AR_ENABLE: 'Y',
+            ADDB_COMPANY: `${newData.MB_NAME} ${newData.MB_SURNME}`,
+            ADDB_PHONE: newData.MB_REG_MOBILE,
+            ADDB_EMAIL: newData.MB_EMAIL,
+            ADDB_ADDB_1: newData.ADDB_ADDB_1,
+            ADDB_SUB_DISTRICT: newData.ADDB_SUB_DISTRICT,
+            ADDB_DISTRICT: newData.ADDB_DISTRICT,
+            ADDB_PROVINCE: newData.ADDB_PROVINCE,
+            ADDB_POST: newData.ADDB_POST,
+            CT_INTL: newData.MB_INTL,
+            CT_NAME: newData.MB_NAME,
+            CT_SURNME: newData.MB_SURNME,
+            DFAR_TYPE: "1"
+        }
+
+        console.log(" ######## createARfile  #######", Parameter)
+        await fetch(configToken.WebService + '/CreateUpdateMaster', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'NEWARFILE',
+                'BPAPUS-PARAM': JSON.stringify(Parameter),
+                'BPAPUS-FILTER': '',
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    console.log(" responseData createARfile  >>>", responseData)
+
+
+                    await dispatch(updateARcode(responseData.AR_CODE))
+                    await LoginByMobile()
+                } else {
+                    console.log('Function Parameter Required');
+                    let temp_error = 'error_ser.' + json.ResponseCode;
+                    console.log('>> ', temp_error)
+                    Alert.alert(
+                        Language.t('alert.errorTitle'),
+                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => console.log() }])
+                console.log('ERROR ' + error);
+            })
+
+    }
     const LoginByMobile = async () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -325,121 +455,11 @@ const RegisterScreen = ({ route }: any) => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    await getMemberInfo(responseData.MB_LOGIN_GUID)
-                } else {
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
-                }
-            })
-            .catch((error) => {
-
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
-                console.log('ERROR ' + error);
-
-            });
-
-    }
-    const getMemberInfo = async (MB_LOGIN_GUID: any) => {
-        console.log(`getProJ [Ec000400]`)
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-
-        await fetch(configToken.WebService + '/Member', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'ShowMemberInfo',
-                'BPAPUS-PARAM':
-                    '{ "MB_LOGIN_GUID": "' + MB_LOGIN_GUID + '"}',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                console.log(json)
-                if (json.ResponseCode == 200) {
-                    let responseData = JSON.parse(json.ResponseData);
-                    await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    await updateMB_LOGIN_GUID(MB_LOGIN_GUID)
+                    await updateMB_LOGIN_GUID(responseData.MB_LOGIN_GUID)
                     const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    await RNRestart.restart()
-                    setLoadingstate()
-                } else {
-                    console.log('Function Parameter Required');
-                    let temp_error = 'error_ser.' + json.ResponseCode;
-                    console.log('>> ', temp_error)
-                    Alert.alert(
-                        Language.t('alert.errorTitle'),
-                        Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => setLoadingstate() }])
-                }
-            })
-            .catch((error) => {
-                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                    { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
-                console.log('ERROR ' + error);
-            });
-    }
-    const UpdateMember = async (NEW_GUID: any) => {
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let sex = 'M'
-        let birthDate = ''
-        if (newData.MB_BIRTH == '') {
-            let nowDate = new Date();
-            birthDate = `${nowDate.getFullYear()}${nowDate.getMonth().toString().length > 1 ? nowDate.getMonth() : '0' + nowDate.getMonth()}${nowDate.getDate().toString().length > 1 ? nowDate.getDate() : '0' + nowDate.getDate()}`
-        } else {
-            let nowDate = newData.MB_BIRTH.split('-')
-            birthDate = nowDate[2] + nowDate[1] + nowDate[0];
-        }
-        newData.MB_INTL == 'นาย' || newData.MB_INTL == 'คุณ' || newData.MB_INTL == 'ด.ช.' || newData.MB_INTL == 'MR.' ? sex = 'M' : sex = 'F'
-
-        await fetch(configToken.WebService + '/MbUsers', {
-            method: 'POST',
-            body: JSON.stringify({
-                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                'BPAPUS-LOGIN-GUID': ConfigList.LoginList.BPAPUS_GUID,
-                'BPAPUS-FUNCTION': 'UpdateMember',
-                'BPAPUS-PARAM':
-                    '{"MB_LOGIN_GUID":  "' +
-                    NEW_GUID +
-                    '","MB_INTL": "' +
-                    newData.MB_INTL +
-                    '","MB_NAME":"' +
-                    newData.MB_NAME +
-                    '","MB_SURNME":"' +
-                    newData.MB_SURNME +
-                    '","MB_SEX": "' +
-                    sex +
-                    '","MB_BIRTH": "' +
-                    birthDate +
-                    '","MB_ADDR_1": "' +
-                    newData.MB_ADDR_1 +
-                    '","MB_ADDR_2": "' +
-                    newData.MB_ADDR_2 +
-                    '","MB_ADDR_3": "' +
-                    newData.MB_ADDR_3 +
-                    '","MB_POST": "' +
-                    newData.MB_POST +
-
-                    '","MB_EMAIL": "' +
-                    newData.MB_EMAIL +
-                    '","MB_CNTRY_CODE":"' +
-                    newData.MB_CNTRY_CODE +
-                    '","MB_REG_MOBILE":"' +
-                    newData.MB_REG_MOBILE +
-                    '","MB_PW": "' +
-                    newData.MB_PW + '"}',
-            }),
-        })
-            .then((response) => response.json())
-            .then(async (json) => {
-                if (json && json.ResponseCode == '200') {
+                    navigation.goBack()
+                    // await RNRestart.restart()
 
                 } else {
                     console.log('Function Parameter Required');
@@ -451,11 +471,15 @@ const RegisterScreen = ({ route }: any) => {
                 }
             })
             .catch((error) => {
+
                 Alert.alert(Language.t('notiAlert.header'), `${error}`, [
                     { text: Language.t('alert.confirm'), onPress: () => setLoadingstate() }])
                 console.log('ERROR ' + error);
+
             });
+
     }
+
 
     const _PressResend = () => {
 
@@ -498,12 +522,12 @@ const RegisterScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight + statusBarHeight
                 }}
             >
                 {loading &&
                     <Modal
-                        transparent={true}
+                        transparent={loading}
                         animationType={'none'}
                         visible={loading}
                         onRequestClose={() => { styles.header_text_title }}>
@@ -884,10 +908,10 @@ const RegisterScreen = ({ route }: any) => {
                                         }}>
                                             <TextInput
                                                 placeholderTextColor={Colors.fontColorSecondary}
-                                                value={newData.MB_ADDR_1}
+                                                value={newData.ADDB_ADDB_1}
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
-                                                    MB_ADDR_1: item,
+                                                    ADDB_ADDB_1: item,
                                                 })}
                                                 placeholder={`${Language.t('profile.address')}-${Language.t('profile.road')}`}
 
@@ -898,7 +922,7 @@ const RegisterScreen = ({ route }: any) => {
                                         marginTop: deviceWidth * 0.05
                                     }}>
                                         <Text style={styles.textLight}>
-                                            {`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
+                                            {`${Language.t('profile.subdistrict')}`}
                                         </Text>
                                         <View style={{
                                             backgroundColor: Colors.backgroundColorSecondary,
@@ -914,12 +938,41 @@ const RegisterScreen = ({ route }: any) => {
                                         }}>
                                             <TextInput
                                                 placeholderTextColor={Colors.fontColorSecondary}
-                                                value={newData.MB_ADDR_2}
+                                                value={newData.ADDB_SUB_DISTRICT}
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
-                                                    MB_ADDR_2: item,
+                                                    ADDB_SUB_DISTRICT: item,
                                                 })}
-                                                placeholder={`${Language.t('profile.subdistrict')} ${Language.t('profile.and')} ${Language.t('profile.district')}`}
+                                                placeholder={`${Language.t('profile.subdistrict')}`}
+                                                style={styles.textInput}></TextInput>
+                                        </View>
+                                    </View>
+                                    <View style={{
+                                        marginTop: deviceWidth * 0.05
+                                    }}>
+                                        <Text style={styles.textLight}>
+                                            {`${Language.t('profile.district')}`}
+                                        </Text>
+                                        <View style={{
+                                            backgroundColor: Colors.backgroundColorSecondary,
+                                            borderRadius: 10,
+                                            paddingLeft: 20,
+                                            paddingRight: 20,
+                                            paddingTop: 10,
+                                            height: 'auto',
+                                            paddingBottom: 10,
+                                            borderColor: 'gray',
+                                            borderWidth: 0.7,
+                                            flexDirection: 'row',
+                                        }}>
+                                            <TextInput
+                                                placeholderTextColor={Colors.fontColorSecondary}
+                                                value={newData.ADDB_DISTRICT}
+                                                onChangeText={(item: any) => setNewData({
+                                                    ...newData,
+                                                    ADDB_DISTRICT: item,
+                                                })}
+                                                placeholder={`${Language.t('profile.district')}`}
                                                 style={styles.textInput}></TextInput>
                                         </View>
                                     </View>
@@ -943,10 +996,10 @@ const RegisterScreen = ({ route }: any) => {
                                         }}>
                                             <TextInput
                                                 placeholderTextColor={Colors.fontColorSecondary}
-                                                value={newData.MB_ADDR_3}
+                                                value={newData.ADDB_PROVINCE}
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
-                                                    MB_ADDR_3: item,
+                                                    ADDB_PROVINCE: item,
                                                 })}
                                                 placeholder={Language.t('profile.province')}
 
@@ -973,11 +1026,11 @@ const RegisterScreen = ({ route }: any) => {
                                         }}>
                                             <TextInput
                                                 placeholderTextColor={Colors.fontColorSecondary}
-                                                value={newData.MB_POST}
+                                                value={newData.ADDB_POST}
                                                 keyboardType="number-pad"
                                                 onChangeText={(item: any) => setNewData({
                                                     ...newData,
-                                                    MB_POST: item,
+                                                    ADDB_POST: item,
                                                 })}
                                                 placeholder={Language.t('profile.postCode')}
 
@@ -1053,7 +1106,6 @@ const RegisterScreen = ({ route }: any) => {
                                                         height: 30,
                                                         resizeMode: 'contain',
                                                     }}
-                                                    resizeMode={'contain'}
                                                     source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
                                                 />
                                             </TouchableOpacity>

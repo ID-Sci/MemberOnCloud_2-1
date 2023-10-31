@@ -25,8 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { FontSize } from '../styles/FontSizeHelper';
-import { styles } from '../styles/styles';
+import { FontSize } from '../styles/FontSizeHelper'; 
 import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
@@ -35,8 +34,7 @@ import moment from 'moment';
 import { Language } from '../translations/I18n';
 import RNRestart from 'react-native-restart';
 import * as Keychain from 'react-native-keychain';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
 
 const FoegetScreen = ({ route }: any) => {
     const dispatch = useAppDispatch();
@@ -231,7 +229,8 @@ const FoegetScreen = ({ route }: any) => {
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: newData.MB_REG_MOBILE, MB_PW: newData.MB_PW, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    await RNRestart.restart()
+                    navigation.goBack()
+                    // await RNRestart.restart()
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -405,7 +404,6 @@ const FoegetScreen = ({ route }: any) => {
                                                 height: 30,
                                                 resizeMode: 'contain',
                                             }}
-                                            resizeMode={'contain'}
                                             source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
                                         />
                                     </TouchableOpacity>
@@ -486,7 +484,7 @@ const FoegetScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                     opacity: 0.5,
 
                     alignSelf: 'center',
@@ -507,7 +505,7 @@ const FoegetScreen = ({ route }: any) => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight
+                    height: deviceHeight+statusBarHeight
                 }}
             >
 

@@ -30,7 +30,7 @@ import FlatSlider from '../components/FlatListSlider';
 import RNRestart from 'react-native-restart';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
+import { config, updateARcode, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import { docinfoSelector, updateDocinfoList, clearDocinfoList, updateDocinfoPage, clearDocinfoPage } from '../store/slices/docinfoReducer';
 import { projSelector, updateProjList, clearProjList } from '../store/slices/projReducer';
 import { promotionSelector, updatePromotionList, clearPromotionList, updatePromotionPage, clearPromotionPage } from '../store/slices/promotionReducer';
@@ -42,8 +42,7 @@ import { mycardSelector, updateMycardList, clearMycardList, updateMycardPage, cl
 import { newproductSlice, updateNewproductList, updateAllproductList, clearAllproductList, clearnewproductList, updateNewproductPage, clearNewproductPage, updateNewproductContent, clearNewproductContent } from '../store/slices/newproductReducer';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import { Language, changeLanguage } from '../translations/I18n';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles, statusBarHeight, deviceWidth, deviceHeight } from '../styles/styles';
 const MyConfig = '/config.json';
 let CState = true
 const SpaceScreen = () => {
@@ -52,7 +51,7 @@ const SpaceScreen = () => {
     const projList = useAppSelector(projSelector)
     let images: Array<[]> = [];
     const navigation = useNavigation();
-
+    let ProducrALL: any[] = []
     useEffect(() => {
         if (CState)
             loadFuntion()
@@ -64,8 +63,6 @@ const SpaceScreen = () => {
 
         if (CState) await setConfig()
         if (CState) await UnRegister()
-        if (CState) await Register()
-        if (CState) await fetchGuidLog()
         if (CState) await setnotiItem()
         if (CState)
             navigation.dispatch(
@@ -75,8 +72,6 @@ const SpaceScreen = () => {
     }
 
     const getMac = async () => {
-
-
         try {
             let mac = await DeviceInfo.getMacAddress();
 
@@ -134,7 +129,7 @@ const SpaceScreen = () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         let superObj = {
-            "WebService": "http://192.168.0.110:8907/Member/BplusErpDvSvrIIS.dll",
+            "WebService": "http://223.27.215.37:2541/BplusErpDvSvrIIS31.dll",
             "OTPService": "http://203.150.55.21:8891/BplusNotiService/BplusNotiIIS.dll",
             "ServiceID": {
                 "ShowPrice": "{66365970-7284-465e-bd98-e99cd51bf7f1}",
@@ -160,12 +155,10 @@ const SpaceScreen = () => {
             "MB_PW": "",
             "logined": "false",
             "Language": Language.getLang(),
-            "upDateVsersion": "3.0.4"
+            "upDateVsersion": "3.0.7"
         }
         changeLanguage(configToken?.Language ? configToken.Language : Language.getLang())
-        console.log(` JSON.stringify(superObj) ${JSON.stringify(superObj.Mac)}`)
         if (configToken == null || configToken.upDateVsersion != superObj.upDateVsersion) {
-            console.log(`new Obj >>`)
             await Keychain.setGenericPassword("config", JSON.stringify(superObj))
         }
     }
@@ -189,11 +182,9 @@ const SpaceScreen = () => {
             }),
         })
             .then((response) => response.json())
-            .then((json) => {
+            .then(async (json) => {
                 console.log(json.ReasonString)
-                console.log(json.ReasonString)
-                if (json && json.ResponseCode == '200') {
-                }
+                await Register()
             }
             )
             .catch((error) => {
@@ -228,7 +219,7 @@ const SpaceScreen = () => {
                 console.log(json.ReasonString)
 
                 if (json.ResponseCode == 200 && json.ReasonString == 'Completed') {
-
+                    await fetchGuidLog()
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -276,12 +267,10 @@ const SpaceScreen = () => {
                     console.log(responseData)
                     console.log(`configToken.logined >> [${configToken.logined}]`)
                     if (configToken.logined == 'true') {
-                        await getLoginMbUsers(responseData)
+                        getLoginMbUsers(responseData)
                     }
-                    await dispatch(updateLoginList(responseData))
+                    dispatch(updateLoginList(responseData))
                     await getProJ(responseData)
-
-
                 } else {
                     console.log('Function Parameter Required');
 
@@ -340,7 +329,6 @@ const SpaceScreen = () => {
     }
 
     const getMemberInfo = async (LoginList: Object, MB_LOGIN_GUID: any) => {
-        console.log(`getProJ [Ec000400]`)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         await fetch(configToken.WebService + '/Member', {
@@ -358,11 +346,7 @@ const SpaceScreen = () => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
-                    await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
-                    const NewKey = { ...configToken, Phone: configToken.Phone, MB_PW: configToken.MB_PW, logined: 'true' }
-                    await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-
+                    await GetARinfo(LoginList, responseData.ShowMemberInfo[0], MB_LOGIN_GUID)
                 } else {
                     console.log('Function Parameter Required');
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -378,7 +362,60 @@ const SpaceScreen = () => {
                 console.log('ERROR ' + error);
             })
     }
+    const GetARinfo = async (LoginList: Object, MemberInfo: any, MB_LOGIN_GUID: any) => {
 
+        console.log(`GetARinfo`)
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        const { MB_CODE } = MemberInfo
+        console.log(MB_CODE)
+        if (MB_CODE) {
+            await fetch(configToken.WebService + '/LookupErp', {
+                method: 'POST',
+                body: JSON.stringify({
+                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                    'BPAPUS-FUNCTION': 'Ar000130',
+                    'BPAPUS-PARAM': '',
+                    'BPAPUS-FILTER': `AND(AR_MBCODE = '${MB_CODE}')`,
+                    'BPAPUS-ORDERBY': '',
+                    'BPAPUS-OFFSET': '0',
+                    'BPAPUS-FETCH': '0',
+                }),
+            })
+                .then((response) => response.json())
+                .then(async (json) => {
+                    console.log(json.ReasonString)
+                    if (json.ResponseCode == 200) {
+                        let responseData = JSON.parse(json.ResponseData);
+                        if (responseData.Ar000130.length > 0) {
+                            MemberInfo.ADDB_KEY = responseData.Ar000130[0].ADDB_KEY
+                            MemberInfo.AR_KEY = responseData.Ar000130[0].AR_KEY
+                            MemberInfo.AR_CODE = responseData.Ar000130[0].AR_CODE
+                            MemberInfo.ADDB_ADDB_1 = responseData.Ar000130[0].ADDB_ADDB_1
+                            MemberInfo.ADDB_SUB_DISTRICT = responseData.Ar000130[0].ADDB_SUB_DISTRICT
+                            MemberInfo.ADDB_DISTRICT = responseData.Ar000130[0].ADDB_DISTRICT
+                            MemberInfo.ADDB_PROVINCE = responseData.Ar000130[0].ADDB_PROVINCE
+                            MemberInfo.ADDB_POST = responseData.Ar000130[0].ADDB_POST
+                            const NewKey = { ...configToken, Phone: configToken.Phone, MB_PW: configToken.MB_PW, logined: 'true' }
+                            await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
+                            await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
+                            await dispatch(updateUserList(MemberInfo))
+                            await dispatch(updateARcode(responseData.Ar000130[0].AR_CODE))
+                            console.log(responseData.ReasonString)
+                        }
+                    } else {
+                        Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                            { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    }
+                })
+                .catch((error) => {
+                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                    console.log('ERROR ' + error);
+                })
+        }
+    }
     const getProJ = async (LoginList: Object) => {
         console.log(`getProJ [Ec000400]`)
         const checkLoginToken = await Keychain.getGenericPassword();
@@ -433,7 +470,21 @@ const SpaceScreen = () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
         console.log(`FetchDataProject`)
-
+        let fullDay: any = ''
+        try {
+            const response = await fetch(configToken.WebService + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
+                method: 'GET'
+            });
+            const datetime = response.headers.get('date');
+            const x = new Date(datetime);
+            const year = x.getFullYear().toString();
+            const month = (x.getMonth() + 1).toString().padStart(2, '0');
+            const day = x.getDate().toString().padStart(2, '0');
+            fullDay = year + month + day;
+        } catch (error) {
+            console.log('ERROR at fetchContent 1>> ' + error);
+        }
+        console.log(`fullDay >> ${fullDay}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -443,9 +494,9 @@ const SpaceScreen = () => {
                 'BPAPUS-PARAM':
                     '{"SHWJ_GUID": "' +
                     ProjList.SHWJH_GUID +
-                    '","SHWJ_IMAGE": "Y", "SHWL_IMAGE": "Y"}',
+                    '","SHWJ_IMAGE": "N", "SHWL_IMAGE": "N"}',
                 'BPAPUS-FILTER': '',
-                'BPAPUS-ORDERBY': '',
+                'BPAPUS-ORDERBY': 'ORDER BY SHWLH_CODE',
                 'BPAPUS-OFFSET': '0',
                 'BPAPUS-FETCH': '0',
             }),
@@ -457,38 +508,50 @@ const SpaceScreen = () => {
                     let tempArray = [];
                     let responseData = JSON.parse(json.ResponseData);
                     console.log(`\n\rresponseData.SHOWLAYOUT [${responseData.SHOWLAYOUT.length}]`)
+                    let temp_data = {
+                        BANNER: null,
+                        NOTI: null,
+                        CATEGORY: null,
+                        PROMOTION: null,
+                        NEWPRODUCT: null,
+                        ACTIVITY: null,
+                        MYCARD: null,
+                        DOCINFO: null,
 
-                    let Banner = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('BANNER') })[0]
-                    console.log(`\nBanner [${Banner ? true : false}]\n +> `)
-                    Banner && await fetchLayoutData('Banner', LoginList, Banner)
+                    }
+                    for (const iterator of responseData.SHOWLAYOUT) {
+                        let SHWLH_CODE = iterator.SHWLH_CODE
+                        if (SHWLH_CODE.includes('BANNER')) {
+                            temp_data.BANNER = iterator
+                        } else if (SHWLH_CODE.includes('NOTI')) {
+                            temp_data.NOTI = iterator
+                        } else if (SHWLH_CODE.includes('CATEGORY')) {
+                            temp_data.CATEGORY = iterator
+                        } else if (SHWLH_CODE.includes('PROMOTION')) {
+                            temp_data.PROMOTION = iterator
+                        } else if (SHWLH_CODE.includes('NEWPRODUCT')) {
+                            temp_data.NEWPRODUCT = iterator
+                        } else if (SHWLH_CODE.includes('ACTIVITY')) {
+                            temp_data.ACTIVITY = iterator
+                        } else if (SHWLH_CODE.includes('MYCARD')) {
+                            temp_data.MYCARD = iterator
+                        } else if (SHWLH_CODE.includes('DOCINFO')) {
+                            temp_data.DOCINFO = iterator
+                        }
+                    }
+                    await Promise.allSettled([
+                        fetchLayoutData('Banner', LoginList, temp_data.BANNER, fullDay),
+                        fetchLayoutData('Notication', LoginList, temp_data.NOTI, fullDay),
+                        fetchLayoutData('Category', LoginList, temp_data.CATEGORY, fullDay),
+                        fetchLayoutData('Promotion', LoginList, temp_data.PROMOTION, fullDay),
+                        fetchLayoutData('Newproduct', LoginList, temp_data.NEWPRODUCT, fullDay),
+                        fetchLayoutData('Activity', LoginList, temp_data.ACTIVITY, fullDay),
+                        fetchLayoutData('Mycard', LoginList, temp_data.MYCARD, fullDay),
+                        fetchLayoutData('Docinfo', LoginList, temp_data.DOCINFO, fullDay),
+                    ])
 
-                    let Notication = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NOTI') })[0]
-                    console.log(`\nNotication [${Notication ? true : false}]\n +> `)
-                    Notication && await fetchLayoutData('Notication', LoginList, Notication)
 
-                    let Category = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('CATEGORY') })[0]
-                    console.log(`\nCategory [${Category ? true : false}]\n +>`)
-                    Category && await fetchLayoutData('Category', LoginList, Category)
 
-                    let Promotion = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('PROMOTION') })[0]
-                    console.log(`\nPromotion [${Promotion ? true : false}]\n +> `)
-                    Promotion && await fetchLayoutData('Promotion', LoginList, Promotion)
-
-                    let Newproduct = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('NEWPRODUCT') })[0]
-                    console.log(`\nPromotion [${Newproduct ? true : false}]\n +> `)
-                    Newproduct && await fetchLayoutData('Newproduct', LoginList, Newproduct)
-
-                    let Activity = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('ACTIVITY') })[0]
-                    console.log(`\nActivity [${Activity ? true : false}]\n +> `)
-                    Activity && await fetchLayoutData('Activity', LoginList, Activity)
-
-                    let Mycard = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('MYCARD') })[0]
-                    console.log(`\nMycard [${Mycard ? true : false}]\n +> `)
-                    Mycard && await fetchLayoutData('Mycard', LoginList, Mycard)
-
-                    let Docinfo = await responseData.SHOWLAYOUT.filter((filteritem: any) => { return filteritem.SHWLH_CODE.includes('DOCINFO') })[0]
-                    console.log(`\nDocinfo [${Docinfo ? true : false}]\n +> `)
-                    Docinfo && await fetchLayoutData('Docinfo', LoginList, Docinfo)
                 } else {
                     CState = false
                     console.log('Function Parameter Required');
@@ -509,31 +572,10 @@ const SpaceScreen = () => {
             })
     }
 
-    const fetchLayoutData = async (LayoutKey: String, LoginList: object, LayoutList: object) => {
+    const fetchLayoutData = async (LayoutKey: String, LoginList: object, LayoutList: object, fullDay: any) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchLayoutData ${LayoutKey}`)
-        let fullDay: any = ''
-        try {
-            const response = await fetch(configToken.WebService + `/ServerReady?date_for_no_cache=${new Date().getMilliseconds()},randomForNoCache=${Math.random() * 10}`, {
-                method: 'GET'
-            });
-
-            const datetime = response.headers.get('date');
-
-
-            const x = new Date(datetime);
-            const year = x.getFullYear().toString();
-            const month = (x.getMonth() + 1).toString().padStart(2, '0');
-            const day = x.getDate().toString().padStart(2, '0');
-            fullDay = year + month + day;
-
-
-        } catch (error) {
-            console.log('ERROR at fetchContent 1>> ' + error);
-
-        }
-        console.log(`fullDay >> ${fullDay}`)
+        console.log(`fetchLayoutData ${LayoutKey} >> ${LayoutList.SHWLH_GUID}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -543,11 +585,11 @@ const SpaceScreen = () => {
                 'BPAPUS-PARAM':
                     '{"SHWL_GUID": "' +
                     LayoutList.SHWLH_GUID +
-                    '","SHWL_IMAGE": "Y", "SHWP_IMAGE": "Y"}',
+                    '","SHWL_IMAGE": "N", "SHWP_IMAGE": "N"}',
                 'BPAPUS-FILTER': '',
                 'BPAPUS-ORDERBY': '',
                 'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
+                'BPAPUS-FETCH':LayoutKey == 'Banner' || LayoutKey == 'Notication' ? '0' :  LayoutKey == 'Category' ? '10' : '3',
             }),
         })
             .then((response) => response.json())
@@ -555,44 +597,39 @@ const SpaceScreen = () => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
                     if (LayoutKey == 'Banner') {
-                        await responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        }).map((Banneritem: any) => {
-                            let objImage: any = {
-                                image: `data:image/png;base64,${Banneritem.IMAGE64}`
-                            }
-                            images.push(objImage)
-                        })
+
                         await dispatch(updateBannerList(responseData.SHOWLAYOUT))
-                        await dispatch(updateBannerPage(responseData.SHOWPAGE))
+
+                        await dispatch(updateBannerPage(
+                            await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE.sort((a: any, b: any) => {
+                                return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                            }), fullDay)))
                     }
                     if (LayoutKey == 'Notication') {
                         await dispatch(updateNotificationList(responseData.SHOWLAYOUT))
-                        await dispatch(updateNotificationPage(responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        })))
+                        await dispatch(updateNotificationPage(
+                            await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE.sort((a: any, b: any) => {
+                                return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                            }), fullDay)))
+
                     }
                     if (LayoutKey == 'Category') {
                         await dispatch(updateCategoryList(responseData.SHOWLAYOUT))
-                        let tempdata = await getProducrALLCategory(responseData.SHOWPAGE, LoginList,fullDay)
-                   
-                        await dispatch(updateAllproductList(tempdata.sort((a: any, b: any) => {
-                            return a.GOODS_CODE - b.GOODS_CODE;
-                        })))
-                        let tempCPTNC = await getPageProJ(responseData.SHOWPAGE, LoginList)
-                        await dispatch(updateCategoryPage(tempCPTNC))
-
+                        await dispatch(updateCategoryPage(
+                            await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE, fullDay
+                            )))
                     }
                     if (LayoutKey == 'Docinfo') {
+
                         await dispatch(updateDocinfoList(responseData.SHOWLAYOUT))
-                        await dispatch(updateDocinfoPage(responseData.SHOWPAGE))
+                        await dispatch(updateDocinfoPage(await fetchDocType(LoginList, responseData.SHOWPAGE)))
                     }
                     if (LayoutKey == 'Promotion') {
                         await dispatch(updatePromotionList(responseData.SHOWLAYOUT))
-                        await fetchNewproductContent('Newproduct', LoginList, responseData.SHOWPAGE[0])
-                        await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE.sort((a: any, b: any) => {
-                            return b.SHWLD_SEQ - a.SHWLD_SEQ;
-                        }), fullDay)
+                        await dispatch(updatePromotionPage(
+                            await fetchPageiItem(LayoutKey, LoginList, responseData.SHOWPAGE.sort((a: any, b: any) => {
+                                return b.SHWLD_SEQ - a.SHWLD_SEQ;
+                            }), fullDay)))
 
                     }
                     if (LayoutKey == 'Activity') {
@@ -606,7 +643,7 @@ const SpaceScreen = () => {
                     if (LayoutKey == 'Newproduct') {
                         await dispatch(updateNewproductList(responseData.SHOWLAYOUT))
                         await dispatch(updateNewproductPage(responseData.SHOWPAGE))
-                        await fetchNewproductContent('Newproduct', LoginList, responseData.SHOWPAGE[0])
+                        await fetchProductContent('Newproduct', LoginList, responseData.SHOWPAGE[0])
                     }
 
                     //    console.log(responseData)
@@ -628,11 +665,52 @@ const SpaceScreen = () => {
 
             })
     }
+    const fetchDocType = async (LoginList: Object, SHOWLAYOUT: any) => {
+        console.log(`fetchDocType SHOWLAYOUT >.${JSON.stringify(SHOWLAYOUT)}`)
+        let LAYOUTDATA = SHOWLAYOUT
+        let DT_DOCCODE = SHOWLAYOUT[0].SHWPH_TTL_ECPTN
 
-    const fetchNewproductContent = async (PageKey: String, LoginList: object, PageList: object) => {
+        console.log(`GetARinfo`)
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchNewproductContent ${PageList}`)
+
+        await fetch(configToken.WebService + '/LookupErp', {
+            method: 'POST',
+            body: JSON.stringify({
+                'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
+                'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
+                'BPAPUS-FUNCTION': 'Dc000110',
+                'BPAPUS-PARAM': '',
+                'BPAPUS-FILTER': `AND ( DT_DOCCODE = '${DT_DOCCODE}' )`,
+                'BPAPUS-ORDERBY': '',
+                'BPAPUS-OFFSET': '0',
+                'BPAPUS-FETCH': '0',
+            }),
+        })
+            .then((response) => response.json())
+            .then(async (json) => {
+                console.log(json.ReasonString)
+                if (json.ResponseCode == 200) {
+                    let responseData = JSON.parse(json.ResponseData);
+                    responseData.Dc000110[0].SHWPH_TTL_CPTN = LAYOUTDATA[0].SHWPH_TTL_CPTN
+                    LAYOUTDATA[0] = responseData.Dc000110[0]
+
+                } else {
+                    Alert.alert(Language.t('notiAlert.header'), `${json.ReasonString}`, [
+                        { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                }
+            })
+            .catch((error) => {
+                Alert.alert(Language.t('notiAlert.header'), `${error}`, [
+                    { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
+                console.log('ERROR ' + error);
+            })
+        return LAYOUTDATA
+    }
+    const fetchProductContent = async (LayoutKey: String, LoginList: object, PageList: object) => {
+        const checkLoginToken = await Keychain.getGenericPassword();
+        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
+        console.log(`fetchNewproductContent ${JSON.stringify(PageList.SHWPH_GUID)}`)
         await fetch(configToken.WebService + '/ECommerce', {
             method: 'POST',
             body: JSON.stringify({
@@ -642,21 +720,20 @@ const SpaceScreen = () => {
                 'BPAPUS-PARAM':
                     '{"SHWP_GUID": "' +
                     PageList.SHWPH_GUID +
-                    '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                    '","SHWP_IMAGE": "N", "SHWC_IMAGE": "N"}',
                 'BPAPUS-FILTER': '',
                 'BPAPUS-ORDERBY': '',
                 'BPAPUS-OFFSET': '0',
-                'BPAPUS-FETCH': '0',
+                'BPAPUS-FETCH': '5',
             }),
         })
             .then((response) => response.json())
             .then(async (json) => {
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    if (PageKey == 'Newproduct') {
-                        await dispatch(updateNewproductContent(responseData.SHOWCONTENT))
-                    }
-                    //console.log(responseData)
+                    console.log(responseData.SHOWPAGE.RECORD_COUNT)
+                    await dispatch(updateNewproductContent(responseData.SHOWCONTENT))
+
                 } else {
                     CState = false
                     console.log('Function Parameter Required');
@@ -675,15 +752,15 @@ const SpaceScreen = () => {
                     { text: Language.t('alert.confirm'), onPress: () => BackHandler.exitApp() }])
 
             })
+
     }
     const fetchPageiItem = async (PageKey: String, LoginList: object, PageList: any, fullDay: string) => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        console.log(`fetchPageiItem ${fullDay}`)
         let SHOWPAGE: any[] = []
+        let SP_IMAGE = "N"
+        if (PageKey == 'Banner') SP_IMAGE = "Y"
         for (var i in PageList) {
-            console.log(`fetchPageiItem ${PageList[i].SHWPH_GUID} `)
-
             await fetch(configToken.WebService + '/ECommerce', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -693,7 +770,9 @@ const SpaceScreen = () => {
                     'BPAPUS-PARAM':
                         '{"SHWP_GUID": "' +
                         PageList[i].SHWPH_GUID +
-                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
+                        '","SHWP_IMAGE" : "' + SP_IMAGE +
+                        '","SHWC_IMAGE" : "' + SP_IMAGE +
+                        '"}',
                     'BPAPUS-FILTER': '',
                     'BPAPUS-ORDERBY': '',
                     'BPAPUS-OFFSET': '0',
@@ -705,8 +784,17 @@ const SpaceScreen = () => {
                     if (json.ResponseCode == 200) {
                         let responseData = JSON.parse(json.ResponseData);
                         if (responseData.SHOWPAGE) {
-                            console.log(`${fullDay} => ${responseData.SHOWPAGE.SHWPH_FROM_DATE} && ${responseData.SHOWPAGE.SHWPH_TO_DATE} <= ${fullDay}`)
-                            await SHOWPAGE.push(responseData.SHOWPAGE)
+                            if (PageKey == 'Category') {
+                                responseData.SHOWPAGE.IMAGE64 = true
+                                await SHOWPAGE.push(responseData.SHOWPAGE)
+                            } else {
+                                if (responseData.SHOWPAGE.SHWPH_FROM_DATE <= fullDay && fullDay <= responseData.SHOWPAGE.SHWPH_TO_DATE) {
+
+                                    if (PageKey != 'Banner') responseData.SHOWPAGE.IMAGE64 = true
+                                    await SHOWPAGE.push(responseData.SHOWPAGE)
+                                }
+                            }
+
                         }
                     } else {
                         CState = false
@@ -730,125 +818,10 @@ const SpaceScreen = () => {
 
 
         }
-        if (PageKey == 'Promotion') {
-            await dispatch(updatePromotionPage(SHOWPAGE.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })))
-        }else  if (PageKey == 'Category') {
+        return SHOWPAGE
 
-        }
+
     }
-    const getPageProJ = async (categoryList: any, LoginList: object,) => {
-
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let tempProductList: any = []
-        for (var r in categoryList) {
-            console.log(`[${r + 1}] ${categoryList[r].SHWPH_GUID}`)
-            await fetch(configToken.WebService + '/ECommerce', {
-                method: 'POST',
-                body: JSON.stringify({
-                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
-                    'BPAPUS-FUNCTION': 'GetPage',
-                    'BPAPUS-PARAM':
-                        '{"SHWP_GUID": "' +
-                        categoryList[r].SHWPH_GUID +
-                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
-                    'BPAPUS-FILTER': '',
-                    'BPAPUS-ORDERBY': '',
-                    'BPAPUS-OFFSET': '0',
-                    'BPAPUS-FETCH': '0',
-                }),
-            })
-                .then((response) => response.json())
-                .then(async (json) => {
-                    if (json.ResponseCode == 200) {
-                        let responseData = JSON.parse(json.ResponseData);
-                        if (responseData.SHOWPAGE) {
-                            console.log(`responseData > ${responseData.SHOWPAGE}`)
-                            tempProductList.push(responseData.SHOWPAGE)
-
-                        }
-                    } else {
-                        console.log('Function Parameter Required');
-                        let temp_error = 'error_ser.' + json.ResponseCode;
-                        console.log('>> ', temp_error)
-                        Alert.alert(
-                            Language.t('alert.errorTitle'),
-                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
-                    }
-                    console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
-
-                })
-                .catch((error) => {
-                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-                    console.log('ERROR ' + error);
-                })
-            console.log()
-
-        }
-
-        console.log(`end getProducrALLCategory`)
-        return tempProductList
-    }
-
-    const getProducrALLCategory = async (categoryList: any, LoginList: object,fullDay) => {
-
-        const checkLoginToken = await Keychain.getGenericPassword();
-        const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
-        let tempProductList: any = []
-        for (var r in categoryList) {
-            console.log(`[${r + 1}] ${categoryList[r].SHWPH_GUID}`)
-            await fetch(configToken.WebService + '/ECommerce', {
-                method: 'POST',
-                body: JSON.stringify({
-                    'BPAPUS-BPAPSV': configToken.ServiceID.ETransaction,
-                    'BPAPUS-LOGIN-GUID': LoginList.BPAPUS_GUID,
-                    'BPAPUS-FUNCTION': 'GetPage',
-                    'BPAPUS-PARAM':
-                        '{"SHWP_GUID": "' +
-                        categoryList[r].SHWPH_GUID +
-                        '","SHWP_IMAGE": "Y", "SHWC_IMAGE": "Y"}',
-                    'BPAPUS-FILTER': '',
-                    'BPAPUS-ORDERBY': '',
-                    'BPAPUS-OFFSET': '0',
-                    'BPAPUS-FETCH': '0',
-                }),
-            })
-                .then((response) => response.json())
-                .then(async (json) => {
-                    if (json.ResponseCode == 200) {
-                        let responseData = JSON.parse(json.ResponseData);
-                        if (responseData.SHOWCONTENT) {
-                            await responseData.SHOWCONTENT.map((tempItem: any) => {
-                                tempProductList.push(tempItem)
-                            })
-                        }
-                    } else {
-                        console.log('Function Parameter Required');
-                        let temp_error = 'error_ser.' + json.ResponseCode;
-                        console.log('>> ', temp_error)
-                        Alert.alert(
-                            Language.t('alert.errorTitle'),
-                            Language.t(temp_error), [{ text: Language.t('alert.ok'), onPress: () => console.log() }])
-                    }
-                    console.log(`[${json.ResponseCode}] ${json.ReasonString}`)
-
-                })
-                .catch((error) => {
-                    Alert.alert(Language.t('notiAlert.header'), `${error}`, [
-                        { text: Language.t('alert.confirm'), onPress: () => console.log() }])
-                    console.log('ERROR ' + error);
-                })
-            console.log()
-
-        }
-
-        console.log(`end getProducrALLCategory`)
-        return tempProductList.filter((filteritem: any) => { return fullDay >= filteritem.SHWPH_FROM_DATE && fullDay <= filteritem.SHWPH_TO_DATE })
-   
-    }
-
     const setnotiItem = async () => {
         try {
             const value = await AsyncStorage.getItem('noti')
@@ -890,7 +863,7 @@ const SpaceScreen = () => {
             <View
                 style={{
                     width: deviceWidth,
-                    height: deviceHeight,
+                    height: deviceHeight + statusBarHeight,
                     opacity: 0.5,
 
                     alignSelf: 'center',
@@ -908,129 +881,5 @@ const SpaceScreen = () => {
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    container1: {
-
-        flex: 1,
-
-    },
-    body: {
-        marginTop: 10,
-        marginLeft: 10,
-        marginRight: 10,
-        width: deviceWidth * 2,
-        borderRadius: 15,
-        backgroundColor: Colors.backgroundColorSecondary
-    },
-    body1e: {
-        marginTop: 20,
-        flexDirection: "row",
-        justifyContent: 'flex-end'
-    },
-    body1: {
-        marginTop: 20,
-        flexDirection: "row",
-    },
-    tabbar: {
-        height: FontSize.large * 3,
-        paddingTop: deviceWidth * 0.03,
-        paddingLeft: deviceWidth * 0.03,
-        paddingRight: deviceWidth * 0.03,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-    },
-    footer: {
-        position: 'absolute',
-
-        justifyContent: 'center',
-        flexDirection: "row",
-
-        left: 0,
-        top: deviceHeight - deviceHeight * 0.1,
-        width: deviceWidth,
-    },
-    table: {
-
-    },
-    tableView: {
-
-
-        paddingLeft: 10,
-        paddingRight: 10,
-
-        flexDirection: "row",
-
-    },
-    tableHeader: {
-        borderTopLeftRadius: 15,
-        borderTopEndRadius: 15,
-
-        flexDirection: "row",
-        backgroundColor: Colors.buttonColorPrimary,
-
-    },
-    dorpdown: {
-        justifyContent: 'center',
-        fontSize: FontSize.medium,
-    },
-    dorpdownTop: {
-        justifyContent: 'flex-end',
-        fontSize: FontSize.medium,
-    },
-    textTitle: {
-        paddingRight: deviceWidth * 0.07,
-        fontSize: FontSize.medium,
-        fontWeight: 'bold',
-        color: '#ffff',
-    },
-    image: {
-        flex: 1,
-        paddingTop: deviceHeight * 0.2
-
-    },
-    topImage: {
-        height: deviceHeight / 3,
-        width: deviceWidth,
-
-    },
-    imageIcon: {
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    button: {
-        marginTop: 10,
-        marginBottom: 25,
-        padding: 5,
-        alignItems: 'center',
-        backgroundColor: Colors.buttonColorPrimary,
-        borderRadius: 10,
-    },
-    textButton: {
-        fontSize: FontSize.large,
-        color: Colors.fontColor2,
-    },
-    buttonContainer: {
-        marginTop: 10,
-    },
-    checkboxContainer: {
-        flexDirection: "row",
-        marginLeft: 10,
-        marginBottom: 20,
-    },
-    checkbox: {
-        alignSelf: "center",
-        borderBottomColor: '#ffff',
-        color: '#f fff',
-    },
-    label: {
-        margin: 8,
-        color: '#ffff',
-    },
-});
 
 export default SpaceScreen;

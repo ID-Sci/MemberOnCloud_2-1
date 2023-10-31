@@ -23,16 +23,15 @@ import { useNavigation } from '@react-navigation/native';
 import Colors from '../styles/colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { FontSize } from '../styles/FontSizeHelper';
-import { config, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
+import { config,updateARcode, updateUserList, updateMB_LOGIN_GUID, clearUserList, updateLoginList, clearLoginList } from '../store/slices/configReducer';
 import CurrencyInput from 'react-native-currency-input';
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useAppDispatch, useAppSelector } from '../store/store';
 import RNRestart from 'react-native-restart';
 import { Language } from '../translations/I18n';
 import * as Keychain from 'react-native-keychain';
-import { styles } from '../styles/styles';
-const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
+import { styles,statusBarHeight, deviceWidth,deviceHeight} from '../styles/styles';
+ 
 
 const LoginScreen = () => {
     const dispatch = useAppDispatch();
@@ -51,6 +50,7 @@ const LoginScreen = () => {
     useEffect(() => {
         getVersionData()
     })
+    
     const getVersionData = async () => {
         const checkLoginToken = await Keychain.getGenericPassword();
         const configToken = checkLoginToken ? JSON.parse(checkLoginToken.password) : null
@@ -119,12 +119,15 @@ const LoginScreen = () => {
                 console.log(json)
                 if (json.ResponseCode == 200) {
                     let responseData = JSON.parse(json.ResponseData);
-                    await dispatch(updateUserList(responseData.ShowMemberInfo[0]))
+             
+
+                    await dispatch(updateUserList(MB_LOGIN_GUID))
+                    await dispatch(updateARcode(responseData.ShowMemberInfo[0]))
 
                     await dispatch(updateMB_LOGIN_GUID(MB_LOGIN_GUID))
                     const NewKey = { ...configToken, Phone: PhoneParm, MB_PW: PasswordParm, logined: 'true' }
                     await Keychain.setGenericPassword("config", JSON.stringify(NewKey))
-                    await setLoading(false)
+                    // RNRestart.restart()
                 } else {
                     console.log('Function Parameter Required'); 
                     let temp_error = 'error_ser.' + json.ResponseCode;
@@ -140,7 +143,7 @@ const LoginScreen = () => {
                 console.log('ERROR ' + error);
             });
     }
-
+   
     return (
         (
             <ScrollView>
@@ -187,7 +190,6 @@ const LoginScreen = () => {
                                 height: deviceWidth / 1.5,
                                 resizeMode: 'contain',
                             }}
-                            resizeMode={'contain'}
                             source={require('../img/LogoBplusMember.png')}
                         />
                     </View>
@@ -237,7 +239,6 @@ const LoginScreen = () => {
                                         height: 30,
                                         resizeMode: 'contain',
                                     }}
-                                    resizeMode={'contain'}
                                     source={showPassword ? require('../img/iconsMenu/eye.png') : require('../img/iconsMenu/eye-off.png')}
                                 />
                             </TouchableOpacity>
@@ -315,10 +316,12 @@ const LoginScreen = () => {
 
                 </View>
                 <View style={{
+
                     width: deviceWidth,
                     position: 'absolute',
                     alignItems: 'flex-end',
-                    padding: 10
+                    paddingTop:statusBarHeight,
+                    paddingRight: 10
                 }}>
                     <TouchableOpacity
                         style={{
@@ -335,7 +338,6 @@ const LoginScreen = () => {
                                 height: 30,
                                 resizeMode: 'contain',
                             }}
-                            resizeMode={'contain'}
                             source={require('../img/iconsMenu/world.png')}
                         />
 
